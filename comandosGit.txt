@@ -1,0 +1,89 @@
+VIDEOS: https://youtu.be/ILgZt8Ee_PU?si=CAvq5A33cP-caFn8
+https://youtu.be/VdGzPZ31ts8?si=YwZ63zKgcZSP9zdt
+		GNU/LINUX(Git Bash)
+----Comandos para directorios(carpetas)----
+-pwd: directorio actual
+-ls: lista de archivos en el directorio actual
+-mkdir: crear un directorio
+-rmdir: eliminar un directorios vacios
+-rm -r: directorio con contenido
+-rm -rf: eliminacion forzada
+-rm -rv: muestra lo que se elimina
+
+----Comandos para archivos----
+
+-touch: crear archivos
+-rm: eliminar un archivo
+-code . : abrir archivo en vscode o un editor de codigo
+-echo: editar archivo directamene en la terminal
+ejemplo: echo "Este es el contenido del archivo" > nombre_archivo.txt
+-nano: editor en la terminal
+ejemplo: nano nombre_archivo.txt y se abre el archivo en la terminal
+Ctrl + O para guardar
+Ctrl + X para salir
+-vim nombre_archivo.txt: editar el archivo con vim en la terminal
+-vimtutor: para aprender a usar vim
+-mv: para cambiar el nombre
+
+----comandos de uso----
+-git status: estado actual del repositorio
+-git add archivo1.txt: agregar solo un archivo
+-git add . :agrega todos los archivos
+-git commit -m "primer commit": comprometer archivos	 	
+-git restore archivo1.txt: recuperar archivos borrados
+-git restore --staged archivo1.txt: quitar el archivo de staged
+Archivo .gitignore para archivos que no queremos subir
+-git status -s: status simplificado
+-git diff: cambios a agregar en el archivo
+-git diff -staged: cambios en la etapa de staged
+-git log: historial del repositorio Q para salir
+-git log --oneline: historial simplificado
+-git branch, mostrar las ramas
+-git checkout -b ramab: hacer una nueva rama
+-git checkout main: cambiar de rama
+-cat archivo2.txt: mostrar archivo
+-git merge ramab: unir la ramab con la master 
+-git branch -D nombre_rama: eliminar rama
+
+------Poner el código de GitHub en local------------
+-git checkout 2daparteWIFI
+-git fetch origin
+-git reset --hard origin/2daparteWIFI
+-git clean -df
+
+----Subir el código a github---------
+-crear nuevo repositorio en GitHub
+-coipiar esto: git remote add origin https://github.com/Dimasa5/Tankold-app.git
+-git checkout -b TankoldBLE: crear la rama
+-git push -u origin master: para subir la rama al repositorio 
+-git push: para subir cambios después de git add y git commit
+
+-------descargar repositorio de GitHub al local--------------
+
+-git init
+-git remote add origin https://github.com/usuario/repositorio.git
+-git fetch origin
+-git reset --hard origin/main  # o tu rama principal
+
+
+        POWERSHELL
+----Comandos para directorios (carpetas)----
+-Get-Location o pwd: directorio actual
+-Get-ChildItem o ls: lista de archivos en el directorio actual
+-New-Item -ItemType Directory -Name <nombre> o mkdir: crear un directorio
+-Remove-Item <nombre> o rmdir: eliminar un directorio vacío
+-Remove-Item -Recurse <nombre> o rm -r: directorio con contenido
+-Remove-Item -Recurse -Force <nombre> o rm -rf: eliminación forzada
+-Remove-Item -Recurse -Verbose <nombre> o rm -rv: muestra lo que se elimina
+
+----Comandos para archivos----
+-New-Item -ItemType File -Name <nombre> o touch: crear archivos
+-Remove-Item <nombre> o rm: eliminar un archivo
+-code . : abrir archivo en VSCode o un editor de código
+-echo o Write-Output: editar archivo directamente en la terminal
+Ejemplo: echo "Este es el contenido del archivo" > nombre_archivo.txt
+-notepad <nombre> o nano: editor en la terminal
+Ejemplo: notepad nombre_archivo.txt (abre el archivo en el Bloc de notas)
+-Ctrl + S para guardar, Ctrl + X para salir (en Bloc de notas)
+-vim nombre_archivo.txt: editar el archivo con vim en la terminal (requiere instalación previa)
+-vimtutor: para aprender a usar vim (requiere instalación previa)
