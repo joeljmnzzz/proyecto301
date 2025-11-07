@@ -21,6 +21,14 @@
       "herramientas": "Tools"
     }
   },
+  "login": {
+    "titulo": "Login",
+    "correo": "Email",
+    "contrasena": "Password",
+    "boton": "Sign In",
+    "noCuenta": "Don't have an account?",
+    "registrate": "Sign Up"
+  },
   "footer": {
     "texto": "© 2025 Proyecto 301 — Creative development community"
   }

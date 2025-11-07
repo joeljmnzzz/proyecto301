@@ -21,6 +21,14 @@
       "herramientas": "Herramientas"
     }
   },
+  "login": {
+    "titulo": "Iniciar sesión",
+    "correo": "Correo electrónico",
+    "contrasena": "Contraseña",
+    "boton": "Entrar",
+    "noCuenta": "¿No tienes cuenta?",
+    "registrate": "Regístrate"
+  },
   "footer": {
     "texto": "© 2025 Proyecto 301 — Comunidad de desarrollo creativo"
   }

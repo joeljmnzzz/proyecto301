@@ -1,3 +1,5 @@
+// i18n.js
+
 const defaultLang = 'es';
 let currentLang = defaultLang;
 let translations = {};
@@ -5,11 +7,14 @@ let translations = {};
 // Cargar JSON de idioma
 async function loadLanguage(lang) {
   try {
-    // ✅ Cambiado i18n/ a languages/
     const res = await fetch(`languages/${lang}.json`);
     if (!res.ok) throw new Error(`No se pudo cargar ${lang}.json`);
     translations = await res.json();
     currentLang = lang;
+
+    // Guardar idioma seleccionado
+    localStorage.setItem('selectedLang', lang);
+
     updateTexts();
   } catch (err) {
     console.error(`Error loading language ${lang}:`, err);
@@ -18,6 +23,7 @@ async function loadLanguage(lang) {
 
 // Actualizar todos los textos
 function updateTexts() {
+  // Elementos con data-key
   document.querySelectorAll('[data-key]').forEach(el => {
     const keys = el.getAttribute('data-key').split('.');
     let text = translations;
@@ -27,6 +33,7 @@ function updateTexts() {
     if (text) el.textContent = text;
   });
 
+  // Elementos con data-key-placeholder
   document.querySelectorAll('[data-key-placeholder]').forEach(el => {
     const keys = el.getAttribute('data-key-placeholder').split('.');
     let text = translations;
@@ -42,26 +49,39 @@ function updateTexts() {
     if (logo) logo.alt = translations.navbar.logoAlt;
   }
 
-  // Animación del título
+  // Animación del título principal (main)
   if (translations.main && translations.main.titulo) {
     if (window.startTypingAnimation) {
       window.startTypingAnimation(translations.main.titulo);
     }
   }
+
+  // Traducir login si existe
+  if (translations.login) {
+    const loginTitle = document.querySelector('.login-box h1');
+    if (loginTitle && translations.login.titulo) loginTitle.textContent = translations.login.titulo;
+
+    const emailInput = document.querySelector('input[name="email"]');
+    if (emailInput && translations.login.correo) emailInput.placeholder = translations.login.correo;
+
+    const passwordInput = document.querySelector('input[name="password"]');
+    if (passwordInput && translations.login.contrasena) passwordInput.placeholder = translations.login.contrasena;
+
+    const loginButton = document.querySelector('.login-box button[type="submit"]');
+    if (loginButton && translations.login.boton) loginButton.textContent = translations.login.boton;
+
+    const registerText = document.querySelector('.login-box p');
+    if (registerText && translations.login.noCuenta && translations.login.registrate) {
+      registerText.innerHTML = `${translations.login.noCuenta} <a href="#">${translations.login.registrate}</a>`;
+    }
+  }
 }
 
-// Cambiar idioma al hacer clic en la bandera
-document.querySelectorAll('.flag-option').forEach(option => {
-  option.addEventListener('click', () => {
-    const country = option.getAttribute('data-country');
-    let lang = 'es';
-    if (country === 'us') lang = 'en';
-    if (country === 'de') lang = 'de';
-    loadLanguage(lang);
-  });
-});
+// Exportamos la función para usarla desde load-navbar.js
+window.loadLanguage = loadLanguage;
 
-// Inicializar con idioma por defecto
+// Inicializar idioma según localStorage o por defecto
 document.addEventListener('DOMContentLoaded', () => {
-  loadLanguage(defaultLang);
+  const savedLang = localStorage.getItem('selectedLang') || defaultLang;
+  loadLanguage(savedLang);
 });
