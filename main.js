@@ -1,37 +1,33 @@
-const switchModo = document.getElementById("modoSwitch");
-const preferenciaOscura = window.matchMedia("(prefers-color-scheme: dark)");
+document.addEventListener("DOMContentLoaded", function () {
+  const textoElemento = document.getElementById("texto");
+  const texto = "Explora proyectos tecnológicos sobresalientes.";
+  const errorIndex = 8;
+  let i = 0;
+  let errorHecho = false;
 
-// Función para aplicar el modo
-function aplicarModo(modo) {
-  if (modo === "oscuro") {
-    document.body.classList.add("dark-mode");
-    switchModo.checked = true;
-  } else {
-    document.body.classList.remove("dark-mode");
-    switchModo.checked = false;
+  function escribir() {
+    if (i < texto.length) {
+      const velocidad = 40 + Math.random() * 60;
+      textoElemento.textContent += texto.charAt(i);
+      i++;
+
+      // Simula un error natural
+      if (i === errorIndex && !errorHecho) {
+        errorHecho = true;
+        textoElemento.textContent += "x";
+        setTimeout(() => {
+          textoElemento.textContent = textoElemento.textContent.slice(0, -1);
+          setTimeout(() => {
+            textoElemento.textContent += texto.charAt(i - 1);
+            setTimeout(escribir, velocidad);
+          }, 150);
+        }, 400);
+      } else {
+        const pausa = texto.charAt(i - 1) === " " ? 150 : 0;
+        setTimeout(escribir, velocidad + pausa);
+      }
+    }
   }
-}
 
-// 1️⃣ Comprobar si hay un modo guardado en localStorage
-const modoGuardado = localStorage.getItem("modo");
-
-if (modoGuardado) {
-  aplicarModo(modoGuardado);
-} else {
-  // 2️⃣ Si no hay guardado, usar el tema del sistema
-  aplicarModo(preferenciaOscura.matches ? "oscuro" : "claro");
-}
-
-// 3️⃣ Escuchar cambios del sistema (si el usuario cambia tema en su PC)
-preferenciaOscura.addEventListener("change", (evento) => {
-  if (!localStorage.getItem("modo")) {
-    aplicarModo(evento.matches ? "oscuro" : "claro");
-  }
-});
-
-// 4️⃣ Escuchar el cambio manual del usuario
-switchModo.addEventListener("change", () => {
-  const nuevoModo = switchModo.checked ? "oscuro" : "claro";
-  aplicarModo(nuevoModo);
-  localStorage.setItem("modo", nuevoModo);
+  escribir();
 });
