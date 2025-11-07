@@ -1,0 +1,117 @@
+/* === Variables de color === */
+:root {
+  --color-fondo: #ffffff;
+  --color-texto: #000000;
+  --color-acento: linear-gradient(90deg, #ff5757, #8c52ff);
+  --color-navbar: rgba(224, 224, 224, 0.8);
+}
+
+body.dark-mode {
+  --color-fondo: #1f1f1f;
+  --color-texto: #f5f5f5;
+  --color-acento: linear-gradient(90deg, #ff5757, #8c52ff);
+  --color-navbar: rgba(18, 18, 18, 0.8);
+}
+
+/* === Estilos generales === */
+body {
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: Arial, sans-serif;
+  transition: background-color 0.3s, color 0.3s;
+  margin: 0;
+  padding: 0;
+}
+
+/* === Barra de navegación === */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: var(--color-navbar);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  box-sizing: border-box;
+  z-index: 1000;
+}
+
+/* Tamaño base del logo */
+.logo {
+  height: 30px;
+  width: auto;
+  transition: opacity 0.3s ease;
+  padding: 6px 0;
+}
+
+/* Mostrar solo el logo claro por defecto */
+.logo-dark {
+  display: none;
+}
+
+/* Cuando el modo oscuro esté activo */
+body.dark-mode .logo-light {
+  display: none;
+}
+
+body.dark-mode .logo-dark {
+  display: inline-block;
+}
+
+/* === Contenido principal === */
+main {
+  padding: 100px 24px 24px; /* margen uniforme con respecto a navbar */
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* === Estilo del switch === */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 58px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* --- Fondo del switch --- */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+/* --- Círculo interno --- */
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 24px;
+  width: 24px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+/* --- Activado --- */
+input:checked + .slider {
+  background-image: var(--color-acento);
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
