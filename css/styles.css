@@ -45,6 +45,13 @@ body {
   z-index: 1000;
 }
 
+.nav-left,
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
 .logo {
   height: 38px;
   transition: transform 0.3s ease;
@@ -169,4 +176,86 @@ p {
   color: white;
   box-shadow: var(--sombra-acento);
   transform: translateY(-2px);
+}
+
+/* === 🚩 Menú de región === */
+.nav-right {
+  position: relative; /* necesario para posicionar el menú */
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.flag-menu {
+  position: absolute;
+  top: 35px;
+  right: 0;
+  background: rgba(30, 30, 30, 0.9);
+  backdrop-filter: blur(8px);
+  border-radius: 10px;
+  padding: 8px 0;
+  display: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  min-width: 120px;
+}
+
+.flag-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  color: white;
+  font-size: 14px;
+  transition: background 0.2s ease;
+}
+
+.flag-option:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* === 👤 Icono de login minimalista === */
+.login-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-icon i,
+.login-icon svg {
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: var(--color-texto);
+  transition: transform 0.2s ease, color 0.2s ease;
+   margin-left: 20px;
+}
+
+.login-icon i:hover,
+.login-icon svg:hover {
+  transform: scale(1.1);
+  color: #ff5757;
+}
+
+/* === 🔻 Footer === */
+footer {
+  padding: 25px 20px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--color-secundario);
+}
+
+/* === 🔻 Media Queries (responsive) === */
+@media screen and (max-width: 768px) {
+  .navbar {
+    padding: 0 16px;
+  }
+
+  .categorias {
+    gap: 8px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
 }
