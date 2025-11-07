@@ -1,0 +1,27 @@
+{
+  "navbar": {
+    "logoAlt": "Proyecto 301 Logo",
+    "flagMenu": {
+      "mexico": "Mexico",
+      "spain": "Spain",
+      "usa": "USA",
+      "germany": "Germany"
+    }
+  },
+  "main": {
+    "titulo": "Explore outstanding tech projects",
+    "descripcion": "Discover, invest, hire, showcase yourself.",
+    "buscador": {
+      "placeholder": "Search..."
+    },
+    "categorias": {
+      "proyectos": "Projects",
+      "portafolios": "Portfolios",
+      "equipos": "Teams",
+      "herramientas": "Tools"
+    }
+  },
+  "footer": {
+    "texto": "© 2025 Proyecto 301 — Creative development community"
+  }
+}

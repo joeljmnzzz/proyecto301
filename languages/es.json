@@ -1,0 +1,27 @@
+{
+  "navbar": {
+    "logoAlt": "Logo Proyecto 301",
+    "flagMenu": {
+      "mexico": "México",
+      "spain": "España",
+      "usa": "USA",
+      "germany": "Germany"
+    }
+  },
+  "main": {
+    "titulo": "Explora proyectos tecnológicos sobresalientes",
+    "descripcion": "Descubre, invierte, contrata, exponte.",
+    "buscador": {
+      "placeholder": "Buscar..."
+    },
+    "categorias": {
+      "proyectos": "Proyectos",
+      "portafolios": "Portafolios",
+      "equipos": "Equipos",
+      "herramientas": "Herramientas"
+    }
+  },
+  "footer": {
+    "texto": "© 2025 Proyecto 301 — Comunidad de desarrollo creativo"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "navbar": {
+    "logoAlt": "Projekt 301 Logo",
+    "flagMenu": {
+      "mexico": "Mexiko",
+      "spain": "Spanien",
+      "usa": "USA",
+      "germany": "Deutschland"
+    }
+  },
+  "main": {
+    "titulo": "Erkunde herausragende Technologieprojekte",
+    "descripcion": "Entdecken, investieren, einstellen, dich präsentieren.",
+    "buscador": {
+      "placeholder": "Suche..."
+    },
+    "categorias": {
+      "proyectos": "Projekte",
+      "portafolios": "Portfolios",
+      "equipos": "Teams",
+      "herramientas": "Werkzeuge"
+    }
+  },
+  "footer": {
+    "texto": "© 2025 Projekt 301 — Kreative Entwicklergemeinschaft"
+  }
+}

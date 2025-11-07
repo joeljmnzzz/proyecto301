@@ -6,42 +6,74 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <script src="main.js" defer></script>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css">
+  
+  <!-- Agregamos Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <script src="js/main.js" defer></script>
   <title>Proyecto 301</title>
 </head>
 <body>
-  <!-- 🧭 Barra de navegación -->
+  <!--Barra de navegación -->
   <nav class="navbar">
     <div class="nav-left">
-      <img src="assets/logos/logo-darkmode.png" alt="Logo Proyecto 301" class="logo logo-dark">
+      <img src="assets/logos/logo-darkmode.png" alt="Logo Proyecto 301" class="logo logo-dark" id="logo-alt">
+    </div>
+
+    <!--Menú de región + login -->
+    <div class="nav-right">
+
+      <span class="login-icon" title="Login">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+    <circle cx="12" cy="7" r="4"></circle>
+  </svg>
+</span>
+
+      <span class="fi fi-mx" id="flag-btn"></span>
+
+      <div class="flag-menu" id="flag-menu">
+        <div class="flag-option" data-country="mx"><span class="fi fi-mx"></span> <span data-key="navbar.flagMenu.mexico">México</span></div>
+        <div class="flag-option" data-country="es"><span class="fi fi-es"></span> <span data-key="navbar.flagMenu.spain">España</span></div>
+        <div class="flag-option" data-country="us"><span class="fi fi-us"></span> <span data-key="navbar.flagMenu.usa">USA</span></div>
+        <div class="flag-option" data-country="de"><span class="fi fi-de"></span> <span data-key="navbar.flagMenu.germany">Germany</span></div>
+      </div>
+
+      <!-- Icono de login -->
+
     </div>
   </nav>
 
   <!-- 🌌 Contenido principal -->
   <main>
     <h1 id="titulo">
-      <span id="texto"></span><span id="cursor">|</span>
+      <span id="texto" data-key="main.titulo"></span><span id="cursor">|</span>
     </h1>
 
-    <p>Descubre, invierte, contrata, exponte.</p>
+    <p data-key="main.descripcion">Descubre, invierte, contrata, exponte.</p>
 
     <!-- 🔍 Buscador -->
     <div class="buscador">
-      <input type="text" placeholder="Buscar..." class="input-busqueda">
+      <input type="text" placeholder="Buscar..." class="input-busqueda" data-key-placeholder="main.buscador.placeholder">
     </div>
 
     <!-- 🧭 Menú de secciones -->
     <div class="categorias">
-      <button data-section="proyectos">Proyectos</button>
-      <button data-section="portafolios">Portafolios</button>
-      <button data-section="equipos">Equipos</button>
-      <button data-section="herramientas">Herramientas</button>
+      <button data-section="proyectos" data-key="main.categorias.proyectos">Proyectos</button>
+      <button data-section="portafolios" data-key="main.categorias.portafolios">Portafolios</button>
+      <button data-section="equipos" data-key="main.categorias.equipos">Equipos</button>
+      <button data-section="herramientas" data-key="main.categorias.herramientas">Herramientas</button>
     </div>
-
+  </main>
 
   <footer>
-    <p>© 2025 Proyecto 301 — Comunidad de desarrollo creativo</p>
+    <p data-key="footer.texto">© 2025 Proyecto 301 — Comunidad de desarrollo creativo</p>
   </footer>
+
+  <!-- JS de traducción -->
+  <script src="js/i18n.js" defer></script>
 </body>
 </html>
