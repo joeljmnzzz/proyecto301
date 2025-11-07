@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-key="login.titulo">Login - Proyecto 301</title>
+  <link rel="stylesheet" href="css/login.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <script src="js/load-navbar.js" defer></script>
+  <script src="js/i18n.js" defer></script>
+</head>
+<body class="login-page">
+
+  <!-- Navbar placeholder -->
+  <div id="navbar-placeholder"></div>
+
+  <!-- 🌌 Contenedor de login -->
+  <div class="login-container">
+    <div class="ball"></div>
+
+    <div class="login-box">
+      <h1 data-key="login.titulo">Iniciar sesión</h1>
+      <form action="#" method="POST">
+        <input type="email" name="email" placeholder="" data-key-placeholder="login.correo" required>
+        <input type="password" name="password" placeholder="" data-key-placeholder="login.contrasena" required>
+        <button type="submit" data-key="login.boton">Entrar</button>
+      </form>
+      <p>
+        <span data-key="login.noCuenta">¿No tienes cuenta?</span>
+        <a href="#" data-key="login.registrate">Regístrate</a>
+      </p>
+    </div>
+  </div>
+
+</body>
+</html>

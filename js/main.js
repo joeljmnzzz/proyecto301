@@ -1,6 +1,6 @@
 // main.js
 
-// Animación escritura
+// Animación de escritura para el título
 function startTypingAnimation(texto) {
   const textoElemento = document.getElementById("texto");
   textoElemento.textContent = '';
@@ -34,28 +34,5 @@ function startTypingAnimation(texto) {
   escribir();
 }
 
-// Menú Región
-const flagBtn = document.getElementById('flag-btn');
-const flagMenu = document.getElementById('flag-menu');
-
-flagBtn.addEventListener('click', () => {
-  flagMenu.style.display = (flagMenu.style.display === 'block') ? 'none' : 'block';
-});
-
-document.addEventListener('click', (event) => {
-  if (!flagBtn.contains(event.target) && !flagMenu.contains(event.target)) {
-    flagMenu.style.display = 'none';
-  }
-});
-
-// Click en bandera solo cambia la clase visual
-document.querySelectorAll('.flag-option').forEach(op => {
-  op.addEventListener('click', () => {
-    const country = op.dataset.country;
-    flagBtn.className = `fi fi-${country}`;
-    flagMenu.style.display = 'none';
-  });
-});
-
-// Exportamos función para usarla desde i18n.js
+// Exportamos la función para que i18n.js la use
 window.startTypingAnimation = startTypingAnimation;

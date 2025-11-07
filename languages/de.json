@@ -21,6 +21,14 @@
       "herramientas": "Werkzeuge"
     }
   },
+  "login": {
+    "titulo": "Anmelden",
+    "correo": "E-Mail",
+    "contrasena": "Passwort",
+    "boton": "Einloggen",
+    "noCuenta": "Noch keinen Account?",
+    "registrate": "Registrieren"
+  },
   "footer": {
     "texto": "© 2025 Projekt 301 — Kreative Entwicklergemeinschaft"
   }
