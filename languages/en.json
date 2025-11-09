@@ -39,6 +39,29 @@
     "siCuenta": "Already have an account?",
     "iniciaSesion": "Sign In"
   },
+  "auth": {
+    "errors": {
+      "passwordsNoMatch": "Passwords do not match",
+      "passwordTooShort": "Password must be at least 6 characters",
+      "nameRequired": "Please enter your name",
+      "completeAllFields": "Please complete all fields",
+      "emailAlreadyRegistered": "This email is already registered",
+      "invalidCredentials": "Email or password incorrect",
+      "emailNotVerified": "Please verify your email first",
+      "invalidEmail": "Please enter a valid email",
+      "userNotFound": "User not found",
+      "unknownError": "Unknown error",
+      "unexpectedError": "Unexpected error"
+    },
+    "success": {
+      "registrationSuccess": "Registration successful! Please check your email to verify your account.",
+      "loginSuccess": "Welcome, {email}!",
+      "welcome": "Welcome!"
+    },
+    "loading": {
+      "processing": "Processing..."
+    }
+  },
   "footer": {
     "texto": "© 2025 Project 301 — Creative development community"
   }
