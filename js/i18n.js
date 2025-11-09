@@ -57,7 +57,7 @@ function updateTexts() {
   }
 
   // Traducir login si existe
-  if (translations.login) {
+ if (translations.login) {
     const loginTitle = document.querySelector('.login-box h1');
     if (loginTitle && translations.login.titulo) loginTitle.textContent = translations.login.titulo;
 
@@ -70,9 +70,40 @@ function updateTexts() {
     const loginButton = document.querySelector('.login-box button[type="submit"]');
     if (loginButton && translations.login.boton) loginButton.textContent = translations.login.boton;
 
-    const registerText = document.querySelector('.login-box p');
-    if (registerText && translations.login.noCuenta && translations.login.registrate) {
-      registerText.innerHTML = `${translations.login.noCuenta} <a href="#">${translations.login.registrate}</a>`;
+    // SOLUCIÓN: Solo actualizar textos, no reemplazar HTML completo
+    const switchText = document.querySelector('.login-box p span[data-key="login.noCuenta"]');
+    const switchLink = document.querySelector('.login-box a[data-key="login.registrate"]');
+    
+    if (switchText && translations.login.noCuenta) {
+      switchText.textContent = translations.login.noCuenta;
+    }
+    if (switchLink && translations.login.registrate) {
+      switchLink.textContent = translations.login.registrate;
+    }
+  }
+
+  // También actualizar textos de registro si estamos en ese modo
+  if (translations.register) {
+    const registerTitle = document.querySelector('.login-box h1[data-key="register.titulo"]');
+    if (registerTitle && translations.register.titulo) registerTitle.textContent = translations.register.titulo;
+
+    const nameInput = document.querySelector('input[name="name"]');
+    if (nameInput && translations.register.nombre) nameInput.placeholder = translations.register.nombre;
+
+    const confirmInput = document.querySelector('input[name="confirmPassword"]');
+    if (confirmInput && translations.register.confirmarContrasena) confirmInput.placeholder = translations.register.confirmarContrasena;
+
+    const registerButton = document.querySelector('.login-box button[data-key="register.boton"]');
+    if (registerButton && translations.register.boton) registerButton.textContent = translations.register.boton;
+
+    const switchText = document.querySelector('.login-box p span[data-key="register.siCuenta"]');
+    const switchLink = document.querySelector('.login-box a[data-key="register.iniciaSesion"]');
+    
+    if (switchText && translations.register.siCuenta) {
+      switchText.textContent = translations.register.siCuenta;
+    }
+    if (switchLink && translations.register.iniciaSesion) {
+      switchLink.textContent = translations.register.iniciaSesion;
     }
   }
 }

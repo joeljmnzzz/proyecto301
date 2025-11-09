@@ -10,6 +10,7 @@
 
   <script src="js/load-navbar.js" defer></script>
   <script src="js/i18n.js" defer></script>
+  <script src="js/switcher-login.js" defer></script>
 </head>
 <body class="login-page">
 
@@ -29,7 +30,8 @@
       </form>
       <p>
         <span data-key="login.noCuenta">¿No tienes cuenta?</span>
-        <a href="#" data-key="login.registrate">Regístrate</a>
+        <!-- CAMBIO AQUÍ: usar javascript:void(0) en lugar de # -->
+        <a href="javascript:void(0)" data-key="login.registrate">Regístrate</a>
       </p>
     </div>
   </div>
