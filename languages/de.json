@@ -29,6 +29,16 @@
     "noCuenta": "Noch keinen Account?",
     "registrate": "Registrieren"
   },
+  "register": {
+    "titulo": "Registrieren",
+    "nombre": "Vollständiger Name",
+    "correo": "E-Mail",
+    "contrasena": "Passwort",
+    "confirmarContrasena": "Passwort bestätigen",
+    "boton": "Konto erstellen",
+    "siCuenta": "Bereits ein Konto?",
+    "iniciaSesion": "Anmelden"
+  },
   "footer": {
     "texto": "© 2025 Projekt 301 — Kreative Entwicklergemeinschaft"
   }

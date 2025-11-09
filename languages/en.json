@@ -1,6 +1,6 @@
 {
   "navbar": {
-    "logoAlt": "Proyecto 301 Logo",
+    "logoAlt": "Project 301 Logo",
     "flagMenu": {
       "mexico": "Mexico",
       "spain": "Spain",
@@ -10,7 +10,7 @@
   },
   "main": {
     "titulo": "Explore outstanding tech projects",
-    "descripcion": "Discover, invest, hire, showcase yourself.",
+    "descripcion": "Discover, invest, hire, get exposure.",
     "buscador": {
       "placeholder": "Search..."
     },
@@ -29,7 +29,17 @@
     "noCuenta": "Don't have an account?",
     "registrate": "Sign Up"
   },
+  "register": {
+    "titulo": "Register",
+    "nombre": "Full name",
+    "correo": "Email",
+    "contrasena": "Password",
+    "confirmarContrasena": "Confirm password",
+    "boton": "Create account",
+    "siCuenta": "Already have an account?",
+    "iniciaSesion": "Sign In"
+  },
   "footer": {
-    "texto": "© 2025 Proyecto 301 — Creative development community"
+    "texto": "© 2025 Project 301 — Creative development community"
   }
 }
