@@ -28,6 +28,21 @@ body {
   overflow-x: hidden;
 }
 
+.ball {
+  position: absolute;
+  top: 100vh;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  width: min(300px, 80vw);
+  height: min(300px, 80vw);
+  background: url('/assets/elements/gradient-ball.png') no-repeat center center;
+  background-size: cover;
+  filter: blur(60px);
+  border-radius: 50%;
+  z-index: 1;
+  /* SIN ANIMACIÓN */
+}
+
 /* === 🚀 Navbar === */
 .navbar {
   position: fixed;

@@ -11,6 +11,9 @@
   <script src="js/load-navbar.js" defer></script>
   <script src="js/i18n.js" defer></script>
   <script src="js/switcher-login.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="js/supabase-client.js" defer></script>
+  <script src="js/auth.js" defer></script>
 </head>
 <body class="login-page">
 
@@ -21,20 +24,22 @@
   <div class="login-container">
     <div class="ball"></div>
 
-    <div class="login-box">
-      <h1 data-key="login.titulo">Iniciar sesión</h1>
-      <form action="#" method="POST">
-        <input type="email" name="email" placeholder="" data-key-placeholder="login.correo" required>
-        <input type="password" name="password" placeholder="" data-key-placeholder="login.contrasena" required>
-        <button type="submit" data-key="login.boton">Entrar</button>
-      </form>
-      <p>
-        <span data-key="login.noCuenta">¿No tienes cuenta?</span>
-        <!-- CAMBIO AQUÍ: usar javascript:void(0) en lugar de # -->
-        <a href="javascript:void(0)" data-key="login.registrate">Regístrate</a>
-      </p>
-    </div>
-  </div>
+<div class="login-box">
+  <h1 data-key="login.titulo">Iniciar sesión</h1>
+  <form action="#" method="POST">
+    <input type="email" name="email" placeholder="" data-key-placeholder="login.correo" required>
+    <input type="password" name="password" placeholder="" data-key-placeholder="login.contrasena" required>
+    
+    <!-- CONTENEDOR DE MENSAJES - NUEVO -->
+    <div class="message-container"></div>
+    
+    <button type="submit" data-key="login.boton">Entrar</button>
+  </form>
+  <p>
+    <span data-key="login.noCuenta">¿No tienes cuenta?</span>
+    <a href="javascript:void(0)" data-key="login.registrate">Regístrate</a>
+  </p>
+</div>
 
 </body>
 </html>

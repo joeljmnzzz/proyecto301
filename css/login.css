@@ -30,7 +30,7 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 80px 20px 40px; /* Aumentado padding superior para navbar */
   overflow: hidden;
 }
 
@@ -47,6 +47,18 @@ body, html {
   filter: blur(60px);
   border-radius: 50%;
   z-index: 1;
+  animation: ballMoveUp 1s ease-out forwards;
+}
+
+@keyframes ballMoveUp {
+  from {
+    top: 100vh;
+    transform: translateX(-50%) translateY(-50%);
+  }
+  to {
+    top: -150px;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 /* === 📦 Caja de login === */
@@ -73,6 +85,9 @@ body, html {
   
   /* Prevenir desbordamiento */
   box-sizing: border-box;
+  
+  /* Asegurar que siempre sea visible */
+  margin-top: 20px; /* Espacio extra para evitar que se oculte */
 }
 
 .login-box h1 {
@@ -221,18 +236,99 @@ body, html {
   animation: slideInUp 0.3s ease forwards;
 }
 
+/* === 📝 Contenedor de mensajes - MEJORADO === */
+.message-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* Eliminamos el margin fijo y min-height */
+  margin: 0;
+  min-height: 0;
+  /* Hacemos que solo ocupe espacio cuando hay mensajes */
+  height: auto;
+  transition: all 0.3s ease;
+}
+
+/* Cuando el contenedor está vacío, lo ocultamos completamente */
+.message-container:empty {
+  display: none;
+}
+
+/* Cuando tiene mensajes, agregamos margen */
+.message-container:not(:empty) {
+  margin: 15px 0;
+  min-height: auto;
+}
+
+.message {
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  animation: messageSlideIn 0.3s ease;
+  backdrop-filter: blur(10px);
+  border: 1px solid transparent;
+  /* Aseguramos que los mensajes tengan buen espaciado */
+  margin: 0;
+}
+
+.message.error {
+  background: rgba(255, 87, 87, 0.1);
+  color: #ff5757;
+  border-color: rgba(255, 87, 87, 0.2);
+}
+
+.message.success {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+  border-color: rgba(76, 175, 80, 0.2);
+}
+
+.message.warning {
+  background: rgba(255, 152, 0, 0.1);
+  color: #ff9800;
+  border-color: rgba(255, 152, 0, 0.2);
+}
+
+/* Animación específica para mensajes (para evitar conflicto) */
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Efecto de desvanecimiento al eliminar mensajes */
+.message.fade-out {
+  animation: messageFadeOut 0.3s ease forwards;
+}
+
+@keyframes messageFadeOut {
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+    height: 0;
+    padding: 0;
+    margin: 0;
+  }
+}
+
 /* === 🔻 Responsive mejorado === */
 @media screen and (max-width: 480px) {
   .login-container {
-    padding: 15px;
+    padding: 70px 15px 30px; /* Ajustado para móviles */
     align-items: flex-start;
-    padding-top: 60px;
   }
   
   .login-box {
     padding: 30px 20px;
     max-width: 95vw;
-    margin-top: 20px;
+    margin-top: 10px; /* Reducido en móviles */
   }
 
   .ball {
@@ -260,13 +356,13 @@ body, html {
 /* Para pantallas muy pequeñas (móviles pequeños) */
 @media screen and (max-width: 320px) {
   .login-container {
-    padding: 10px;
-    padding-top: 40px;
+    padding: 60px 10px 20px; /* Ajustado para móviles pequeños */
   }
   
   .login-box {
     padding: 25px 15px;
     border-radius: 16px;
+    margin-top: 5px;
   }
   
   .ball {

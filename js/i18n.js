@@ -16,6 +16,10 @@ async function loadLanguage(lang) {
     localStorage.setItem('selectedLang', lang);
 
     updateTexts();
+    
+    // EXPONER TRADUCCIONES GLOBALMENTE PARA AUTH.JS
+    window.translations = translations;
+    
   } catch (err) {
     console.error(`Error loading language ${lang}:`, err);
   }

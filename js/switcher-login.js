@@ -40,125 +40,187 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Manejar el envío del formulario - solo prevenir envío por defecto
-    function handleFormSubmit(e) {
-        e.preventDefault();
-        // La lógica de autenticación se manejará en otro archivo
-        console.log('Formulario enviado - modo:', isLoginMode ? 'login' : 'registro');
-    }
+
+function handleFormSubmit(e) {
+    e.preventDefault();
     
-    // Función para cambiar a modo registro con animación
-    function switchToRegister() {
-        if (isAnimating) return;
-        isAnimating = true;
-        
-        const loginBox = document.querySelector('.login-box');
-        const loginTitle = loginBox.querySelector('h1');
-        const loginForm = loginBox.querySelector('form');
-        const loginButton = loginBox.querySelector('button[type="submit"]');
-        const switchLink = loginBox.querySelector('a[data-key="login.registrate"]');
-        const switchText = loginBox.querySelector('p span[data-key="login.noCuenta"]');
-        
-        // Animación de fade out
-        loginBox.style.opacity = '0';
-        loginBox.style.transform = 'translateX(-20px)';
-        
-        setTimeout(() => {
-            // Cambiar atributos de datos para i18n
-            if (loginTitle) loginTitle.setAttribute('data-key', 'register.titulo');
-            if (switchText) switchText.setAttribute('data-key', 'register.siCuenta');
-            if (switchLink) switchLink.setAttribute('data-key', 'register.iniciaSesion');
-            if (loginButton) loginButton.setAttribute('data-key', 'register.boton');
-            
-            // Modificar el formulario
-            if (loginForm) {
-                loginForm.innerHTML = '';
-                
-                // Campos para registro
-                const nameField = createInputField('text', 'name', 'register.nombre', 'Nombre completo');
-                const emailField = createInputField('email', 'email', 'login.correo', 'Correo electrónico');
-                const passwordField = createInputField('password', 'password', 'login.contrasena', 'Contraseña');
-                const confirmPasswordField = createInputField('password', 'confirmPassword', 'register.confirmarContrasena', 'Confirmar contraseña');
-                
-                loginForm.appendChild(nameField);
-                loginForm.appendChild(emailField);
-                loginForm.appendChild(passwordField);
-                loginForm.appendChild(confirmPasswordField);
-                loginForm.appendChild(loginButton);
-            }
-            
-            // Actualizar textos
-            if (window.updateTexts) {
-                window.updateTexts();
-            }
-            
-            // Re-inicializar los listeners
-            initializeSwitcher();
-            
-            // Animación de fade in
-            setTimeout(() => {
-                loginBox.style.opacity = '1';
-                loginBox.style.transform = 'translateX(0)';
-                isAnimating = false;
-                isLoginMode = false;
-            }, 50);
-            
-        }, 300);
-    }
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
     
-    // Función para cambiar a modo login con animación
-    function switchToLogin() {
-        if (isAnimating) return;
-        isAnimating = true;
-        
-        const loginBox = document.querySelector('.login-box');
-        const loginTitle = loginBox.querySelector('h1');
-        const loginForm = loginBox.querySelector('form');
-        const loginButton = loginBox.querySelector('button[type="submit"]');
-        const switchLink = loginBox.querySelector('a[data-key="register.iniciaSesion"]');
-        const switchText = loginBox.querySelector('p span[data-key="register.siCuenta"]');
-        
-        // Animación de fade out
-        loginBox.style.opacity = '0';
-        loginBox.style.transform = 'translateX(20px)';
-        
-        setTimeout(() => {
-            // Restaurar atributos de datos para i18n
-            if (loginTitle) loginTitle.setAttribute('data-key', 'login.titulo');
-            if (switchText) switchText.setAttribute('data-key', 'login.noCuenta');
-            if (switchLink) switchLink.setAttribute('data-key', 'login.registrate');
-            if (loginButton) loginButton.setAttribute('data-key', 'login.boton');
-            
-            // Restaurar formulario de login
-            if (loginForm) {
-                loginForm.innerHTML = '';
-                
-                const emailField = createInputField('email', 'email', 'login.correo', 'Correo electrónico');
-                const passwordField = createInputField('password', 'password', 'login.contrasena', 'Contraseña');
-                
-                loginForm.appendChild(emailField);
-                loginForm.appendChild(passwordField);
-                loginForm.appendChild(loginButton);
-            }
-            
-            // Actualizar textos
-            if (window.updateTexts) {
-                window.updateTexts();
-            }
-            
-            // Re-inicializar los listeners
-            initializeSwitcher();
-            
-            // Animación de fade in
-            setTimeout(() => {
-                loginBox.style.opacity = '1';
-                loginBox.style.transform = 'translateX(0)';
-                isAnimating = false;
-                isLoginMode = true;
-            }, 50);
-            
-        }, 300);
+    console.log('📤 Formulario enviado:', data);
+    
+    if (isLoginMode) {
+        // Modo login - usar la nueva función
+        authManager.loginUser(data.email, data.password);
+    } else {
+        // Modo registro
+        authManager.registerUser(data);
     }
+}
+    
+   // Función para cambiar a modo registro con animación - MEJORADA
+function switchToRegister() {
+    if (isAnimating) return;
+    isAnimating = true;
+    
+    const loginBox = document.querySelector('.login-box');
+    const loginTitle = loginBox.querySelector('h1');
+    const loginForm = loginBox.querySelector('form');
+    const loginButton = loginBox.querySelector('button[type="submit"]');
+    const switchLink = loginBox.querySelector('a[data-key="login.registrate"]');
+    const switchText = loginBox.querySelector('p span[data-key="login.noCuenta"]');
+    
+    // Animación de fade out
+    loginBox.style.opacity = '0';
+    loginBox.style.transform = 'translateX(-20px)';
+    
+    setTimeout(() => {
+        // Cambiar atributos de datos para i18n
+        if (loginTitle) loginTitle.setAttribute('data-key', 'register.titulo');
+        if (switchText) switchText.setAttribute('data-key', 'register.siCuenta');
+        if (switchLink) switchLink.setAttribute('data-key', 'register.iniciaSesion');
+        if (loginButton) loginButton.setAttribute('data-key', 'register.boton');
+        
+        // Modificar el formulario - MEJORADO: preservar contenedor de mensajes
+        if (loginForm) {
+            // Guardar el contenedor de mensajes si existe
+            const existingMessageContainer = loginForm.querySelector('.message-container');
+            
+            // Limpiar mensajes existentes al cambiar de modo
+            if (existingMessageContainer) {
+                existingMessageContainer.innerHTML = ''; // Limpiar todos los mensajes
+            }
+            
+            // Limpiar el formulario pero preservar el botón
+            const formChildren = Array.from(loginForm.children);
+            const preservedElements = formChildren.filter(child => 
+                child.classList.contains('message-container') || child.tagName === 'BUTTON'
+            );
+            
+            loginForm.innerHTML = '';
+            
+            // Campos para registro
+            const nameField = createInputField('text', 'name', 'register.nombre', 'Nombre completo');
+            const emailField = createInputField('email', 'email', 'login.correo', 'Correo electrónico');
+            const passwordField = createInputField('password', 'password', 'login.contrasena', 'Contraseña');
+            const confirmPasswordField = createInputField('password', 'confirmPassword', 'register.confirmarContrasena', 'Confirmar contraseña');
+            
+            loginForm.appendChild(nameField);
+            loginForm.appendChild(emailField);
+            loginForm.appendChild(passwordField);
+            loginForm.appendChild(confirmPasswordField);
+            
+            // Restaurar o crear el contenedor de mensajes
+            if (existingMessageContainer) {
+                loginForm.appendChild(existingMessageContainer);
+            } else {
+                const messageContainer = document.createElement('div');
+                messageContainer.className = 'message-container';
+                loginForm.appendChild(messageContainer);
+            }
+            
+            // Agregar el botón al final
+            loginForm.appendChild(loginButton);
+        }
+        
+        // Actualizar textos
+        if (window.updateTexts) {
+            window.updateTexts();
+        }
+        
+        // Re-inicializar los listeners
+        initializeSwitcher();
+        
+        // Animación de fade in
+        setTimeout(() => {
+            loginBox.style.opacity = '1';
+            loginBox.style.transform = 'translateX(0)';
+            isAnimating = false;
+            isLoginMode = false;
+        }, 50);
+        
+    }, 300);
+}
+
+// Función para cambiar a modo login con animación - MEJORADA
+function switchToLogin() {
+    if (isAnimating) return;
+    isAnimating = true;
+    
+    const loginBox = document.querySelector('.login-box');
+    const loginTitle = loginBox.querySelector('h1');
+    const loginForm = loginBox.querySelector('form');
+    const loginButton = loginBox.querySelector('button[type="submit"]');
+    const switchLink = loginBox.querySelector('a[data-key="register.iniciaSesion"]');
+    const switchText = loginBox.querySelector('p span[data-key="register.siCuenta"]');
+    
+    // Animación de fade out
+    loginBox.style.opacity = '0';
+    loginBox.style.transform = 'translateX(20px)';
+    
+    setTimeout(() => {
+        // Restaurar atributos de datos para i18n
+        if (loginTitle) loginTitle.setAttribute('data-key', 'login.titulo');
+        if (switchText) switchText.setAttribute('data-key', 'login.noCuenta');
+        if (switchLink) switchLink.setAttribute('data-key', 'login.registrate');
+        if (loginButton) loginButton.setAttribute('data-key', 'login.boton');
+        
+        // Restaurar formulario de login - MEJORADO: preservar contenedor de mensajes
+        if (loginForm) {
+            // Guardar el contenedor de mensajes si existe
+            const existingMessageContainer = loginForm.querySelector('.message-container');
+            
+            // Limpiar mensajes existentes al cambiar de modo
+            if (existingMessageContainer) {
+                existingMessageContainer.innerHTML = ''; // Limpiar todos los mensajes
+            }
+            
+            // Limpiar el formulario pero preservar el botón
+            const formChildren = Array.from(loginForm.children);
+            const preservedElements = formChildren.filter(child => 
+                child.classList.contains('message-container') || child.tagName === 'BUTTON'
+            );
+            
+            loginForm.innerHTML = '';
+            
+            const emailField = createInputField('email', 'email', 'login.correo', 'Correo electrónico');
+            const passwordField = createInputField('password', 'password', 'login.contrasena', 'Contraseña');
+            
+            loginForm.appendChild(emailField);
+            loginForm.appendChild(passwordField);
+            
+            // Restaurar o crear el contenedor de mensajes
+            if (existingMessageContainer) {
+                loginForm.appendChild(existingMessageContainer);
+            } else {
+                const messageContainer = document.createElement('div');
+                messageContainer.className = 'message-container';
+                loginForm.appendChild(messageContainer);
+            }
+            
+            // Agregar el botón al final
+            loginForm.appendChild(loginButton);
+        }
+        
+        // Actualizar textos
+        if (window.updateTexts) {
+            window.updateTexts();
+        }
+        
+        // Re-inicializar los listeners
+        initializeSwitcher();
+        
+        // Animación de fade in
+        setTimeout(() => {
+            loginBox.style.opacity = '1';
+            loginBox.style.transform = 'translateX(0)';
+            isAnimating = false;
+            isLoginMode = true;
+        }, 50);
+        
+    }, 300);
+}
+
     
     // Función auxiliar para crear campos de entrada
     function createInputField(type, name, dataKey, placeholder) {
