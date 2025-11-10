@@ -129,10 +129,16 @@ async function loadPublicProjects(searchTerm = '') {
       .eq('visibility', 'public')
       .order('created_at', { ascending: false });
 
-    // Aplicar filtro de búsqueda si existe
+    // 🔥 CORRECCIÓN: Aplicar filtro de búsqueda de forma segura
     if (searchTerm && searchTerm.trim() !== '') {
       console.log('🔍 Buscando:', searchTerm);
-      query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,technologies.cs.{${searchTerm}}`);
+      
+      // 🔥 OPCIÓN 1: Solo buscar en título y descripción (más seguro)
+      query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+      
+      // 🔥 OPCIÓN 2: Si quieres buscar en tecnologías también, usa esta sintaxis:
+      // query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
+      //          .contains('technologies', [searchTerm.toLowerCase()]);
     }
 
     const { data: projects, error } = await query;
@@ -496,56 +502,39 @@ function displayProjectsByCategory(categories, searchTerm = '') {
   }
 }
 
-// 🔥 FUNCIÓN: Configurar event listeners
+// 🔧 FUNCIÓN: Configurar event listeners
 function setupEventListeners() {
-  // Buscador
-  const searchInput = document.getElementById('search-input');
-  if (searchInput) {
-    let searchTimeout;
-    searchInput.addEventListener('input', (e) => {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(() => {
-        loadPublicProjects(e.target.value.trim());
-      }, 500);
+    // Navegación entre secciones
+    const sectionButtons = document.querySelectorAll('.categorias button');
+    sectionButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            // Remover clase active de todos los botones
+            sectionButtons.forEach(btn => btn.classList.remove('active'));
+            // Agregar clase active al botón clickeado
+            e.target.classList.add('active');
+            
+            const section = e.target.getAttribute('data-section');
+            console.log('Cambiando a sección:', section);
+            
+            if (section === 'proyectos') {
+                loadPublicProjects();
+            }
+        });
     });
-  }
-  
-  // Navegación entre secciones
-  const sectionButtons = document.querySelectorAll('.categorias button');
-  sectionButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
-      // Remover clase active de todos los botones
-      sectionButtons.forEach(btn => btn.classList.remove('active'));
-      // Agregar clase active al botón clickeado
-      e.target.classList.add('active');
-      
-      // Aquí puedes implementar la carga de diferentes secciones
-      const section = e.target.getAttribute('data-section');
-      console.log('Cambiando a sección:', section);
-      
-      // Por ahora, solo manejamos proyectos
-      if (section === 'proyectos') {
-        loadPublicProjects();
-      }
-    });
-  });
 }
 
 // 🔥 FUNCIÓN: Conectar acciones de proyectos
 function connectProjectActions() {
-  const viewButtons = document.querySelectorAll('.btn-view-project');
-  viewButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
-      const slug = e.currentTarget.getAttribute('data-project-slug');
-      if (slug) {
-        // Mostrar spinner de carga
-        if (window.universalSpinner) {
-          universalSpinner.show('Cargando proyecto...');
-        }
-        window.location.href = `/proyectos/${slug}`;
-      }
+    const viewButtons = document.querySelectorAll('.btn-view-project');
+    viewButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            const slug = e.currentTarget.getAttribute('data-project-slug');
+            if (slug) {
+                // 🔥 NAVEGAR A LA URL CORRECTA PARA NETLIFY
+                window.location.href = `/proyectos/${slug}`;
+            }
+        });
     });
-  });
 }
 
 // 🔥 FUNCIONES AUXILIARES
