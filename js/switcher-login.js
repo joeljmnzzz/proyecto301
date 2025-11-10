@@ -1,287 +1,301 @@
-// switcher-login.js - Sistema de alternancia entre login y registro con animaciones
+// switcher-login.js
 document.addEventListener('DOMContentLoaded', function() {
-    // Estados
-    let isLoginMode = true;
-    let isAnimating = false;
+    console.log('🔄 Switcher Login cargado');
     
-    // Función para inicializar o reinicializar los event listeners
-    function initializeSwitcher() {
-        const loginBox = document.querySelector('.login-box');
-        if (!loginBox) return;
-        
-        const switchLink = loginBox.querySelector('a[data-key="login.registrate"], a[data-key="register.iniciaSesion"]');
-        const loginForm = loginBox.querySelector('form');
-        
-        if (!switchLink) return;
-        
-        // Remover event listeners anteriores para evitar duplicados
-        const newSwitchLink = switchLink.cloneNode(true);
-        switchLink.parentNode.replaceChild(newSwitchLink, switchLink);
-        
-        // Agregar event listener al nuevo enlace
-        newSwitchLink.addEventListener('click', handleSwitchClick);
-        
-        // También para el formulario - solo prevenir envío por defecto
-        if (loginForm) {
-            loginForm.removeEventListener('submit', handleFormSubmit);
-            loginForm.addEventListener('submit', handleFormSubmit);
-        }
+    // Esperar a que las traducciones estén cargadas
+    if (!window.translations) {
+        setTimeout(() => {
+            document.dispatchEvent(new Event('DOMContentLoaded'));
+        }, 100);
+        return;
     }
-    
-    // Manejar el clic en el enlace de alternancia
-    function handleSwitchClick(e) {
-        e.preventDefault();
-        if (isAnimating) return;
-        
-        if (isLoginMode) {
-            switchToRegister();
-        } else {
-            switchToLogin();
-        }
-    }
-    
 
-function handleFormSubmit(e) {
+    initializeFormSwitcher();
+    initializeFormHandlers();
+});
+
+function initializeFormSwitcher() {
+    const switchLinks = document.querySelectorAll('.switch-form');
+    
+    switchLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetForm = this.getAttribute('data-form');
+            switchForm(targetForm);
+        });
+    });
+
+    // ✅ CORREGIDO: Botón para omitir perfil - SOLO SI ESTÁ AUTENTICADO
+    const skipProfileBtn = document.getElementById('skip-profile-btn');
+    if (skipProfileBtn) {
+        skipProfileBtn.addEventListener('click', async function() {
+            console.log('⏭️ Intentando omitir perfil...');
+            if (window.authManager) {
+                await authManager.skipProfileCompletion();
+            } else {
+                console.error('❌ AuthManager no disponible');
+            }
+        });
+    }
+}
+
+function switchForm(formType) {
+    const loginContainer = document.getElementById('login-form-container');
+    const registerBasicContainer = document.getElementById('register-basic-container');
+    const registerCompleteContainer = document.getElementById('register-complete-container');
+    
+    // Ocultar todos los formularios primero
+    loginContainer.style.display = 'none';
+    registerBasicContainer.style.display = 'none';
+    registerCompleteContainer.style.display = 'none';
+    
+    // Mostrar el formulario correspondiente
+    if (formType === 'login') {
+        loginContainer.style.display = 'block';
+        console.log('🔁 Cambiando a formulario de login');
+    } else if (formType === 'register-basic') {
+        registerBasicContainer.style.display = 'block';
+        console.log('🔁 Cambiando a formulario de registro básico');
+    } else if (formType === 'register-complete') {
+        registerCompleteContainer.style.display = 'block';
+        console.log('🔁 Cambiando a formulario de registro completo');
+    }
+    
+    // Limpiar mensajes anteriores
+    clearMessages();
+}
+
+function initializeFormHandlers() {
+    // Manejar envío del formulario de login
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleLoginSubmit);
+    }
+    
+    // Manejar envío del formulario de registro básico
+    const registerBasicForm = document.getElementById('register-basic-form');
+    if (registerBasicForm) {
+        registerBasicForm.addEventListener('submit', handleRegisterBasicSubmit);
+    }
+    
+    // ✅ CORREGIDO: Manejar envío del formulario de registro completo
+    const registerCompleteForm = document.getElementById('register-complete-form');
+    if (registerCompleteForm) {
+        registerCompleteForm.addEventListener('submit', handleRegisterCompleteSubmit);
+    }
+}
+
+async function handleLoginSubmit(e) {
     e.preventDefault();
+    console.log('🔐 Procesando login...');
     
     const formData = new FormData(e.target);
-    const data = Object.fromEntries(formData);
+    const email = formData.get('email');
+    const password = formData.get('password');
     
-    console.log('📤 Formulario enviado:', data);
-    
-    if (isLoginMode) {
-        // Modo login - usar la nueva función
-        authManager.loginUser(data.email, data.password);
+    if (window.authManager) {
+        await authManager.loginUser(email, password);
     } else {
-        // Modo registro
-        authManager.registerUser(data);
+        console.error('❌ AuthManager no disponible');
     }
-}
-    
-   // Función para cambiar a modo registro con animación - MEJORADA
-function switchToRegister() {
-    if (isAnimating) return;
-    isAnimating = true;
-    
-    const loginBox = document.querySelector('.login-box');
-    const loginTitle = loginBox.querySelector('h1');
-    const loginForm = loginBox.querySelector('form');
-    const loginButton = loginBox.querySelector('button[type="submit"]');
-    const switchLink = loginBox.querySelector('a[data-key="login.registrate"]');
-    const switchText = loginBox.querySelector('p span[data-key="login.noCuenta"]');
-    
-    // Animación de fade out
-    loginBox.style.opacity = '0';
-    loginBox.style.transform = 'translateX(-20px)';
-    
-    setTimeout(() => {
-        // Cambiar atributos de datos para i18n
-        if (loginTitle) loginTitle.setAttribute('data-key', 'register.titulo');
-        if (switchText) switchText.setAttribute('data-key', 'register.siCuenta');
-        if (switchLink) switchLink.setAttribute('data-key', 'register.iniciaSesion');
-        if (loginButton) loginButton.setAttribute('data-key', 'register.boton');
-        
-        // Modificar el formulario - MEJORADO: preservar contenedor de mensajes
-        if (loginForm) {
-            // Guardar el contenedor de mensajes si existe
-            const existingMessageContainer = loginForm.querySelector('.message-container');
-            
-            // Limpiar mensajes existentes al cambiar de modo
-            if (existingMessageContainer) {
-                existingMessageContainer.innerHTML = ''; // Limpiar todos los mensajes
-            }
-            
-            // Limpiar el formulario pero preservar el botón
-            const formChildren = Array.from(loginForm.children);
-            const preservedElements = formChildren.filter(child => 
-                child.classList.contains('message-container') || child.tagName === 'BUTTON'
-            );
-            
-            loginForm.innerHTML = '';
-            
-            // Campos para registro
-            const nameField = createInputField('text', 'name', 'register.nombre', 'Nombre completo');
-            const emailField = createInputField('email', 'email', 'login.correo', 'Correo electrónico');
-            const passwordField = createInputField('password', 'password', 'login.contrasena', 'Contraseña');
-            const confirmPasswordField = createInputField('password', 'confirmPassword', 'register.confirmarContrasena', 'Confirmar contraseña');
-            
-            loginForm.appendChild(nameField);
-            loginForm.appendChild(emailField);
-            loginForm.appendChild(passwordField);
-            loginForm.appendChild(confirmPasswordField);
-            
-            // Restaurar o crear el contenedor de mensajes
-            if (existingMessageContainer) {
-                loginForm.appendChild(existingMessageContainer);
-            } else {
-                const messageContainer = document.createElement('div');
-                messageContainer.className = 'message-container';
-                loginForm.appendChild(messageContainer);
-            }
-            
-            // Agregar el botón al final
-            loginForm.appendChild(loginButton);
-        }
-        
-        // Actualizar textos
-        if (window.updateTexts) {
-            window.updateTexts();
-        }
-        
-        // Re-inicializar los listeners
-        initializeSwitcher();
-        
-        // Animación de fade in
-        setTimeout(() => {
-            loginBox.style.opacity = '1';
-            loginBox.style.transform = 'translateX(0)';
-            isAnimating = false;
-            isLoginMode = false;
-        }, 50);
-        
-    }, 300);
 }
 
-// Función para cambiar a modo login con animación - MEJORADA
-function switchToLogin() {
-    if (isAnimating) return;
-    isAnimating = true;
+// ✅ CORREGIDO: Manejar registro básico (Paso 1) - SIN LOGIN AUTOMÁTICO
+async function handleRegisterBasicSubmit(e) {
+    e.preventDefault();
+    console.log('📝 Procesando registro básico...');
     
-    const loginBox = document.querySelector('.login-box');
-    const loginTitle = loginBox.querySelector('h1');
-    const loginForm = loginBox.querySelector('form');
-    const loginButton = loginBox.querySelector('button[type="submit"]');
-    const switchLink = loginBox.querySelector('a[data-key="register.iniciaSesion"]');
-    const switchText = loginBox.querySelector('p span[data-key="register.siCuenta"]');
-    
-    // Animación de fade out
-    loginBox.style.opacity = '0';
-    loginBox.style.transform = 'translateX(20px)';
-    
-    setTimeout(() => {
-        // Restaurar atributos de datos para i18n
-        if (loginTitle) loginTitle.setAttribute('data-key', 'login.titulo');
-        if (switchText) switchText.setAttribute('data-key', 'login.noCuenta');
-        if (switchLink) switchLink.setAttribute('data-key', 'login.registrate');
-        if (loginButton) loginButton.setAttribute('data-key', 'login.boton');
-        
-        // Restaurar formulario de login - MEJORADO: preservar contenedor de mensajes
-        if (loginForm) {
-            // Guardar el contenedor de mensajes si existe
-            const existingMessageContainer = loginForm.querySelector('.message-container');
-            
-            // Limpiar mensajes existentes al cambiar de modo
-            if (existingMessageContainer) {
-                existingMessageContainer.innerHTML = ''; // Limpiar todos los mensajes
-            }
-            
-            // Limpiar el formulario pero preservar el botón
-            const formChildren = Array.from(loginForm.children);
-            const preservedElements = formChildren.filter(child => 
-                child.classList.contains('message-container') || child.tagName === 'BUTTON'
-            );
-            
-            loginForm.innerHTML = '';
-            
-            const emailField = createInputField('email', 'email', 'login.correo', 'Correo electrónico');
-            const passwordField = createInputField('password', 'password', 'login.contrasena', 'Contraseña');
-            
-            loginForm.appendChild(emailField);
-            loginForm.appendChild(passwordField);
-            
-            // Restaurar o crear el contenedor de mensajes
-            if (existingMessageContainer) {
-                loginForm.appendChild(existingMessageContainer);
-            } else {
-                const messageContainer = document.createElement('div');
-                messageContainer.className = 'message-container';
-                loginForm.appendChild(messageContainer);
-            }
-            
-            // Agregar el botón al final
-            loginForm.appendChild(loginButton);
-        }
-        
-        // Actualizar textos
-        if (window.updateTexts) {
-            window.updateTexts();
-        }
-        
-        // Re-inicializar los listeners
-        initializeSwitcher();
-        
-        // Animación de fade in
-        setTimeout(() => {
-            loginBox.style.opacity = '1';
-            loginBox.style.transform = 'translateX(0)';
-            isAnimating = false;
-            isLoginMode = true;
-        }, 50);
-        
-    }, 300);
-}
-
-    
-    // Función auxiliar para crear campos de entrada
-    function createInputField(type, name, dataKey, placeholder) {
-        const input = document.createElement('input');
-        input.type = type;
-        input.name = name;
-        input.setAttribute('data-key-placeholder', dataKey);
-        input.placeholder = placeholder;
-        input.required = true;
-        input.style.opacity = '0';
-        input.style.transform = 'translateY(10px)';
-        
-        // Animación de entrada para nuevos campos
-        setTimeout(() => {
-            input.style.transition = 'all 0.3s ease';
-            input.style.opacity = '1';
-            input.style.transform = 'translateY(0)';
-        }, 100);
-        
-        // Validación de contraseñas coincidentes
-        if (name === 'confirmPassword') {
-            input.addEventListener('input', validatePasswordMatch);
-        }
-        
-        return input;
-    }
-    
-    // Validar que las contraseñas coincidan (solo validación visual)
-    function validatePasswordMatch() {
-        const password = document.querySelector('input[name="password"]');
-        const confirmPassword = document.querySelector('input[name="confirmPassword"]');
-        
-        if (password && confirmPassword && password.value !== confirmPassword.value) {
-            confirmPassword.setCustomValidity('Las contraseñas no coinciden');
-        } else {
-            confirmPassword.setCustomValidity('');
-        }
-    }
-    
-    // Aplicar estilos de transición iniciales
-    const loginBox = document.querySelector('.login-box');
-    if (loginBox) {
-        loginBox.style.transition = 'all 0.3s ease';
-    }
-    
-    // Inicializar por primera vez
-    initializeSwitcher();
-    
-    // También inicializar después de que i18n actualice los textos
-    const originalUpdateTexts = window.updateTexts;
-    if (originalUpdateTexts) {
-        window.updateTexts = function() {
-            originalUpdateTexts();
-            setTimeout(initializeSwitcher, 50);
-        };
-    }
-    
-    // Exportar funciones para uso futuro si es necesario
-    window.loginSwitcher = {
-        getCurrentMode: () => isLoginMode ? 'login' : 'register',
-        switchToLogin,
-        switchToRegister
+    const formData = new FormData(e.target);
+    const userData = {
+        // Datos básicos de autenticación
+        name: formData.get('full_name'),
+        email: formData.get('email'),
+        password: formData.get('password'),
+        confirmPassword: formData.get('confirmPassword')
     };
+    
+    console.log('📋 Datos del registro básico:', userData);
+    
+    if (window.authManager) {
+        // ✅ CORREGIDO: Guardar credenciales temporalmente para login posterior
+        window.tempUserCredentials = {
+            email: userData.email,
+            password: userData.password,
+            name: userData.name
+        };
+        
+        await authManager.registerBasicUser(userData);
+    } else {
+        console.error('❌ AuthManager no disponible');
+    }
+}
+
+// ✅ CORREGIDO: Manejar registro completo (Paso 2) - SOLO SI ESTÁ AUTENTICADO
+async function handleRegisterCompleteSubmit(e) {
+    e.preventDefault();
+    console.log('📝 Procesando registro completo...');
+    
+    const formData = new FormData(e.target);
+    const profileData = {
+        profession: formData.get('profession'),
+        age: formData.get('age') ? parseInt(formData.get('age')) : null,
+        main_interest: formData.get('main_interest'),
+        location: formData.get('location'),
+        bio: formData.get('bio'),
+        skills: formData.get('skills') ? 
+                formData.get('skills').split(',').map(skill => skill.trim()).filter(skill => skill !== '') 
+                : []
+    };
+    
+    console.log('📋 Datos del perfil:', profileData);
+    
+    if (window.authManager) {
+        await authManager.completeUserProfile(profileData);
+    } else {
+        console.error('❌ AuthManager no disponible');
+    }
+}
+
+// ✅ CORREGIDO: Mostrar formulario de registro completo - CON MEJOR MANEJO DE ERRORES
+async function showCompleteRegistrationForm(userEmail) {
+    console.log('🎯 Mostrando formulario de registro completo para:', userEmail);
+    
+    try {
+        // ✅ NUEVO: Verificar autenticación antes de mostrar el formulario
+        if (window.authManager) {
+            const authCheck = await authManager.checkAuthAndVerification();
+            
+            if (!authCheck.success) {
+                console.log('❌ No se puede mostrar formulario completo:', authCheck.message);
+                
+                // Mostrar mensaje de error
+                authManager.showError(authCheck.message);
+                
+                // Si hay error de autenticación, limpiar y volver al login
+                if (authCheck.message.includes('Sesión inválida') || authCheck.message.includes('Error de autenticación')) {
+                    setTimeout(() => {
+                        switchForm('login');
+                        authManager.showInfo('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+                    }, 2000);
+                } else {
+                    // Si no está autenticado, volver al login
+                    setTimeout(() => {
+                        switchForm('login');
+                        authManager.showInfo('Por favor inicia sesión para completar tu perfil.');
+                    }, 2000);
+                }
+                return;
+            }
+        }
+        
+        // Actualizar el email del usuario en el formulario
+        const userEmailElement = document.getElementById('registered-user-email');
+        if (userEmailElement) {
+            userEmailElement.textContent = userEmail;
+        }
+        
+        // Cambiar al formulario de registro completo
+        switchForm('register-complete');
+        
+        // Mostrar mensaje informativo
+        if (window.authManager) {
+            authManager.showSuccess('¡Ahora puedes completar tu perfil! (Opcional)');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error inesperado en showCompleteRegistrationForm:', error);
+        
+        // En caso de error inesperado, volver al login
+        setTimeout(() => {
+            switchForm('login');
+            if (window.authManager) {
+                authManager.showError('Error inesperado. Por favor inicia sesión nuevamente.');
+            }
+        }, 2000);
+    }
+}
+
+// ✅ NUEVA FUNCIÓN: Mostrar formulario de login (para uso desde auth.js)
+function showLoginForm() {
+    console.log('🔁 Volviendo al formulario de login');
+    switchForm('login');
+    
+    // Limpiar credenciales temporales si existen
+    if (window.tempUserCredentials) {
+        console.log('🗑️ Limpiando credenciales temporales');
+        delete window.tempUserCredentials;
+    }
+    
+    // Mostrar mensaje informativo
+    if (window.authManager) {
+        authManager.showInfo('Por favor verifica tu email e inicia sesión para continuar.');
+    }
+}
+
+// ✅ NUEVA FUNCIÓN: Manejar sesión expirada o inválida
+function handleInvalidSession(message = 'Tu sesión ha expirado. Por favor inicia sesión nuevamente.') {
+    console.log('🔐 Manejando sesión inválida:', message);
+    
+    // Cambiar al formulario de login
+    switchForm('login');
+    
+    // Limpiar credenciales temporales
+    if (window.tempUserCredentials) {
+        delete window.tempUserCredentials;
+    }
+    
+    // Mostrar mensaje de error
+    if (window.authManager) {
+        authManager.showError(message);
+    }
+}
+
+// ✅ NUEVA FUNCIÓN: Verificar estado de autenticación al cargar la página
+async function checkAuthStateOnLoad() {
+    try {
+        console.log('🔍 Verificando estado de autenticación al cargar...');
+        
+        if (window.authManager && window.supabase) {
+            const { data: { user }, error } = await window.supabase.auth.getUser();
+            
+            if (error) {
+                console.log('❌ Error verificando autenticación:', error);
+                // No hacer nada, dejar en formulario de login
+                return;
+            }
+            
+            if (user) {
+                console.log('✅ Usuario autenticado detectado:', user.email);
+                // El authManager manejará la redirección automáticamente
+            } else {
+                console.log('🔐 No hay usuario autenticado, mostrando login');
+                switchForm('login');
+            }
+        }
+    } catch (error) {
+        console.error('❌ Error verificando estado de autenticación:', error);
+        // En caso de error, mostrar formulario de login
+        switchForm('login');
+    }
+}
+
+function clearMessages() {
+    const messageContainers = document.querySelectorAll('.message-container');
+    messageContainers.forEach(container => {
+        container.innerHTML = '';
+    });
+}
+
+// Ejecutar verificación de autenticación al cargar
+document.addEventListener('DOMContentLoaded', function() {
+    // Pequeño delay para asegurar que todo esté cargado
+    setTimeout(() => {
+        checkAuthStateOnLoad();
+    }, 500);
 });
+
+// Hacer las funciones disponibles globalmente
+window.switchForm = switchForm;
+window.showCompleteRegistrationForm = showCompleteRegistrationForm;
+window.showLoginForm = showLoginForm;
+window.handleInvalidSession = handleInvalidSession; // ✅ NUEVA: Para manejo de sesiones inválidas

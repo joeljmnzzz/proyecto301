@@ -29,8 +29,8 @@ body, html {
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 80px 20px 40px; /* Aumentado padding superior para navbar */
+  align-items: flex-start; /* ✅ Cambiado a flex-start para mejor scroll */
+  padding: 80px 20px 40px;
   overflow: hidden;
 }
 
@@ -66,11 +66,13 @@ body, html {
   position: relative;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 20px;
-  padding: clamp(30px, 6vw, 50px) clamp(20px, 5vw, 40px);
+  padding: clamp(25px, 5vw, 35px) clamp(20px, 4vw, 30px); /* ✅ Reducido padding */
   width: 100%;
-  max-width: min(400px, 90vw);
+  max-width: min(450px, 90vw);
+  max-height: 85vh; /* ✅ Altura máxima */
   text-align: center;
   z-index: 2;
+  overflow-y: auto; /* ✅ Scroll vertical cuando sea necesario */
 
   /* efecto glass */
   backdrop-filter: blur(15px) saturate(180%);
@@ -87,17 +89,45 @@ body, html {
   box-sizing: border-box;
   
   /* Asegurar que siempre sea visible */
-  margin-top: 20px; /* Espacio extra para evitar que se oculte */
+  margin-top: 20px;
+}
+
+/* ✅ NUEVO: Personalizar scrollbar */
+.login-box::-webkit-scrollbar {
+  width: 6px;
+}
+
+.login-box::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.login-box::-webkit-scrollbar-thumb {
+  background: rgba(102, 126, 234, 0.5);
+  border-radius: 3px;
+}
+
+.login-box::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 126, 234, 0.7);
 }
 
 .login-box h1 {
-  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-size: clamp(1.4rem, 5vw, 1.8rem); /* ✅ Reducido tamaño */
   background: var(--color-acento);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: clamp(20px, 4vw, 30px);
+  margin-bottom: clamp(15px, 3vw, 20px); /* ✅ Reducido margen */
   transition: all 0.3s ease;
   line-height: 1.2;
+}
+
+.login-box h3 {
+  font-size: clamp(0.9rem, 4vw, 1.1rem); /* ✅ Reducido tamaño */
+  color: var(--color-secundario);
+  margin: 15px 0 10px 0; /* ✅ Reducido margen */
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 6px; /* ✅ Reducido padding */
 }
 
 .login-box form {
@@ -105,19 +135,58 @@ body, html {
   width: 100%;
 }
 
-.login-box input {
+.login-box input, 
+.login-box select, 
+.login-box textarea {
   width: 100%;
-  padding: clamp(10px, 3vw, 12px) clamp(16px, 4vw, 20px);
-  margin: 8px 0;
-  border-radius: 12px;
+  padding: clamp(8px, 2.5vw, 10px) clamp(14px, 3vw, 16px); /* ✅ Reducido padding */
+  margin: 6px 0; /* ✅ Reducido margen */
+  border-radius: 10px; /* ✅ Reducido border-radius */
   border: none;
   outline: none;
   background-color: rgba(255, 255, 255, 0.08);
   color: var(--color-texto);
-  font-size: clamp(14px, 3vw, 15px);
+  font-size: clamp(13px, 2.5vw, 14px); /* ✅ Reducido tamaño */
   transition: all 0.3s ease;
   animation: slideInUp 0.3s ease forwards;
   box-sizing: border-box;
+}
+
+/* ✅ NUEVO: Estilos específicos para select */
+.login-box select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center; /* ✅ Ajustado posición */
+  background-size: 14px; /* ✅ Reducido tamaño */
+  padding-right: 35px; /* ✅ Reducido padding */
+  cursor: pointer;
+}
+
+.login-box select:focus {
+  background-color: rgba(255, 255, 255, 0.12);
+  transform: scale(1.01);
+}
+
+.login-box select option {
+  background: #1a1a2e;
+  color: white;
+  padding: 8px; /* ✅ Reducido padding */
+}
+
+/* ✅ NUEVO: Estilos específicos para textarea */
+.login-box textarea {
+  resize: vertical;
+  min-height: 70px; /* ✅ Reducido altura mínima */
+  font-family: inherit;
+  line-height: 1.4;
+  font-size: clamp(13px, 2.5vw, 14px); /* ✅ Tamaño consistente */
+}
+
+.login-box textarea:focus {
+  background-color: rgba(255, 255, 255, 0.12);
+  transform: scale(1.01);
 }
 
 /* Retrasos escalonados para los inputs */
@@ -126,23 +195,26 @@ body, html {
 .login-box input:nth-child(3) { animation-delay: 0.2s; }
 .login-box input:nth-child(4) { animation-delay: 0.25s; }
 
-.login-box input:focus {
+.login-box input:focus,
+.login-box select:focus,
+.login-box textarea:focus {
   background-color: rgba(255, 255, 255, 0.12);
   transform: scale(1.01);
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
 }
 
 .login-box button {
   width: 100%;
-  padding: clamp(10px, 3vw, 12px);
-  margin-top: clamp(15px, 4vw, 20px);
+  padding: clamp(8px, 2.5vw, 10px); /* ✅ Reducido padding */
+  margin-top: clamp(12px, 3vw, 15px); /* ✅ Reducido margen */
   border: none;
-  border-radius: 12px;
+  border-radius: 10px; /* ✅ Reducido border-radius */
   background: var(--color-acento);
   color: #fff;
-  font-size: clamp(14px, 3vw, 16px);
+  font-size: clamp(13px, 2.5vw, 14px); /* ✅ Reducido tamaño */
   cursor: pointer;
   transition: all 0.3s ease;
-  min-height: 44px; /* Tamaño mínimo para touch */
+  min-height: 40px; /* ✅ Reducido altura mínima */
 }
 
 .login-box button:hover {
@@ -155,9 +227,9 @@ body, html {
 }
 
 .login-box p {
-  margin-top: clamp(12px, 3vw, 15px);
+  margin-top: clamp(10px, 2.5vw, 12px); /* ✅ Reducido margen */
   color: var(--color-secundario);
-  font-size: clamp(13px, 3vw, 14px);
+  font-size: clamp(12px, 2.5vw, 13px); /* ✅ Reducido tamaño */
   transition: all 0.3s ease;
   line-height: 1.4;
 }
@@ -174,6 +246,39 @@ body, html {
   text-decoration: underline;
   color: #ff5757;
   transform: translateY(-1px);
+}
+
+/* ✅ NUEVO: Sección de información de perfil */
+.form-section {
+  margin: 1rem 0; /* ✅ Reducido margen */
+  padding: 1rem; /* ✅ Reducido padding */
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px; /* ✅ Reducido border-radius */
+  border-left: 3px solid #667eea;
+  text-align: left;
+  animation: slideInUp 0.4s ease forwards;
+  animation-delay: 0.3s;
+  opacity: 0;
+}
+
+.form-section h3 {
+  margin: 0 0 0.8rem 0; /* ✅ Reducido margen */
+  color: #667eea;
+  font-size: 0.9rem; /* ✅ Reducido tamaño */
+  font-weight: 600;
+  text-align: left;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* ✅ NUEVO: Contenedores de formularios */
+.form-container {
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.form-container[style*="display: none"] {
+  display: none !important;
 }
 
 /* === 🎭 Animaciones === */
@@ -240,11 +345,9 @@ body, html {
 .message-container {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  /* Eliminamos el margin fijo y min-height */
+  gap: 6px; /* ✅ Reducido gap */
   margin: 0;
   min-height: 0;
-  /* Hacemos que solo ocupe espacio cuando hay mensajes */
   height: auto;
   transition: all 0.3s ease;
 }
@@ -256,20 +359,19 @@ body, html {
 
 /* Cuando tiene mensajes, agregamos margen */
 .message-container:not(:empty) {
-  margin: 15px 0;
+  margin: 12px 0; /* ✅ Reducido margen */
   min-height: auto;
 }
 
 .message {
-  padding: 12px 16px;
-  border-radius: 12px;
-  font-size: 14px;
+  padding: 10px 14px; /* ✅ Reducido padding */
+  border-radius: 10px; /* ✅ Reducido border-radius */
+  font-size: 13px; /* ✅ Reducido tamaño */
   font-weight: 500;
   text-align: center;
   animation: messageSlideIn 0.3s ease;
   backdrop-filter: blur(10px);
   border: 1px solid transparent;
-  /* Aseguramos que los mensajes tengan buen espaciado */
   margin: 0;
 }
 
@@ -321,14 +423,15 @@ body, html {
 /* === 🔻 Responsive mejorado === */
 @media screen and (max-width: 480px) {
   .login-container {
-    padding: 70px 15px 30px; /* Ajustado para móviles */
+    padding: 70px 15px 30px;
     align-items: flex-start;
   }
   
   .login-box {
-    padding: 30px 20px;
+    padding: 25px 18px; /* ✅ Reducido padding en móviles */
     max-width: 95vw;
-    margin-top: 10px; /* Reducido en móviles */
+    margin-top: 10px;
+    max-height: 80vh; /* ✅ Menor altura en móviles */
   }
 
   .ball {
@@ -338,31 +441,44 @@ body, html {
     filter: blur(30px);
   }
   
-  .login-box input {
-    padding: 12px 16px;
-    margin: 6px 0;
+  .login-box input,
+  .login-box select,
+  .login-box textarea {
+    padding: 10px 14px; /* ✅ Reducido padding */
+    margin: 5px 0; /* ✅ Reducido margen */
   }
   
   .login-box button {
-    padding: 12px;
-    margin-top: 15px;
+    padding: 10px;
+    margin-top: 12px; /* ✅ Reducido margen */
   }
   
   .login-box h1 {
-    margin-bottom: 25px;
+    margin-bottom: 20px; /* ✅ Reducido margen */
+  }
+  
+  /* ✅ NUEVO: Ajustes para móviles en la sección de perfil */
+  .form-section {
+    padding: 0.8rem; /* ✅ Reducido padding */
+    margin: 0.8rem 0; /* ✅ Reducido margen */
+  }
+  
+  .form-section h3 {
+    font-size: 0.85rem; /* ✅ Reducido tamaño */
   }
 }
 
 /* Para pantallas muy pequeñas (móviles pequeños) */
 @media screen and (max-width: 320px) {
   .login-container {
-    padding: 60px 10px 20px; /* Ajustado para móviles pequeños */
+    padding: 60px 10px 20px;
   }
   
   .login-box {
-    padding: 25px 15px;
+    padding: 20px 12px; /* ✅ Más reducido en móviles pequeños */
     border-radius: 16px;
     margin-top: 5px;
+    max-height: 75vh; /* ✅ Aún menor altura */
   }
   
   .ball {
@@ -372,29 +488,47 @@ body, html {
     filter: blur(25px);
   }
   
-  .login-box input {
-    padding: 10px 14px;
+  .login-box input,
+  .login-box select,
+  .login-box textarea {
+    padding: 8px 12px; /* ✅ Más reducido */
     font-size: 13px;
+    margin: 4px 0; /* ✅ Más reducido margen */
   }
   
   .login-box button {
-    padding: 10px;
-    font-size: 14px;
-    min-height: 40px;
+    padding: 8px;
+    font-size: 13px;
+    min-height: 38px; /* ✅ Reducido altura */
+  }
+  
+  /* ✅ NUEVO: Ajustes adicionales para móviles pequeños */
+  .form-section {
+    padding: 0.6rem; /* ✅ Más reducido */
+    margin: 0.6rem 0; /* ✅ Más reducido */
   }
 }
 
 /* Para tablets y pantallas más grandes */
 @media screen and (min-width: 768px) and (max-width: 1024px) {
   .login-box {
-    max-width: 450px;
-    padding: 50px 45px;
+    max-width: 480px; /* ✅ Aumentado para tablets */
+    padding: 35px 35px; /* ✅ Reducido padding */
+    max-height: 80vh; /* ✅ Altura máxima para tablets */
   }
   
   .ball {
     width: 350px;
     height: 350px;
     top: -175px;
+  }
+}
+
+/* ✅ NUEVO: Para pantallas grandes */
+@media screen and (min-width: 1025px) {
+  .login-box {
+    max-width: 480px; /* ✅ Mantenido consistente */
+    max-height: 80vh; /* ✅ Altura máxima */
   }
 }
 
@@ -409,7 +543,8 @@ body, html {
   .login-box,
   .login-box input,
   .login-box button,
-  .login-box p a {
+  .login-box p a,
+  .form-section {
     transition: none;
     animation: none;
   }
@@ -423,7 +558,9 @@ body, html {
 
 /* Prevenir zoom en iOS en inputs */
 @supports (-webkit-touch-callout: none) {
-  .login-box input {
+  .login-box input,
+  .login-box select,
+  .login-box textarea {
     font-size: 16px; /* Previene zoom en iOS */
   }
 }
@@ -435,8 +572,42 @@ body, html {
     border: 2px solid rgba(255, 255, 255, 0.3);
   }
   
-  .login-box input {
+  .login-box input,
+  .login-box select,
+  .login-box textarea {
     background-color: rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.3);
   }
+  
+  .form-section {
+    background: rgba(255, 255, 255, 0.08);
+    border-left: 3px solid rgba(255, 255, 255, 0.6);
+  }
+}
+
+/* ✅ NUEVO: Placeholder styling */
+.login-box input::placeholder,
+.login-box select::placeholder,
+.login-box textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+  opacity: 1;
+}
+
+.login-box input:focus::placeholder,
+.login-box select:focus::placeholder,
+.login-box textarea:focus::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ✅ NUEVO: Estilos para campos opcionales */
+.login-box input:optional,
+.login-box select:optional,
+.login-box textarea:optional {
+  opacity: 0.9;
+}
+
+.login-box input:required,
+.login-box select:required,
+.login-box textarea:required {
+  opacity: 1;
 }

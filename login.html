@@ -24,22 +24,90 @@
   <div class="login-container">
     <div class="ball"></div>
 
-<div class="login-box">
-  <h1 data-key="login.titulo">Iniciar sesión</h1>
-  <form action="#" method="POST">
-    <input type="email" name="email" placeholder="" data-key-placeholder="login.correo" required>
-    <input type="password" name="password" placeholder="" data-key-placeholder="login.contrasena" required>
-    
-    <!-- CONTENEDOR DE MENSAJES - NUEVO -->
-    <div class="message-container"></div>
-    
-    <button type="submit" data-key="login.boton">Entrar</button>
-  </form>
-  <p>
-    <span data-key="login.noCuenta">¿No tienes cuenta?</span>
-    <a href="javascript:void(0)" data-key="login.registrate">Regístrate</a>
-  </p>
-</div>
+    <div class="login-box">
+      <!-- FORMULARIO DE LOGIN -->
+      <div class="form-container" id="login-form-container">
+        <h1 data-key="login.titulo">Iniciar sesión</h1>
+        <form action="#" method="POST" id="login-form">
+          <input type="email" name="email" placeholder="" data-key-placeholder="login.correo" required>
+          <input type="password" name="password" placeholder="" data-key-placeholder="login.contrasena" required>
+          
+          <!-- CONTENEDOR DE MENSAJES -->
+          <div class="message-container"></div>
+          
+          <button type="submit" data-key="login.boton">Entrar</button>
+        </form>
+        <p>
+          <span data-key="login.noCuenta">¿No tienes cuenta?</span>
+          <a href="javascript:void(0)" class="switch-form" data-form="register-basic" data-key="login.registrate">Regístrate</a>
+        </p>
+      </div>
 
+      <!-- FORMULARIO DE REGISTRO BÁSICO (PASO 1) -->
+      <div class="form-container" id="register-basic-container" style="display: none;">
+        <h1 data-key="register.titulo">Crear cuenta</h1>
+        <form action="#" method="POST" id="register-basic-form">
+          <!-- Campos básicos obligatorios -->
+          <input type="text" name="full_name" placeholder="" data-key-placeholder="register.nombre" required>
+          <input type="email" name="email" placeholder="" data-key-placeholder="register.correo" required>
+          <input type="password" name="password" placeholder="" data-key-placeholder="register.contrasena" required>
+          <input type="password" name="confirmPassword" placeholder="" data-key-placeholder="register.confirmarContrasena" required>
+
+          <!-- CONTENEDOR DE MENSAJES -->
+          <div class="message-container"></div>
+          
+          <button type="submit" data-key="register.boton">Continuar</button>
+        </form>
+        <p>
+          <span data-key="register.siCuenta">¿Ya tienes cuenta?</span>
+          <a href="javascript:void(0)" class="switch-form" data-form="login" data-key="register.iniciaSesion">Inicia sesión</a>
+        </p>
+      </div>
+
+      <!-- FORMULARIO DE REGISTRO COMPLETO (PASO 2) -->
+      <div class="form-container" id="register-complete-container" style="display: none;">
+        <h1>Completa tu perfil</h1>
+        <form action="#" method="POST" id="register-complete-form">
+          <!-- Información del usuario ya registrado -->
+          <div class="user-info">
+            <p><strong>Usuario:</strong> <span id="registered-user-email"></span></p>
+          </div>
+          
+          <!-- NUEVOS CAMPOS DEL PERFIL (opcionales) -->
+          <div class="form-section">
+            <h3>Información adicional (Opcional)</h3>
+            
+            <input type="text" name="profession" placeholder="Profesión" data-key-placeholder="register.profession">
+            <input type="number" name="age" placeholder="Edad" min="16" max="100" data-key-placeholder="register.age">
+            
+            <select name="main_interest" data-key-placeholder="register.mainInterest">
+              <option value="">Selecciona tu interés principal</option>
+              <option value="programacion">Programación</option>
+              <option value="diseno">Diseño</option>
+              <option value="marketing">Marketing</option>
+              <option value="emprendimiento">Emprendimiento</option>
+              <option value="investigacion">Investigación</option>
+              <option value="educacion">Educación</option>
+              <option value="otro">Otro</option>
+            </select>
+            
+            <input type="text" name="location" placeholder="Ubicación (Ciudad, País)" data-key-placeholder="register.location">
+            
+            <textarea name="bio" placeholder="Breve biografía sobre ti..." data-key-placeholder="register.bio" rows="3"></textarea>
+            
+            <input type="text" name="skills" placeholder="Habilidades (separadas por comas)" data-key-placeholder="register.skills">
+          </div>
+
+          <!-- CONTENEDOR DE MENSAJES -->
+          <div class="message-container"></div>
+          
+          <div class="form-actions">
+            <button type="submit" class="btn-complete">Completar registro</button>
+            <button type="button" class="btn-skip" id="skip-profile-btn">Omitir por ahora</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
