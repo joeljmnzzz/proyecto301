@@ -304,6 +304,183 @@ footer {
   width: 100%;
 }
 
+/* 🌐 Spinner Universal - VERSIÓN CORREGIDA */
+.universal-spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(5px);
+}
+
+.universal-spinner.show {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+.universal-spinner-content {
+    text-align: center;
+    color: white;
+    font-family: 'JetBrains Mono', monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem; /* ✅ Más espacio para separar claramente */
+    padding: 3rem;
+}
+
+/* ✅ CORREGIDO: Contenedor del loader con altura fija */
+.universal-spinner .loader-container {
+    height: 120px; /* ✅ Altura fija para el área del spinner */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.universal-spinner .loader {
+    position: relative;
+    width: 6rem;
+    height: 6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ✅ CORREGIDO: Pseudo-elementos con dimensiones fijas */
+.universal-spinner .loader:before,
+.universal-spinner .loader:after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    animation: pulsOut 1.8s ease-in-out infinite;
+    filter: drop-shadow(0 0 1rem rgba(255, 255, 255, 0.75));
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* ✅ Centrado perfecto */
+}
+
+.universal-spinner .loader:before {
+    width: 6rem;
+    height: 6rem;
+    box-shadow: inset 0 0 0 1rem #fff;
+    animation-name: pulsIn;
+}
+
+.universal-spinner .loader:after {
+    width: 4rem;
+    height: 4rem;
+    box-shadow: 0 0 0 0 #fff;
+}
+
+.universal-spinner-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.4;
+    text-align: center;
+    max-width: 300px;
+    word-wrap: break-word;
+    /* ✅ El texto ahora está claramente separado del spinner */
+}
+
+@keyframes pulsIn {
+    0% {
+        box-shadow: inset 0 0 0 1rem #fff;
+        opacity: 1;
+    }
+    50%, 100% {
+        box-shadow: inset 0 0 0 0 #fff;
+        opacity: 0;
+    }
+}
+
+@keyframes pulsOut {
+    0%, 50% {
+        box-shadow: 0 0 0 0 #fff;
+        opacity: 0;
+    }
+    100% {
+        box-shadow: 0 0 0 1rem #fff;
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ✅ Versión responsive para móviles */
+@media (max-width: 768px) {
+    .universal-spinner-content {
+        gap: 2rem;
+        padding: 2rem;
+    }
+    
+    .universal-spinner .loader-container {
+        height: 100px;
+    }
+    
+    .universal-spinner .loader {
+        width: 5rem;
+        height: 5rem;
+    }
+    
+    .universal-spinner .loader:before {
+        width: 5rem;
+        height: 5rem;
+    }
+    
+    .universal-spinner .loader:after {
+        width: 3rem;
+        height: 3rem;
+    }
+    
+    .universal-spinner-text {
+        font-size: 1rem;
+        max-width: 250px;
+    }
+}
+
+/* ✅ Versión para pantallas muy pequeñas */
+@media (max-width: 480px) {
+    .universal-spinner-content {
+        gap: 1.5rem;
+        padding: 1.5rem;
+    }
+    
+    .universal-spinner .loader-container {
+        height: 80px;
+    }
+    
+    .universal-spinner .loader {
+        width: 4rem;
+        height: 4rem;
+    }
+    
+    .universal-spinner .loader:before {
+        width: 4rem;
+        height: 4rem;
+    }
+    
+    .universal-spinner .loader:after {
+        width: 2rem;
+        height: 2rem;
+    }
+    
+    .universal-spinner-text {
+        font-size: 0.9rem;
+        max-width: 200px;
+    }
+}
+
 /* === 🔻 Media Queries mejoradas === */
 
 /* Tabletas pequeñas */

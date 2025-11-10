@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Proyecto 301</title>
+
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- ✅ INCLUIR SUPABASE CDN PRIMERO -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- ✅ SCRIPTS CON ORDEN CORRECTO -->
+  <script src="../js/supabase-client.js" defer></script>
+  <script src="../js/i18n.js" defer></script>
+  <script src="../js/auth.js" defer></script>
+  <script src="../js/dashboard.js" defer></script>
+  <script src="../js/load-navbar.js" defer></script>
+<script src="../js/spinner.js" defer></script>
+</head>
+<body>
+
+  <!-- Navbar placeholder -->
+  <div id="navbar-placeholder"></div>
+  
+  <!-- Bola luminosa (posición diferente para dashboard) -->
+  <div class="ball dashboard-ball"></div>
+
+  <!-- 🌌 Contenido principal del Dashboard -->
+  <main class="dashboard-main">
+    <!-- Header de bienvenida -->
+    <section class="welcome-section">
+      <h1 id="dashboard-titulo">
+        <span id="welcome-text" data-key="dashboard.welcome">¡Bienvenido, </span>
+        <span id="user-name">Usuario</span>
+
+      </h1>
+      <p class="user-role" id="user-role">
+        <span data-key="dashboard.userRole">Desarrollador Full-Stack • Miembro desde</span> 
+        <span id="member-since">2024</span>
+      </p>
+      <div class="reputation">
+        <span class="stars">⭐⭐⭐⭐☆</span>
+        <span class="rating">4.8/5.0</span>
+      </div>
+    </section>
+
+    <!-- 📊 Grid principal del dashboard -->
+    <div class="dashboard-grid">
+      
+      <!-- 🚀 Columna izquierda: Proyectos y Métricas -->
+      <div class="dashboard-column">
+        
+        <!-- Sección de Proyectos -->
+        <section class="dashboard-card projects-section">
+          <div class="card-header">
+            <h2><i class="fas fa-rocket"></i> <span data-key="dashboard.projects.title">Mis Proyectos</span></h2>
+            <button class="btn-primary" id="create-project-btn">
+              <i class="fas fa-plus"></i> <span data-key="dashboard.projects.newProject">Nuevo Proyecto</span>
+            </button>
+          </div>
+          <div class="projects-grid" id="user-projects">
+            <!-- Proyectos cargados dinámicamente -->
+            <div class="project-card loading" data-key="dashboard.projects.loading">Cargando proyectos...</div>
+          </div>
+        </section>
+
+        <!-- 📊 Métricas rápidas -->
+        <section class="dashboard-card metrics-section">
+          <h2><i class="fas fa-chart-line"></i> <span data-key="dashboard.metrics.title">Métricas</span></h2>
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-icon">
+                <i class="fas fa-folder-open"></i>
+              </div>
+              <div class="metric-info">
+                <span class="metric-value" id="projects-count">0</span>
+                <span class="metric-label" data-key="dashboard.metrics.projects">Proyectos</span>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon">
+                <i class="fas fa-eye"></i>
+              </div>
+              <div class="metric-info">
+                <span class="metric-value" id="views-count">0</span>
+                <span class="metric-label" data-key="dashboard.metrics.views">Vistas</span>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon">
+                <i class="fas fa-users"></i>
+              </div>
+              <div class="metric-info">
+                <span class="metric-value" id="followers-count">0</span>
+                <span class="metric-label" data-key="dashboard.metrics.followers">Seguidores</span>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon">
+                <i class="fas fa-handshake"></i>
+              </div>
+              <div class="metric-info">
+                <span class="metric-value" id="collaborations-count">0</span>
+                <span class="metric-label" data-key="dashboard.metrics.collaborations">Colaboraciones</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- 🔔 Columna derecha: Actividad y Oportunidades -->
+      <div class="dashboard-column">
+        
+        <!-- 🔔 Actividad reciente -->
+        <section class="dashboard-card activity-section">
+          <div class="card-header">
+            <h2><i class="fas fa-bell"></i> <span data-key="dashboard.activity.title">Actividad Reciente</span></h2>
+            <button class="btn-secondary" id="view-all-activity">
+              <span data-key="dashboard.activity.viewAll">Ver todo</span>
+            </button>
+          </div>
+          <div class="activity-list" id="recent-activity">
+            <!-- Actividad cargada dinámicamente -->
+            <div class="activity-item loading" data-key="dashboard.activity.loading">Cargando actividad...</div>
+          </div>
+        </section>
+
+        <!-- 💼 Oportunidades -->
+        <section class="dashboard-card opportunities-section">
+          <h2><i class="fas fa-briefcase"></i> <span data-key="dashboard.opportunities.title">Oportunidades</span></h2>
+          <div class="opportunities-list" id="opportunities-list">
+            <!-- Oportunidades cargadas dinámicamente -->
+            <div class="opportunity-item loading" data-key="dashboard.opportunities.searching">Buscando oportunidades...</div>
+          </div>
+        </section>
+
+        <!-- 👥 Tu Red -->
+        <section class="dashboard-card network-section">
+          <h2><i class="fas fa-network-wired"></i> <span data-key="dashboard.network.title">Tu Red</span></h2>
+          <div class="network-stats">
+            <div class="network-stat">
+              <span class="stat-value" id="connections-count">0</span>
+              <span class="stat-label" data-key="dashboard.network.connections">Conexiones</span>
+            </div>
+            <div class="network-stat">
+              <span class="stat-value" id="new-followers-count">0</span>
+              <span class="stat-label" data-key="dashboard.network.newFollowers">Nuevos seguidores</span>
+            </div>
+            <div class="network-stat">
+              <span class="stat-value" id="companies-count">0</span>
+              <span class="stat-label" data-key="dashboard.network.companies">Empresas</span>
+            </div>
+          </div>
+          <div class="recent-connections" id="recent-connections">
+            <!-- Conexiones recientes -->
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- 🏆 Logros y Reconocimientos -->
+    <section class="dashboard-card achievements-section">
+      <h2><i class="fas fa-trophy"></i> <span data-key="dashboard.achievements.title">Logros</span></h2>
+      <div class="achievements-grid" id="achievements-list">
+        <!-- Logros cargados dinámicamente -->
+        <div class="achievement-item loading" data-key="dashboard.achievements.loading">Cargando logros...</div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p data-key="footer.texto">© 2025 Proyecto 301 — Comunidad de desarrollo creativo</p>
+  </footer>
+
+</body>
+</html>

@@ -22,22 +22,28 @@
     }
   },
   "login": {
-    "titulo": "Login",
-    "correo": "Email",
+    "titulo": "Sign In",
+    "correo": "Email address",
     "contrasena": "Password",
     "boton": "Sign In",
     "noCuenta": "Don't have an account?",
     "registrate": "Sign Up"
   },
   "register": {
-    "titulo": "Register",
+    "titulo": "Sign Up",
     "nombre": "Full name",
-    "correo": "Email",
+    "correo": "Email address",
     "contrasena": "Password",
     "confirmarContrasena": "Confirm password",
     "boton": "Create account",
     "siCuenta": "Already have an account?",
-    "iniciaSesion": "Sign In"
+    "iniciaSesion": "Sign In",
+    "profession": "Profession",
+    "age": "Age",
+    "mainInterest": "Main interest",
+    "location": "Location",
+    "bio": "Biography",
+    "skills": "Skills (comma separated)"
   },
   "auth": {
     "errors": {
@@ -46,7 +52,7 @@
       "nameRequired": "Please enter your name",
       "completeAllFields": "Please complete all fields",
       "emailAlreadyRegistered": "This email is already registered",
-      "invalidCredentials": "Email or password incorrect",
+      "invalidCredentials": "Invalid email or password",
       "emailNotVerified": "Please verify your email first",
       "invalidEmail": "Please enter a valid email",
       "userNotFound": "User not found",
@@ -61,6 +67,64 @@
     "loading": {
       "processing": "Processing..."
     }
+  },
+  "dashboard": {
+    "welcome": "Welcome, ",
+    "userRole": "Full-Stack Developer • Member since",
+    "projects": {
+      "title": "My Projects",
+      "newProject": "New Project",
+      "noProjects": "No projects yet",
+      "noProjectsDesc": "Create your first project to start showcasing your work",
+      "createFirstProject": "Create First Project",
+      "loading": "Loading projects...",
+      "error": "Error loading projects",
+      "errorDesc": "Try reloading the page"
+    },
+    "metrics": {
+      "title": "Metrics",
+      "projects": "Projects",
+      "views": "Views",
+      "followers": "Followers",
+      "collaborations": "Collaborations"
+    },
+    "activity": {
+      "title": "Recent Activity",
+      "viewAll": "View all",
+      "noActivity": "No recent activity",
+      "loading": "Loading activity..."
+    },
+    "opportunities": {
+      "title": "Opportunities",
+      "noOpportunities": "No opportunities available",
+      "searching": "Looking for opportunities...",
+      "apply": "Apply"
+    },
+    "network": {
+      "title": "Your Network",
+      "connections": "Connections",
+      "newFollowers": "New followers",
+      "companies": "Companies",
+      "noConnections": "No recent connections"
+    },
+    "achievements": {
+      "title": "Achievements",
+      "noAchievements": "No achievements available",
+      "loading": "Loading achievements...",
+      "earned": "Earned",
+      "notEarned": "Not earned"
+    }
+  },
+  "spinner": {
+    "loading": "Loading...",
+    "loadingDashboard": "Loading dashboard...",
+    "loadingUserInfo": "Loading user information...",
+    "loadingProfile": "Searching profile...",
+    "loadingDashboardData": "Loading dashboard data...",
+    "processing": "Processing...",
+    "verifying": "Verifying...",
+    "saving": "Saving...",
+    "updating": "Updating..."
   },
   "footer": {
     "texto": "© 2025 Project 301 — Creative development community"

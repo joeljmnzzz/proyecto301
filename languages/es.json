@@ -37,7 +37,13 @@
     "confirmarContrasena": "Confirmar contraseña",
     "boton": "Crear cuenta",
     "siCuenta": "¿Ya tienes cuenta?",
-    "iniciaSesion": "Inicia sesión"
+    "iniciaSesion": "Inicia sesión",
+    "profession": "Profesión",
+    "age": "Edad",
+    "mainInterest": "Interés principal",
+    "location": "Ubicación",
+    "bio": "Biografía",
+    "skills": "Habilidades (separadas por comas)"
   },
   "auth": {
     "errors": {
@@ -61,6 +67,64 @@
     "loading": {
       "processing": "Procesando..."
     }
+  },
+  "dashboard": {
+    "welcome": "Bienvenido, ",
+    "userRole": "Desarrollador Full-Stack • Miembro desde",
+    "projects": {
+      "title": "Mis Proyectos",
+      "newProject": "Nuevo Proyecto",
+      "noProjects": "No hay proyectos aún",
+      "noProjectsDesc": "Crea tu primer proyecto para comenzar a mostrar tu trabajo",
+      "createFirstProject": "Crear Primer Proyecto",
+      "loading": "Cargando proyectos...",
+      "error": "Error al cargar proyectos",
+      "errorDesc": "Intenta recargar la página"
+    },
+    "metrics": {
+      "title": "Métricas",
+      "projects": "Proyectos",
+      "views": "Vistas",
+      "followers": "Seguidores",
+      "collaborations": "Colaboraciones"
+    },
+    "activity": {
+      "title": "Actividad Reciente",
+      "viewAll": "Ver todo",
+      "noActivity": "No hay actividad reciente",
+      "loading": "Cargando actividad..."
+    },
+    "opportunities": {
+      "title": "Oportunidades",
+      "noOpportunities": "No hay oportunidades disponibles",
+      "searching": "Buscando oportunidades...",
+      "apply": "Aplicar"
+    },
+    "network": {
+      "title": "Tu Red",
+      "connections": "Conexiones",
+      "newFollowers": "Nuevos seguidores",
+      "companies": "Empresas",
+      "noConnections": "No hay conexiones recientes"
+    },
+    "achievements": {
+      "title": "Logros",
+      "noAchievements": "No hay logros disponibles",
+      "loading": "Cargando logros...",
+      "earned": "Obtenido",
+      "notEarned": "No obtenido"
+    }
+  },
+  "spinner": {
+    "loading": "Cargando..",
+    "loadingDashboard": "Cargando dashboard...",
+    "loadingUserInfo": "Cargando información del usuario...",
+    "loadingProfile": "Buscando perfil...",
+    "loadingDashboardData": "Cargando datos del dashboard...",
+    "processing": "Procesando...",
+    "verifying": "Verificando...",
+    "saving": "Guardando...",
+    "updating": "Actualizando..."
   },
   "footer": {
     "texto": "© 2025 Proyecto 301 — Comunidad de desarrollo creativo"

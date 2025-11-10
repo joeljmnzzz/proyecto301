@@ -9,10 +9,10 @@
     }
   },
   "main": {
-    "titulo": "Erkunde herausragende Technologieprojekte",
-    "descripcion": "Entdecken, investieren, einstellen, dich präsentieren.",
+    "titulo": "Entdecke herausragende Tech-Projekte",
+    "descripcion": "Entdecken, investieren, einstellen, bekannt werden.",
     "buscador": {
-      "placeholder": "Suche..."
+      "placeholder": "Suchen..."
     },
     "categorias": {
       "proyectos": "Projekte",
@@ -23,21 +23,27 @@
   },
   "login": {
     "titulo": "Anmelden",
-    "correo": "E-Mail",
+    "correo": "E-Mail-Adresse",
     "contrasena": "Passwort",
-    "boton": "Einloggen",
-    "noCuenta": "Noch keinen Account?",
+    "boton": "Anmelden",
+    "noCuenta": "Noch kein Konto?",
     "registrate": "Registrieren"
   },
   "register": {
     "titulo": "Registrieren",
     "nombre": "Vollständiger Name",
-    "correo": "E-Mail",
+    "correo": "E-Mail-Adresse",
     "contrasena": "Passwort",
     "confirmarContrasena": "Passwort bestätigen",
     "boton": "Konto erstellen",
     "siCuenta": "Bereits ein Konto?",
-    "iniciaSesion": "Anmelden"
+    "iniciaSesion": "Anmelden",
+    "profession": "Beruf",
+    "age": "Alter",
+    "mainInterest": "Hauptinteresse",
+    "location": "Standort",
+    "bio": "Biografie",
+    "skills": "Fähigkeiten (durch Kommas getrennt)"
   },
   "auth": {
     "errors": {
@@ -46,15 +52,15 @@
       "nameRequired": "Bitte geben Sie Ihren Namen ein",
       "completeAllFields": "Bitte füllen Sie alle Felder aus",
       "emailAlreadyRegistered": "Diese E-Mail ist bereits registriert",
-      "invalidCredentials": "E-Mail oder Passwort falsch",
+      "invalidCredentials": "Ungültige E-Mail oder Passwort",
       "emailNotVerified": "Bitte verifizieren Sie zuerst Ihre E-Mail",
-      "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      "invalidEmail": "Bitte geben Sie eine gültige E-Mail ein",
       "userNotFound": "Benutzer nicht gefunden",
       "unknownError": "Unbekannter Fehler",
       "unexpectedError": "Unerwarteter Fehler"
     },
     "success": {
-      "registrationSuccess": "Registrierung erfolgreich! Bitte überprüfen Sie Ihre E-Mail, um Ihr Konto zu verifizieren.",
+      "registrationSuccess": "Registrierung erfolgreich! Bitte überprüfen Sie Ihre E-Mail zur Verifizierung.",
       "loginSuccess": "Willkommen, {email}!",
       "welcome": "Willkommen!"
     },
@@ -62,7 +68,65 @@
       "processing": "Wird verarbeitet..."
     }
   },
+  "dashboard": {
+    "welcome": "Willkommen, ",
+    "userRole": "Full-Stack Entwickler • Mitglied seit",
+    "projects": {
+      "title": "Meine Projekte",
+      "newProject": "Neues Projekt",
+      "noProjects": "Noch keine Projekte",
+      "noProjectsDesc": "Erstellen Sie Ihr erstes Projekt, um Ihre Arbeit zu präsentieren",
+      "createFirstProject": "Erstes Projekt erstellen",
+      "loading": "Projekte werden geladen...",
+      "error": "Fehler beim Laden der Projekte",
+      "errorDesc": "Versuchen Sie, die Seite neu zu laden"
+    },
+    "metrics": {
+      "title": "Metriken",
+      "projects": "Projekte",
+      "views": "Aufrufe",
+      "followers": "Follower",
+      "collaborations": "Kollaborationen"
+    },
+    "activity": {
+      "title": "Aktuelle Aktivität",
+      "viewAll": "Alle anzeigen",
+      "noActivity": "Keine aktuelle Aktivität",
+      "loading": "Aktivität wird geladen..."
+    },
+    "opportunities": {
+      "title": "Möglichkeiten",
+      "noOpportunities": "Keine Möglichkeiten verfügbar",
+      "searching": "Suche nach Möglichkeiten...",
+      "apply": "Bewerben"
+    },
+    "network": {
+      "title": "Ihr Netzwerk",
+      "connections": "Verbindungen",
+      "newFollowers": "Neue Follower",
+      "companies": "Unternehmen",
+      "noConnections": "Keine aktuellen Verbindungen"
+    },
+    "achievements": {
+      "title": "Erfolge",
+      "noAchievements": "Keine Erfolge verfügbar",
+      "loading": "Erfolge werden geladen...",
+      "earned": "Verdient",
+      "notEarned": "Nicht verdient"
+    }
+  },
+  "spinner": {
+    "loading": "Lädt...",
+    "loadingDashboard": "Lade Dashboard...",
+    "loadingUserInfo": "Lade Benutzerinformationen...",
+    "loadingProfile": "Suche Profil...",
+    "loadingDashboardData": "Lade Dashboard-Daten...",
+    "processing": "Verarbeite...",
+    "verifying": "Überprüfe...",
+    "saving": "Speichere...",
+    "updating": "Aktualisiere..."
+  },
   "footer": {
-    "texto": "© 2025 Projekt 301 — Kreative Entwicklergemeinschaft"
+    "texto": "© 2025 Projekt 301 — Kreative Entwicklungsgemeinschaft"
   }
 }
