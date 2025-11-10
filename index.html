@@ -10,8 +10,8 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <script src="js/main.js" defer></script>
-  <script src="js/load-navbar.js" defer></script>
+  <!-- CDN de Supabase DEBE ir en el head -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -28,15 +28,33 @@
 
     <!-- 🔍 Buscador -->
     <div class="buscador">
-      <input type="text" placeholder="Buscar..." class="input-busqueda" data-key-placeholder="main.buscador.placeholder">
+      <input type="text" placeholder="Buscar..." class="input-busqueda" data-key-placeholder="main.buscador.placeholder" id="search-input">
     </div>
 
     <!-- 🧭 Menú de secciones -->
     <div class="categorias">
-      <button data-section="proyectos" data-key="main.categorias.proyectos">Proyectos</button>
+      <button data-section="proyectos" data-key="main.categorias.proyectos" class="active">Proyectos</button>
       <button data-section="portafolios" data-key="main.categorias.portafolios">Portafolios</button>
       <button data-section="equipos" data-key="main.categorias.equipos">Equipos</button>
       <button data-section="herramientas" data-key="main.categorias.herramientas">Herramientas</button>
+    </div>
+
+    <!-- 🎯 Contenedor de proyectos por categorías -->
+    <div id="projects-container" class="projects-container">
+      <!-- Los proyectos se cargarán aquí dinámicamente -->
+    </div>
+
+    <!-- 🔄 Spinner de carga -->
+    <div id="loading-spinner" class="loading-spinner">
+      <div class="spinner"></div>
+      <p data-key="main.cargando">Cargando proyectos...</p>
+    </div>
+
+    <!-- ❌ Estado vacío -->
+    <div id="empty-state" class="empty-state hidden">
+      <i class="fas fa-folder-open"></i>
+      <h3 data-key="main.sinProyectos">No se encontraron proyectos</h3>
+      <p data-key="main.intentaBuscar">Intenta con otros términos de búsqueda</p>
     </div>
   </main>
 
@@ -44,7 +62,10 @@
     <p data-key="footer.texto">© 2025 Proyecto 301 — Comunidad de desarrollo creativo</p>
   </footer>
 
-  <!-- JS de traducción -->
+  <!-- Scripts en el orden CORRECTO -->
+  <script src="js/supabase-client.js" defer></script>
   <script src="js/i18n.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/load-navbar.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,481 @@
+<!-- Modal para crear nuevo proyecto - VERSIÓN COMPLETAMENTE CORREGIDA -->
+<div id="createProjectModal" class="modal-overlay">
+  <div class="modal-content">
+    
+    <!-- Header del modal -->
+    <div class="modal-header">
+      <h2><i class="fas fa-rocket"></i> Crear Nuevo Proyecto</h2>
+      <button class="close-modal" id="closeProjectModal">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Progreso -->
+    <div class="creation-progress">
+      <div class="progress-steps">
+        <div class="step active" data-step="1">
+          <div class="step-number">1</div>
+          <span class="step-label">Portada</span>
+        </div>
+        <div class="step" data-step="2">
+          <div class="step-number">2</div>
+          <span class="step-label">Identidad</span>
+        </div>
+        <div class="step" data-step="3">
+          <div class="step-number">3</div>
+          <span class="step-label">Equipo</span>
+        </div>
+        <div class="step" data-step="4">
+          <div class="step-number">4</div>
+          <span class="step-label">Tecnologías</span>
+        </div>
+        <div class="step" data-step="5">
+          <div class="step-number">5</div>
+          <span class="step-label">Configuración</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenido del formulario -->
+    <div class="modal-body">
+      
+      <!-- Paso 1: Portada Visual -->
+      <div class="form-step active" data-step="1">
+        <div class="step-header">
+          <h3>Diseña tu Portada</h3>
+          <p>La primera impresión cuenta. Crea una portada atractiva para tu proyecto.</p>
+        </div>
+
+        <div class="cover-design-area">
+          <!-- Preview de la portada -->
+          <div class="cover-preview">
+            <div class="cover-image-placeholder">
+              <i class="fas fa-image"></i>
+              <p>Tu imagen de portada aparecerá aquí</p>
+              <small>Arrastra una imagen o haz clic para subir</small>
+            </div>
+            <div class="cover-overlay">
+              <input type="text" class="cover-title-input" placeholder="Título de tu proyecto" maxlength="60">
+              <input type="text" class="cover-subtitle-input" placeholder="Subtítulo o tagline" maxlength="120">
+            </div>
+          </div>
+
+          <!-- Controles de portada -->
+          <div class="cover-controls">
+            <div class="upload-options">
+              <button type="button" class="btn-upload-image">
+                <i class="fas fa-upload"></i> Subir Imagen
+              </button>
+              <button type="button" class="btn-select-template">
+                <i class="fas fa-palette"></i> Usar Plantilla
+              </button>
+            </div>
+            
+            <div class="cover-settings">
+              <label>Estado del Proyecto:</label>
+              <div class="status-badges">
+                <div class="status-badge active" data-status="planning">
+                  <i class="fas fa-lightbulb"></i> En Idea
+                </div>
+                <div class="status-badge" data-status="development">
+                  <i class="fas fa-code"></i> En Desarrollo
+                </div>
+                <div class="status-badge" data-status="launched">
+                  <i class="fas fa-rocket"></i> Lanzado
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paso 2: Identidad del Proyecto -->
+      <div class="form-step" data-step="2">
+        <div class="step-header">
+          <h3>Define la Identidad</h3>
+          <p>Cuéntanos sobre tu proyecto y su propósito.</p>
+        </div>
+
+        <div class="identity-form">
+          <div class="form-group">
+            <label for="projectName">Nombre Oficial del Proyecto *</label>
+            <input type="text" id="projectName" placeholder="Ej: CodeCollab - Plataforma de Coding en Tiempo Real" maxlength="60" required>
+            <small class="field-hint">Este será el nombre público de tu proyecto</small>
+          </div>
+
+          <div class="form-group">
+            <label for="projectSlug">URL única *</label>
+            <div class="slug-input">
+              <span class="slug-prefix">proyecto301.com/proyectos/</span>
+              <input type="text" id="projectSlug" placeholder="codigo-colaborativo" required>
+            </div>
+            <small class="field-hint">La URL que identificará tu proyecto</small>
+          </div>
+
+          <div class="form-group">
+            <label for="projectCategory">Categoría Principal</label>
+            <select id="projectCategory">
+              <option value="">Selecciona una categoría</option>
+              <option value="web-app">Aplicación Web</option>
+              <option value="mobile-app">App Móvil</option>
+              <option value="ai-ml">Inteligencia Artificial</option>
+              <option value="hardware">Hardware/IoT</option>
+              <option value="blockchain">Blockchain</option>
+              <option value="game-dev">Desarrollo de Juegos</option>
+              <option value="research">Investigación</option>
+              <option value="open-source">Open Source</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="projectTags">Etiquetas (máx. 5)</label>
+            <div class="tags-input-container">
+              <div class="tags-display"></div>
+              <input type="text" id="projectTags" class="tags-input" placeholder="Escribe una etiqueta y presiona Enter" maxlength="20">
+            </div>
+            <small class="field-hint">Etiquetas que describan tu proyecto</small>
+          </div>
+
+          <div class="form-group">
+            <label for="projectDescription">¿Qué problema resuelve?</label>
+            <textarea id="projectDescription" placeholder="Describe el problema que tu proyecto soluciona..." rows="3" maxlength="500"></textarea>
+            <small class="field-hint">Explica el problema que aborda tu proyecto</small>
+          </div>
+
+          <div class="form-group">
+            <label for="projectSolution">¿Cómo lo soluciona?</label>
+            <textarea id="projectSolution" placeholder="Explica cómo tu proyecto aborda este problema..." rows="3" maxlength="500"></textarea>
+            <small class="field-hint">Describe tu solución al problema</small>
+          </div>
+
+          <div class="form-group">
+            <label>¿Qué lo hace único? (2-3 puntos clave)</label>
+            <div class="usp-inputs">
+              <input type="text" id="usp1" class="usp-input" placeholder="Punto único #1" maxlength="100">
+              <input type="text" id="usp2" class="usp-input" placeholder="Punto único #2" maxlength="100">
+              <input type="text" id="usp3" class="usp-input" placeholder="Punto único #3" maxlength="100">
+            </div>
+            <small class="field-hint">Características que diferencian tu proyecto</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paso 3: Equipo y Colaboración -->
+      <div class="form-step" data-step="3">
+        <div class="step-header">
+          <h3>Construye tu Equipo</h3>
+          <p>Invita colaboradores y define los roles necesarios.</p>
+        </div>
+
+        <div class="team-form">
+          <!-- Miembros actuales -->
+          <div class="form-group">
+            <label>Miembros del Equipo</label>
+            <div class="current-members">
+              <div class="member-card owner">
+                <div class="member-avatar">
+                  <i class="fas fa-crown"></i>
+                </div>
+                <div class="member-info">
+                  <span class="member-name">Tú (Creador)</span>
+                  <span class="member-role">Fundador/Owner</span>
+                </div>
+              </div>
+            </div>
+            <small class="field-hint">Puedes agregar miembros más tarde</small>
+          </div>
+
+          <!-- Buscador de usuarios -->
+          <div class="form-group">
+            <label for="userSearchInput">Agregar miembros</label>
+            <div class="user-search">
+              <input type="text" id="userSearchInput" class="user-search-input" placeholder="Buscar usuarios por nombre, email o skills...">
+              <div class="search-results"></div>
+            </div>
+            <small class="field-hint">Busca usuarios para invitarlos a tu equipo</small>
+          </div>
+
+          <!-- Roles buscados -->
+          <div class="form-group">
+            <label>Roles que estás buscando</label>
+            <div class="roles-needed">
+              <div class="role-tags"></div>
+              <select class="role-select" id="roleSelect">
+                <option value="">Selecciona un rol...</option>
+                <option value="frontend">Frontend Developer</option>
+                <option value="backend">Backend Developer</option>
+                <option value="fullstack">Full Stack Developer</option>
+                <option value="ui-ux">UI/UX Designer</option>
+                <option value="devops">DevOps Engineer</option>
+                <option value="data-scientist">Data Scientist</option>
+                <option value="product-manager">Product Manager</option>
+                <option value="qa">QA Tester</option>
+              </select>
+            </div>
+            <small class="field-hint">Especifica los roles que necesitas</small>
+          </div>
+
+          <div class="collaboration-settings">
+            <div class="form-group">
+              <label>Modo de Colaboración</label>
+              <div class="collaboration-options">
+                <label class="option-card">
+                  <input type="radio" name="collaboration-mode" value="remote" checked>
+                  <i class="fas fa-laptop"></i>
+                  <span>Remoto</span>
+                </label>
+                <label class="option-card">
+                  <input type="radio" name="collaboration-mode" value="hybrid">
+                  <i class="fas fa-balance-scale"></i>
+                  <span>Híbrido</span>
+                </label>
+                <label class="option-card">
+                  <input type="radio" name="collaboration-mode" value="in-person">
+                  <i class="fas fa-building"></i>
+                  <span>Presencial</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Compromiso Temporal</label>
+              <div class="commitment-options">
+                <label class="option-card">
+                  <input type="radio" name="time-commitment" value="part-time" checked>
+                  <i class="fas fa-clock"></i>
+                  <span>Part-time</span>
+                </label>
+                <label class="option-card">
+                  <input type="radio" name="time-commitment" value="full-time">
+                  <i class="fas fa-briefcase"></i>
+                  <span>Full-time</span>
+                </label>
+                <label class="option-card">
+                  <input type="radio" name="time-commitment" value="freelance">
+                  <i class="fas fa-calendar"></i>
+                  <span>Freelance</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paso 4: Stack Tecnológico -->
+      <div class="form-step" data-step="4">
+        <div class="step-header">
+          <h3>Stack Tecnológico</h3>
+          <p>Define las tecnologías que usas y las que te gustaría implementar.</p>
+        </div>
+
+        <div class="technology-form">
+          <!-- Tecnologías actuales -->
+          <div class="form-group">
+            <label>Tecnologías que usas actualmente</label>
+            <div class="tech-input-container">
+              <div class="selected-technologies"></div>
+              <input type="text" id="techSearchInput" class="tech-search-input" placeholder="Buscar tecnologías...">
+              <div class="tech-suggestions"></div>
+            </div>
+            <small class="field-hint">Tecnologías con las que trabajas actualmente</small>
+          </div>
+
+          <!-- Tecnologías deseadas -->
+          <div class="form-group">
+            <label>Tecnologías que te gustaría implementar</label>
+            <div class="tech-input-container">
+              <div class="desired-technologies"></div>
+              <input type="text" id="desiredTechInput" class="desired-tech-input" placeholder="Tecnologías que quieres aprender...">
+            </div>
+            <small class="field-hint">Tecnologías que te interesa aprender o implementar</small>
+          </div>
+
+          <!-- Nivel de expertise -->
+          <div class="form-group">
+            <label>Nivel de Expertise del Equipo</label>
+            <div class="expertise-levels">
+              <label class="expertise-option">
+                <input type="radio" name="expertise-level" value="beginner">
+                <div class="expertise-card">
+                  <i class="fas fa-seedling"></i>
+                  <span>Principiante</span>
+                  <small>Estamos aprendiendo</small>
+                </div>
+              </label>
+              <label class="expertise-option">
+                <input type="radio" name="expertise-level" value="intermediate" checked>
+                <div class="expertise-card">
+                  <i class="fas fa-code"></i>
+                  <span>Intermedio</span>
+                  <small>Experiencia sólida</small>
+                </div>
+              </label>
+              <label class="expertise-option">
+                <input type="radio" name="expertise-level" value="advanced">
+                <div class="expertise-card">
+                  <i class="fas fa-rocket"></i>
+                  <span>Avanzado</span>
+                  <small>Expertos en el área</small>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paso 5: Configuración Final -->
+      <div class="form-step" data-step="5">
+        <div class="step-header">
+          <h3>Configuración Final</h3>
+          <p>Define cómo otros pueden interactuar con tu proyecto.</p>
+        </div>
+
+        <div class="configuration-form">
+          <!-- Botones de acción -->
+          <div class="form-group">
+            <label>Botones de Acción Activables</label>
+            <div class="action-buttons-config">
+              <label class="toggle-option">
+                <input type="checkbox" name="join-team" checked>
+                <div class="toggle-card">
+                  <i class="fas fa-user-plus"></i>
+                  <span>"Quiero Unirme"</span>
+                  <small>Permite solicitudes de membresía</small>
+                </div>
+              </label>
+              <label class="toggle-option">
+                <input type="checkbox" name="contact-team" checked>
+                <div class="toggle-card">
+                  <i class="fas fa-envelope"></i>
+                  <span>"Contactar Equipo"</span>
+                  <small>Permite mensajes directos</small>
+                </div>
+              </label>
+              <label class="toggle-option">
+                <input type="checkbox" name="suggest-ideas">
+                <div class="toggle-card">
+                  <i class="fas fa-lightbulb"></i>
+                  <span>"Sugerir Ideas"</span>
+                  <small>Permite lluvia de ideas</small>
+                </div>
+              </label>
+              <label class="toggle-option">
+                <input type="checkbox" name="express-tasks">
+                <div class="toggle-card">
+                  <i class="fas fa-bolt"></i>
+                  <span>"Tareas Express"</span>
+                  <small>Permite micro-tareas pagadas</small>
+                </div>
+              </label>
+            </div>
+            <small class="field-hint">Selecciona cómo pueden interactuar otros con tu proyecto</small>
+          </div>
+
+          <!-- Redes sociales -->
+          <div class="form-group">
+            <label>Enlaces a Redes Sociales</label>
+            <div class="social-links">
+              <div class="social-input">
+                <i class="fab fa-github"></i>
+                <input type="url" id="githubUrl" placeholder="https://github.com/tu-usuario" pattern="https://.*">
+              </div>
+              <div class="social-input">
+                <i class="fab fa-linkedin"></i>
+                <input type="url" id="linkedinUrl" placeholder="https://linkedin.com/company/tu-empresa" pattern="https://.*">
+              </div>
+              <div class="social-input">
+                <i class="fas fa-globe"></i>
+                <input type="url" id="websiteUrl" placeholder="https://tu-sitio-web.com" pattern="https://.*">
+              </div>
+            </div>
+            <small class="field-hint">Enlaces a tus redes sociales y sitio web</small>
+          </div>
+
+          <!-- Configuraciones adicionales -->
+          <div class="additional-settings">
+            <div class="form-group">
+              <label for="projectVisibility">Visibilidad del Proyecto</label>
+              <select id="projectVisibility">
+                <option value="public">Público - Visible para todos</option>
+                <option value="link-only">Solo con enlace - Compartible con URL</option>
+                <option value="private">Privado - Solo miembros</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="projectLicense">Licencia</label>
+              <select id="projectLicense">
+                <option value="open-source">Open Source</option>
+                <option value="proprietary">Propietario</option>
+                <option value="other">Otra</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="checkbox-option">
+                <input type="checkbox" id="needsFunding">
+                <span>¿Necesita financiamiento?</span>
+                <small>Marca si buscas inversionistas o fondos</small>
+              </label>
+            </div>
+          </div>
+
+          <!-- Preview final -->
+          <div class="final-preview">
+            <h4>Vista Previa de tu Proyecto</h4>
+            <div class="preview-card">
+              <div class="preview-cover">
+                <div class="preview-cover-placeholder">
+                  <i class="fas fa-image"></i>
+                </div>
+              </div>
+              <div class="preview-content">
+                <h3 class="preview-title">Título del Proyecto</h3>
+                <p class="preview-subtitle">Subtítulo del proyecto</p>
+                <div class="preview-tech">
+                  <span class="tech-tag">JavaScript</span>
+                  <span class="tech-tag">React</span>
+                </div>
+                <div class="preview-actions">
+                  <button class="btn-action-preview" title="Unirse al equipo">
+                    <i class="fas fa-user-plus"></i>
+                  </button>
+                  <button class="btn-action-preview" title="Contactar equipo">
+                    <i class="fas fa-envelope"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <small class="field-hint">Así se verá tu proyecto en la plataforma</small>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+<div class="modal-footer">
+  <div class="navigation-buttons">
+    <!-- Botón Anterior - oculto inicialmente -->
+    <button class="btn btn-secondary btn-hidden" id="prevStep">
+      <i class="fas fa-arrow-left"></i> Anterior
+    </button>
+    
+    <!-- Indicador de pasos -->
+    <div class="step-indicators">
+      <span class="current-step">Paso 1 de 5</span>
+    </div>
+    
+    <!-- Botón Siguiente - visible inicialmente -->
+    <button class="btn btn-primary btn-visible" id="nextStep">
+      Siguiente <i class="fas fa-arrow-right"></i>
+    </button>
+    
+    <!-- Botón Crear Proyecto - oculto inicialmente -->
+    <button class="btn btn-success btn-hidden" id="createProject">
+      <i class="fas fa-rocket"></i> Crear Proyecto
+    </button>
+  </div>
+</div>
+
+  </div>
+</div>
