@@ -1,0 +1,1019 @@
+/* === 🎨 VARIABLES DE COLORES === */
+:root {
+  /* Colores principales */
+  --color-primario: #0f0f23;
+  --color-secundario: rgba(255, 255, 255, 0.7);
+  --color-acento: linear-gradient(90deg, #ff5757, #8c52ff);
+  --color-acento-solido: #6a11cb;
+  
+  /* Colores de fondo */
+  --fondo-tarjeta: rgba(255, 255, 255, 0.05);
+  --fondo-tarjeta-hover: rgba(255, 255, 255, 0.08);
+  --fondo-imagen: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  
+  /* Colores de borde */
+  --borde-tarjeta: rgba(255, 255, 255, 0.1);
+  --borde-tarjeta-hover: rgba(106, 17, 203, 0.3);
+  
+  /* Colores de texto */
+  --texto-primario: #ffffff;
+  --texto-secundario: rgba(255, 255, 255, 0.7);
+  --texto-destacado: #c084fc;
+  
+  /* Colores de estado */
+  --color-exito: #10b981;
+  --color-advertencia: #f59e0b;
+  --color-peligro: #ef4444;
+  --color-info: #3b82f6;
+}
+
+/* === 🎯 ESTILOS ESPECÍFICOS PARA DASHBOARD MEJORADO === */
+
+/* 🌌 Contenedor principal del dashboard */
+.dashboard-main {
+  max-width: min(1400px, 98vw);
+  margin: 0 auto;
+  padding: clamp(80px, 10vw, 100px) clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);
+  width: 100%;
+}
+
+/* 🎪 Bola luminosa para dashboard */
+.dashboard-ball {
+  top: 15vh;
+  left: 5%;
+  width: min(350px, 80vw);
+  height: min(350px, 80vw);
+  filter: blur(70px);
+  opacity: 0.3;
+  z-index: 0;
+}
+
+/* 🏆 Sección de bienvenida - Siempre centrada */
+.welcome-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: clamp(20px, 4vw, 35px);
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.welcome-section h1 {
+  font-size: clamp(1.8rem, 4.5vw, 2.5rem);
+  font-weight: 600;
+  background: var(--color-acento);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 clamp(8px, 1.5vw, 12px) 0;
+  line-height: 1.1;
+  text-align: center;
+  width: 100%;
+  max-width: none;
+}
+
+.user-role {
+  color: var(--color-secundario);
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  margin: 0 0 clamp(10px, 2vw, 15px) 0;
+  font-weight: 400;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.user-role span {
+  display: inline-block;
+}
+
+.reputation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: clamp(0.85rem, 1.8vw, 0.95rem);
+  color: var(--color-secundario);
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.stars {
+  font-size: clamp(0.9rem, 2.2vw, 1.1rem);
+  display: inline-block;
+}
+
+/* 🔧 Asegurar centrado en todos los dispositivos */
+@media screen and (max-width: 768px) {
+  .welcome-section {
+    padding: 0 10px;
+  }
+  
+  .user-role {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+/* 📱 Para móviles muy pequeños */
+@media screen and (max-width: 480px) {
+  .welcome-section {
+    padding: 0 5px;
+  }
+  
+  .user-role {
+    font-size: clamp(0.85rem, 1.8vw, 1rem);
+    line-height: 1.4;
+  }
+  
+  .reputation {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* 📊 Grid principal del dashboard - MEJORADO */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(16px, 3vw, 24px);
+  margin-bottom: clamp(24px, 5vw, 40px);
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    gap: clamp(16px, 3vw, 24px);
+  }
+  
+  .dashboard-column:first-child {
+    grid-row: 1 / 3;
+  }
+}
+
+.dashboard-column {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 3vw, 24px);
+  min-height: 0;
+}
+
+/* 🎴 Tarjetas del dashboard - Más compactas */
+.dashboard-card {
+  background: var(--fondo-tarjeta);
+  border: 1px solid var(--borde-tarjeta);
+  border-radius: 16px;
+  padding: clamp(18px, 3vw, 24px);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+  min-height: 0;
+  flex-shrink: 0;
+}
+
+/* 🎯 Encabezados de tarjetas - Más compactos */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: clamp(16px, 2.5vw, 20px);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.card-header h2 {
+  font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+  font-weight: 600;
+  background: var(--color-acento);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 🎨 Botones - Más compactos */
+.btn-primary, .btn-secondary {
+  background: var(--color-acento);
+  border: none;
+  border-radius: 10px;
+  padding: clamp(8px, 1.5vw, 10px) clamp(14px, 2.5vw, 18px);
+  color: var(--texto-primario);
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(0.85rem, 1.8vw, 0.95rem);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  min-height: 40px;
+  flex-shrink: 0;
+}
+
+.btn-primary:hover, .btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(106, 17, 203, 0.3);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* 🔥 ESTILOS MEJORADOS PARA PROYECTOS - DISEÑO CREATIVO */
+
+.projects-section {
+  flex: 1;
+  min-height: 400px;
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  margin-top: 20px;
+}
+
+/* 🎨 TARJETA DE PROYECTO MEJORADA */
+.project-card {
+  background: var(--fondo-tarjeta);
+  border: 1px solid var(--borde-tarjeta);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+}
+
+.project-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--borde-tarjeta-hover);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  background: var(--fondo-tarjeta-hover);
+}
+
+/* 🖼️ CONTENEDOR DE IMAGEN MEJORADO */
+.project-media-container {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: var(--fondo-imagen);
+}
+
+.project-cover {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.project-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.project-card:hover .project-cover img {
+  transform: scale(1.05);
+}
+
+.project-cover.no-image {
+  background: var(--color-acento);
+}
+
+.project-cover-placeholder {
+  color: var(--texto-primario);
+  font-size: 3rem;
+  opacity: 0.8;
+}
+
+/* 🏷️ TÍTULO SOBRE LA IMAGEN - VERSIÓN MODERNA */
+.project-title-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(
+    0deg, 
+    rgba(0,0,0,0.9) 0%, 
+    rgba(0,0,0,0.7) 30%, 
+    rgba(0,0,0,0.4) 60%, 
+    transparent 100%
+  );
+  padding: 30px 20px 15px;
+  z-index: 2;
+}
+
+.project-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--texto-primario);
+  margin: 0;
+  line-height: 1.3;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 🎯 ESTADO DEL PROYECTO */
+.project-status {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(0, 0, 0, 0.85);
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 3;
+}
+
+.project-status.planning {
+  color: var(--color-advertencia);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.project-status.development {
+  color: var(--color-info);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.project-status.launched {
+  color: var(--color-exito);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+/* 📝 CONTENIDO DE LA TARJETA */
+.project-card-content {
+  padding: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.project-subtitle {
+  color: var(--texto-secundario);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex-grow: 1;
+}
+
+.project-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  font-size: 0.8rem;
+}
+
+.project-category,
+.project-visibility {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--texto-secundario);
+}
+
+.project-visibility.public {
+  color: var(--color-exito);
+}
+
+.project-visibility.private {
+  color: var(--color-peligro);
+}
+
+.project-visibility.link-only {
+  color: var(--color-advertencia);
+}
+
+/* 🛠️ TECNOLOGÍAS */
+.project-technologies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.tech-tag {
+  background: rgba(106, 17, 203, 0.15);
+  color: var(--texto-destacado);
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid rgba(106, 17, 203, 0.3);
+  transition: all 0.3s ease;
+}
+
+.tech-tag:hover {
+  background: rgba(106, 17, 203, 0.25);
+  transform: translateY(-1px);
+}
+
+.tech-tag-more {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--texto-secundario);
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 0.75rem;
+}
+
+/* 🔘 ACCIONES */
+.project-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.btn-view-project,
+.btn-edit-project {
+  flex: 1;
+  padding: 10px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.btn-view-project {
+  background: var(--color-acento);
+  color: var(--texto-primario);
+}
+
+.btn-edit-project {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--texto-primario);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-view-project:hover,
+.btn-edit-project:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ✨ EFECTO DE BRILLO AL HOVER */
+.project-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--color-acento);
+  transform: scaleX(0);
+  transition: transform 0.4s ease;
+  z-index: 1;
+}
+
+.project-card:hover::before {
+  transform: scaleX(1);
+}
+
+/* 📊 MÉTRICAS RÁPIDAS - Grid más compacto */
+.metrics-section {
+  flex-shrink: 0;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: clamp(12px, 2.5vw, 16px);
+}
+
+.metric-card {
+  background: var(--fondo-tarjeta);
+  border: 1px solid var(--borde-tarjeta);
+  border-radius: 12px;
+  padding: clamp(16px, 2.5vw, 20px);
+  text-align: center;
+  transition: all 0.3s ease;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.metric-card:hover {
+  background: var(--fondo-tarjeta-hover);
+  border-color: var(--borde-tarjeta-hover);
+  transform: translateY(-1px);
+}
+
+.metric-icon {
+  font-size: clamp(1.3rem, 2.5vw, 1.6rem);
+  margin-bottom: 8px;
+  background: var(--color-acento);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.metric-value {
+  display: block;
+  font-size: clamp(1.3rem, 2.5vw, 1.6rem);
+  font-weight: 600;
+  background: var(--color-acento);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.metric-label {
+  color: var(--color-secundario);
+  font-size: clamp(0.75rem, 1.8vw, 0.85rem);
+  display: block;
+}
+
+/* 🔔 Actividad reciente - Más compacta */
+.activity-section {
+  flex: 1;
+  min-height: 300px;
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.8vw, 12px);
+  flex: 1;
+}
+
+.activity-item {
+  background: var(--fondo-tarjeta);
+  border: 1px solid var(--borde-tarjeta);
+  border-radius: 10px;
+  padding: clamp(12px, 1.8vw, 14px);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+}
+
+.activity-item:hover {
+  background: var(--fondo-tarjeta-hover);
+  border-color: var(--borde-tarjeta-hover);
+}
+
+.activity-item.loading {
+  text-align: center;
+  color: var(--color-secundario);
+  font-style: italic;
+  justify-content: center;
+}
+
+.activity-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-acento);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+/* 💼 Oportunidades - Más compactas */
+.opportunities-section {
+  flex: 1;
+  min-height: 250px;
+}
+
+.opportunities-list {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.8vw, 12px);
+  flex: 1;
+}
+
+.opportunity-item {
+  background: var(--fondo-tarjeta);
+  border: 1px solid var(--borde-tarjeta);
+  border-radius: 10px;
+  padding: clamp(12px, 1.8vw, 14px);
+  transition: all 0.3s ease;
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+}
+
+.opportunity-item:hover {
+  background: var(--fondo-tarjeta-hover);
+  border-color: var(--borde-tarjeta-hover);
+  transform: translateX(3px);
+}
+
+.opportunity-item.loading {
+  text-align: center;
+  color: var(--color-secundario);
+  font-style: italic;
+  justify-content: center;
+}
+
+/* 👥 Tu Red - Más compacta */
+.network-section {
+  flex-shrink: 0;
+}
+
+.network-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(12px, 2.5vw, 16px);
+  margin-bottom: clamp(16px, 2.5vw, 20px);
+}
+
+.network-stat {
+  text-align: center;
+  padding: clamp(12px, 2vw, 14px);
+  background: var(--fondo-tarjeta);
+  border-radius: 10px;
+  border: 1px solid var(--borde-tarjeta);
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.stat-value {
+  display: block;
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  font-weight: 600;
+  background: var(--color-acento);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.stat-label {
+  color: var(--color-secundario);
+  font-size: clamp(0.7rem, 1.6vw, 0.8rem);
+  display: block;
+}
+
+.recent-connections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 12px;
+}
+
+/* 🏆 Logros y Reconocimientos - Grid más ajustado */
+.achievements-section {
+  margin-top: clamp(16px, 3vw, 24px);
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: clamp(12px, 2.5vw, 16px);
+}
+
+.achievement-item {
+  background: var(--fondo-tarjeta);
+  border: 1px solid var(--borde-tarjeta);
+  border-radius: 12px;
+  padding: clamp(16px, 2.5vw, 20px);
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.achievement-item:hover {
+  background: var(--fondo-tarjeta-hover);
+  border-color: var(--borde-tarjeta-hover);
+  transform: translateY(-2px);
+}
+
+.achievement-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-acento);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.achievement-item:hover::before {
+  transform: scaleX(1);
+}
+
+.achievement-item.loading {
+  text-align: center;
+  color: var(--color-secundario);
+  font-style: italic;
+  grid-column: 1 / -1;
+  justify-content: center;
+}
+
+.achievement-icon {
+  font-size: clamp(1.6rem, 3.5vw, 2rem);
+  margin-bottom: 8px;
+  background: var(--color-acento);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 📱 MEDIA QUERIES MEJORADAS */
+
+/* Tabletas */
+@media screen and (max-width: 1023px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .network-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .projects-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+  
+  .project-media-container {
+    height: 180px;
+  }
+}
+
+/* Móviles */
+@media screen and (max-width: 768px) {
+  .dashboard-main {
+    padding: clamp(70px, 8vw, 80px) clamp(12px, 2.5vw, 16px) clamp(25px, 4vw, 30px);
+  }
+  
+  .card-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  
+  .card-header h2 {
+    font-size: 1.2rem;
+  }
+  
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .project-media-container {
+    height: 160px;
+  }
+  
+  .project-title-overlay {
+    padding: 16px 16px 30px;
+  }
+  
+  .project-title {
+    font-size: 1.2rem;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .network-stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .achievements-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .btn-primary, .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Móviles pequeños */
+@media screen and (max-width: 480px) {
+  .dashboard-card {
+    padding: clamp(14px, 2.5vw, 16px);
+    border-radius: 12px;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .project-card,
+  .metric-card,
+  .achievement-item {
+    padding: clamp(14px, 2.5vw, 16px);
+  }
+  
+  .project-media-container {
+    height: 140px;
+  }
+  
+  .project-title-overlay {
+    padding: 12px 12px 25px;
+  }
+  
+  .project-title {
+    font-size: 1.1rem;
+  }
+  
+  .welcome-section h1 {
+    font-size: 1.6rem;
+  }
+  
+  .user-role {
+    font-size: 0.9rem;
+  }
+  
+  .network-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .project-actions {
+    flex-direction: column;
+  }
+}
+
+/* Tabletas grandes */
+@media screen and (min-width: 1024px) and (max-width: 1200px) {
+  .dashboard-main {
+    max-width: min(1200px, 98vw);
+  }
+  
+  .projects-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+/* Pantallas muy grandes */
+@media screen and (min-width: 1600px) {
+  .dashboard-main {
+    max-width: min(1600px, 98vw);
+  }
+  
+  .projects-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+  
+  .metrics-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .project-media-container {
+    height: 220px;
+  }
+}
+
+/* Estados vacíos y de error */
+.no-projects,
+.projects-error {
+  text-align: center;
+  padding: 60px 20px;
+  grid-column: 1 / -1;
+  background: var(--fondo-tarjeta);
+  border-radius: 16px;
+  border: 1px solid var(--borde-tarjeta);
+}
+
+.no-projects-icon,
+.error-icon {
+  font-size: 3rem;
+  color: rgba(255, 255, 255, 0.3);
+  margin-bottom: 20px;
+}
+
+.no-projects h3,
+.projects-error h3 {
+  color: var(--texto-primario);
+  margin-bottom: 10px;
+}
+
+.no-projects p,
+.projects-error p {
+  color: var(--texto-secundario);
+  margin-bottom: 20px;
+}
+
+/* Scroll personalizado para listas - Mejorado */
+.activity-list,
+.opportunities-list {
+  max-height: 300px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.activity-list::-webkit-scrollbar,
+.opportunities-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.activity-list::-webkit-scrollbar-track,
+.opportunities-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.activity-list::-webkit-scrollbar-thumb,
+.opportunities-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+.activity-list::-webkit-scrollbar-thumb:hover,
+.opportunities-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* Estados de carga */
+.loading {
+  color: var(--color-secundario);
+  font-style: italic;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 0.8; }
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-card,
+  .project-card,
+  .metric-card,
+  .activity-item,
+  .opportunity-item,
+  .achievement-item {
+    transition: none;
+    transform: none !important;
+  }
+}
+
+/* Soporte para modo oscuro del sistema */
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-primario: #f8fafc;
+    --color-secundario: rgba(0, 0, 0, 0.7);
+    --fondo-tarjeta: rgba(0, 0, 0, 0.03);
+    --fondo-tarjeta-hover: rgba(0, 0, 0, 0.06);
+    --borde-tarjeta: rgba(0, 0, 0, 0.1);
+    --borde-tarjeta-hover: rgba(106, 17, 203, 0.3);
+    --texto-primario: #1a1a1a;
+    --texto-secundario: rgba(0, 0, 0, 0.7);
+    --texto-destacado: #6a11cb;
+  }
+  
+  .project-card,
+  .metric-card,
+  .activity-item,
+  .opportunity-item,
+  .achievement-item,
+  .network-stat {
+    background: var(--fondo-tarjeta);
+    border-color: var(--borde-tarjeta);
+  }
+}

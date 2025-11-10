@@ -7,6 +7,7 @@
 
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/modals/create-project-modal.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -20,6 +21,7 @@
   <script src="../js/auth.js" defer></script>
   <script src="../js/dashboard.js" defer></script>
   <script src="../js/load-navbar.js" defer></script>
+  <script src="../js/modals/create-project-modal.js" defer></script>
 <script src="../js/spinner.js" defer></script>
 </head>
 <body>
@@ -33,21 +35,22 @@
   <!-- 🌌 Contenido principal del Dashboard -->
   <main class="dashboard-main">
     <!-- Header de bienvenida -->
-    <section class="welcome-section">
-      <h1 id="dashboard-titulo">
-        <span id="welcome-text" data-key="dashboard.welcome">¡Bienvenido, </span>
-        <span id="user-name">Usuario</span>
-
-      </h1>
-      <p class="user-role" id="user-role">
-        <span data-key="dashboard.userRole">Desarrollador Full-Stack • Miembro desde</span> 
-        <span id="member-since">2024</span>
-      </p>
-      <div class="reputation">
-        <span class="stars">⭐⭐⭐⭐☆</span>
-        <span class="rating">4.8/5.0</span>
-      </div>
-    </section>
+<!-- En la sección de bienvenida -->
+<section class="welcome-section">
+  <h1 id="dashboard-titulo">
+    <span id="welcome-text" data-key="dashboard.welcome">¡Bienvenido, </span>
+    <span id="user-name">Usuario</span>
+  </h1>
+  <p class="user-role" id="user-role">
+    <span id="user-profession">Desarrollador Full-Stack</span> • 
+    <span data-key="dashboard.userRole.memberSince">Miembro desde</span> 
+    <span id="member-since">2024</span>
+  </p>
+  <div class="reputation">
+    <span class="stars">⭐⭐⭐⭐☆</span>
+    <span class="rating">4.8/5.0</span>
+  </div>
+</section>
 
     <!-- 📊 Grid principal del dashboard -->
     <div class="dashboard-grid">
@@ -179,6 +182,6 @@
   <footer>
     <p data-key="footer.texto">© 2025 Proyecto 301 — Comunidad de desarrollo creativo</p>
   </footer>
-
+<div id="modal-container"></div>
 </body>
 </html>

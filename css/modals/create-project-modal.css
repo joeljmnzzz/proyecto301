@@ -1,0 +1,1151 @@
+/* === 🎨 MODAL DE CREACIÓN DE PROYECTO - VERSIÓN CORREGIDA === */
+
+/* Overlay del modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+  display: flex;
+  opacity: 1;
+}
+
+/* 🔥 CONTENEDOR PRINCIPAL CORREGIDO - FLEXBOX */
+.modal-content {
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 900px;
+  height: 90vh; /* 🔥 Altura fija */
+  max-height: 90vh; /* 🔥 Máxima altura */
+  display: flex; /* 🔥 Flexbox */
+  flex-direction: column; /* 🔥 Dirección columna */
+  overflow: hidden; /* 🔥 Ocultar overflow */
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-content {
+  transform: translateY(0);
+}
+
+/* Header del modal */
+.modal-header {
+  padding: 25px 30px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  flex-shrink: 0; /* 🔥 No se encoge */
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.8rem;
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+}
+
+.close-modal {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-modal:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg);
+}
+
+/* Barra de progreso */
+.creation-progress {
+  padding: 20px 30px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0; /* 🔥 No se encoge */
+}
+
+.progress-steps {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.progress-steps::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 1;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+}
+
+.step-number {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+}
+
+.step.active .step-number {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  border-color: #6a11cb;
+  color: white;
+  box-shadow: 0 0 20px rgba(106, 17, 203, 0.5);
+}
+
+.step-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.step.active .step-label {
+  color: #6a11cb;
+  font-weight: 600;
+}
+
+/* 🔥 CUERPO DEL MODAL CORREGIDO - FLEXIBLE */
+.modal-body {
+  padding: 0;
+  flex: 1; /* 🔥 Ocupa todo el espacio disponible */
+  overflow-y: auto; /* 🔥 Scroll interno */
+  min-height: 0; /* 🔥 Permite que se encoja */
+}
+
+.form-step {
+  display: none;
+  padding: 30px;
+  animation: fadeIn 0.3s ease;
+}
+
+.form-step.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.step-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.step-header h3 {
+  font-size: 1.5rem;
+  margin: 0 0 10px 0;
+  color: white;
+}
+
+.step-header p {
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+/* === PASO 1: PORTADA VISUAL - VERSIÓN CORREGIDA === */
+.cover-design-area {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 30px;
+  align-items: start;
+}
+
+.cover-preview {
+  position: relative;
+  border-radius: 15px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 🔥 CORRECCIÓN: Imagen de fondo */
+.cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.7) contrast(1.1);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1; /* 🔥 Detrás del overlay */
+}
+
+.cover-image-placeholder {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  position: relative;
+  z-index: 2; /* 🔥 Encima de la imagen */
+}
+
+.cover-image-placeholder i {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  display: block;
+}
+
+/* 🔥 CORRECCIÓN: Overlay con z-index más alto */
+.cover-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 30px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  z-index: 10; /* 🔥 Muy importante: encima de todo */
+}
+
+/* 🔥 CORRECCIÓN: Inputs con z-index y estilos mejorados */
+.cover-title-input,
+.cover-subtitle-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: white;
+  font-family: inherit;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 15; /* 🔥 Encima del overlay */
+}
+
+.cover-title-input {
+  font-size: 2rem;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* 🔥 Mejor legibilidad */
+}
+
+.cover-subtitle-input {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); /* 🔥 Mejor legibilidad */
+}
+
+.cover-title-input::placeholder,
+.cover-subtitle-input::placeholder {
+  color: rgba(255, 255, 255, 0.8); /* 🔥 Placeholder más visible */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.cover-title-input:focus,
+.cover-subtitle-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.1); /* 🔥 Fondo al focus */
+  padding: 5px 10px;
+  border-radius: 5px;
+  margin-left: -10px;
+  margin-right: -10px;
+}
+
+/* 🔥 CORRECCIÓN: Botón de eliminar imagen con z-index alto */
+.remove-image-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(239, 68, 68, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20; /* 🔥 El más alto de todos */
+  transition: all 0.3s ease;
+}
+
+.remove-image-btn:hover {
+  background: rgba(239, 68, 68, 1);
+  transform: scale(1.1);
+}
+
+.cover-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.upload-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-upload-image,
+.btn-select-template {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+}
+
+.btn-upload-image:hover,
+.btn-select-template:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.cover-settings label {
+  display: block;
+  margin-bottom: 10px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 600;
+}
+
+.status-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.status-badge {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 8px 16px;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+
+.status-badge.active {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  border-color: #6a11cb;
+  color: white;
+}
+
+/* === PASO 2: IDENTIDAD DEL PROYECTO === */
+.identity-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: white;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #6a11cb;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.slug-input {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.slug-prefix {
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+.slug-input input {
+  flex: 1;
+  border: none;
+  background: transparent;
+}
+
+.tags-input-container {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 8px;
+  min-height: 44px;
+}
+
+.tags-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.tag {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tag-remove {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tags-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 4px;
+}
+
+.tags-input:focus {
+  outline: none;
+}
+
+.usp-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.usp-input {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: white;
+  font-family: inherit;
+}
+
+.usp-input:focus {
+  outline: none;
+  border-color: #6a11cb;
+}
+
+/* === PASO 3: EQUIPO Y COLABORACIÓN === */
+.team-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.current-members {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.member-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.member-card.owner {
+  background: rgba(106, 17, 203, 0.1);
+  border-color: rgba(106, 17, 203, 0.3);
+}
+
+.member-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.member-info {
+  flex: 1;
+}
+
+.member-name {
+  display: block;
+  color: white;
+  font-weight: 600;
+}
+
+.member-role {
+  display: block;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+}
+
+.user-search {
+  position: relative;
+}
+
+.user-search-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: white;
+  font-family: inherit;
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(30, 30, 40, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  margin-top: 5px;
+  max-height: 200px;
+  overflow-y: auto;
+  display: none;
+  z-index: 10;
+}
+
+.roles-needed {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.role-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.role-tag {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  padding: 6px 12px;
+  color: white;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.role-select {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: white;
+  font-family: inherit;
+}
+
+.collaboration-settings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.collaboration-options,
+.commitment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.option-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.option-card input[type="radio"] {
+  margin: 0;
+}
+
+.option-card i {
+  color: #6a11cb;
+  font-size: 1.1rem;
+}
+
+/* === PASO 4: STACK TECNOLÓGICO === */
+.technology-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tech-input-container {
+  position: relative;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 12px;
+  min-height: 44px;
+}
+
+.selected-technologies,
+.desired-technologies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.tech-tag {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tech-search-input,
+.desired-tech-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 4px;
+}
+
+.tech-search-input:focus,
+.desired-tech-input:focus {
+  outline: none;
+}
+
+.tech-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(30, 30, 40, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  margin-top: 5px;
+  max-height: 200px;
+  overflow-y: auto;
+  display: none;
+  z-index: 10;
+}
+
+.expertise-levels {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.expertise-option input[type="radio"] {
+  display: none;
+}
+
+.expertise-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.expertise-option input[type="radio"]:checked + .expertise-card {
+  border-color: #6a11cb;
+  background: rgba(106, 17, 203, 0.1);
+}
+
+.expertise-card i {
+  font-size: 2rem;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.expertise-card span {
+  color: white;
+  font-weight: 600;
+}
+
+.expertise-card small {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+}
+
+/* === PASO 5: CONFIGURACIÓN FINAL === */
+.configuration-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.action-buttons-config {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.toggle-option input[type="checkbox"] {
+  display: none;
+}
+
+.toggle-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.toggle-option input[type="checkbox"]:checked + .toggle-card {
+  border-color: #6a11cb;
+  background: rgba(106, 17, 203, 0.1);
+}
+
+.toggle-card i {
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.toggle-card span {
+  color: white;
+  font-weight: 600;
+}
+
+.toggle-card small {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+}
+
+.social-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.social-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 12px 16px;
+}
+
+.social-input i {
+  color: #6a11cb;
+  width: 20px;
+}
+
+.social-input input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: white;
+  font-family: inherit;
+}
+
+.social-input input:focus {
+  outline: none;
+}
+
+.additional-settings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.final-preview {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.final-preview h4 {
+  margin: 0 0 15px 0;
+  color: white;
+}
+
+.preview-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.preview-cover {
+  height: 120px;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  position: relative;
+}
+
+.preview-content {
+  padding: 20px;
+}
+
+.preview-title {
+  margin: 0 0 5px 0;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.preview-subtitle {
+  margin: 0 0 15px 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+.preview-tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 15px;
+}
+
+.preview-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* 🔥 PIE DEL MODAL CORREGIDO - SIEMPRE VISIBLE */
+.modal-footer {
+  padding: 20px 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  flex-shrink: 0; /* 🔥 No se encoge */
+  display: flex !important; /* 🔥 Forzar display */
+  visibility: visible !important; /* 🔥 Forzar visibilidad */
+  opacity: 1 !important; /* 🔥 Forzar opacidad */
+}
+
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+}
+
+.step-indicators {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  flex: 1;
+  text-align: center;
+}
+
+/* 🔥 CORRECCIÓN: ESTILOS ESPECÍFICOS PARA BOTONES DE NAVEGACIÓN */
+.btn-primary, .btn-secondary, .btn-success {
+  min-width: 120px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  font-size: 14px;
+  
+  /* 🔥 REMOVER LAS PROPIEDADES QUE FUERZAN VISIBILIDAD */
+  /* display: inline-block !important; ← ELIMINAR */
+  /* visibility: visible !important; ← ELIMINAR */
+  /* opacity: 1 !important; ← ELIMINAR */
+}
+
+/* 🔥 BOTÓN PRIMARIO (Siguiente) */
+.btn-primary {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+  display: inline-block; /* 🔥 Sin !important */
+  visibility: visible; /* 🔥 Sin !important */
+  opacity: 1; /* 🔥 Sin !important */
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+}
+
+/* 🔥 BOTÓN SECUNDARIO (Anterior) */
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: none; /* 🔥 Inicialmente oculto */
+  visibility: hidden; /* 🔥 Inicialmente oculto */
+  opacity: 0; /* 🔥 Inicialmente oculto */
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+/* 🔥 BOTÓN ÉXITO (Crear Proyecto) */
+.btn-success {
+  background: linear-gradient(135deg, #00b09b, #96c93d);
+  color: white;
+  display: none; /* 🔥 Inicialmente oculto */
+  visibility: hidden; /* 🔥 Inicialmente oculto */
+  opacity: 0; /* 🔥 Inicialmente oculto */
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 176, 155, 0.4);
+}
+
+/* 🔥 CLASES PARA CONTROL DE VISIBILIDAD DESDE JAVASCRIPT */
+.btn-visible {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.btn-hidden {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* 🔥 PIE DEL MODAL - MANTENER SIEMPRE VISIBLE PERO PERMITIR CONTROL DE BOTONES */
+.modal-footer {
+  padding: 20px 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  flex-shrink: 0;
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+}
+
+.step-indicators {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  flex: 1;
+  text-align: center;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .modal-content {
+    height: 95vh;
+    max-height: 95vh;
+    margin: 10px;
+  }
+  
+  .modal-header {
+    padding: 20px;
+  }
+  
+  .form-step {
+    padding: 20px;
+  }
+  
+  .cover-design-area {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .collaboration-settings {
+    grid-template-columns: 1fr;
+  }
+  
+  .expertise-levels {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-buttons-config {
+    grid-template-columns: 1fr;
+  }
+  
+  .additional-settings {
+    grid-template-columns: 1fr;
+  }
+  
+  .progress-steps::before {
+    left: 5%;
+    right: 5%;
+  }
+  
+  .step-label {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-header h2 {
+    font-size: 1.4rem;
+  }
+  
+  .step-header h3 {
+    font-size: 1.3rem;
+  }
+  
+  .cover-title-input {
+    font-size: 1.6rem;
+  }
+  
+  .cover-subtitle-input {
+    font-size: 1rem;
+  }
+  
+  .navigation-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .btn-primary, .btn-secondary, .btn-success {
+    width: 100%;
+  }
+}
+
+/* Scroll personalizado */
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
