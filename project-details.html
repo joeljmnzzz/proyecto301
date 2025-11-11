@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Proyecto | Proyecto 301</title>
+    
+    <!--Links con rutas ABSOLUTAS-->
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/project-details.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+    <div class="ball"></div>
+
+    <!-- Estado de error -->
+    <div class="error-state hidden" id="error-state">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h3>Proyecto no encontrado</h3>
+        <p>El proyecto que buscas no existe o no está disponible.</p>
+        <a href="projects.html" class="btn btn-primary">Volver a Proyectos</a>
+    </div>
+
+    <main class="project-details hidden" id="project-content">
+        <!-- Hero Section -->
+        <section class="project-hero">
+            <div class="container">
+                <div class="project-breadcrumb">
+                    <a href="index.html" class="breadcrumb-link">Inicio</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="projects.html" class="breadcrumb-link">Proyectos</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current" id="project-title-breadcrumb">Cargando...</span>
+                </div>
+                
+                <h1 class="project-title" id="project-title">Cargando...</h1>
+                <p class="project-subtitle" id="project-subtitle">Cargando descripción del proyecto...</p>
+                
+                <div class="project-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-calendar"></i>
+                        <span id="project-created-at">Publicado: Cargando...</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-tags"></i>
+                        <span id="project-category">Categoría: Cargando...</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-clock"></i>
+                        <span id="project-time-commitment">Tiempo: Cargando...</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-signal"></i>
+                        <span id="project-expertise-level">Nivel: Cargando...</span>
+                    </div>
+                </div>
+
+                <!-- Estado del proyecto -->
+                <div class="project-status-badge">
+                    <span class="status-badge" id="project-status">Cargando...</span>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Project Content -->
+        <section class="project-content">
+            <div class="container">
+                <div class="content-grid">
+                    <div class="content-main">
+                        <!-- Descripción del proyecto -->
+                        <div class="description-section">
+                            <h2>Descripción</h2>
+                            <p id="project-description">Cargando descripción del proyecto...</p>
+                        </div>
+
+                        <!-- Problema y Solución -->
+                        <div class="problem-solution-section">
+                            <h3>Problema & Solución</h3>
+                            <div class="problem-solution-content" id="project-problem-solution">
+                                <p>Cargando información del problema y solución...</p>
+                            </div>
+                        </div>
+
+                        <!-- USP (Unique Selling Propositions) -->
+                        <div class="usp-section">
+                            <h3>Características Únicas</h3>
+                            <div class="usp-grid" id="project-usp">
+                                <!-- Las características se cargarán dinámicamente -->
+                            </div>
+                        </div>
+
+                        <!-- Tecnologías -->
+                        <div class="technologies-section">
+                            <h3>Tecnologías Utilizadas</h3>
+                            <div class="tech-stack" id="project-technologies">
+                                <!-- Las tecnologías se cargarán dinámicamente -->
+                            </div>
+                        </div>
+
+                        <!-- Tecnologías Deseadas -->
+                        <div class="desired-tech-section">
+                            <h3>Tecnologías Buscadas</h3>
+                            <div class="desired-tech-list" id="project-desired-tech">
+                                <!-- Las tecnologías deseadas se cargarán dinámicamente -->
+                            </div>
+                        </div>
+
+                        <!-- Tags -->
+                        <div class="tags-section">
+                            <h3>Etiquetas</h3>
+                            <div class="project-tags" id="project-tags">
+                                <!-- Los tags se cargarán dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-sidebar">
+                        <!-- Información del Proyecto -->
+                        <div class="project-info-card">
+                            <h4>Información del Proyecto</h4>
+                            <div class="info-item">
+                                <strong>Modo de Colaboración:</strong>
+                                <span id="project-collaboration-mode">Cargando...</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Compromiso de Tiempo:</strong>
+                                <span id="project-time-commitment-sidebar">Cargando...</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Nivel de Experiencia:</strong>
+                                <span id="project-expertise-level-sidebar">Cargando...</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Licencia:</strong>
+                                <span id="project-license">Cargando...</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Financiamiento:</strong>
+                                <span id="project-needs-funding">Cargando...</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Visibilidad:</strong>
+                                <span id="project-visibility">Cargando...</span>
+                            </div>
+                            
+                            <!-- Botones Activos -->
+                            <div class="project-actions" id="project-active-buttons">
+                                <!-- Los botones se cargarán dinámicamente -->
+                            </div>
+
+                            <!-- Enlaces Sociales -->
+                            <div class="social-links" id="project-social-links">
+                                <!-- Los enlaces sociales se cargarán dinámicamente -->
+                            </div>
+                        </div>
+
+                        <!-- Roles del Proyecto -->
+                        <div class="project-roles-section">
+                            <h4>Roles Buscados</h4>
+                            <div class="roles-list" id="project-roles">
+                                <!-- Los roles se cargarán dinámicamente -->
+                            </div>
+                        </div>
+
+                        <!-- Miembros del Equipo -->
+                        <div class="team-section">
+                            <h4>Equipo del Proyecto</h4>
+                            <div class="team-members" id="project-members">
+                                <!-- Los miembros se cargarán dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Projects -->
+        <section class="related-projects">
+            <div class="container">
+                <h2>Proyectos Relacionados</h2>
+                <div class="projects-grid" id="related-projects">
+                    <!-- Los proyectos relacionados se cargarán dinámicamente -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p data-key="footer.texto">© 2025 Proyecto 301 — Comunidad de desarrollo creativo</p>
+    </footer>
+    
+    <!-- Scripts en ORDEN CORRECTO -->
+    <script src="/js/supabase-client.js"></script>
+    <script src="/js/load-navbar.js"></script>
+    <script src="/js/spinner.js"></script>
+    <script src="/js/project-details.js?v=2"></script>
+</body>
+</html>

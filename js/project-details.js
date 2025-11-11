@@ -1,394 +1,735 @@
-// project-details.js - Gestión de páginas individuales de proyectos
-
-class ProjectDetails {
+// project-details.js - Carga dinámica de proyectos desde Supabase (VERSIÓN CORREGIDA)
+class ProjectDetailsLoader {
     constructor() {
+        this.projectSlug = this.getSlugFromURL();
         this.currentProject = null;
-        this.isInitialized = false;
+        this.userMap = null;
+        this.init();
     }
 
-    // 🔧 INICIALIZAR PÁGINA DE DETALLES
-    async init() {
-        if (this.isInitialized) return;
-
-        console.log('🚀 Inicializando página de detalles del proyecto...');
-        
-        // Obtener slug de la URL
-        const slug = this.getProjectSlugFromURL();
-        
-        if (!slug) {
-            this.showError('URL de proyecto no válida');
-            return;
+    init() {
+        // Esperar a que Supabase esté listo
+        if (window.supabase) {
+            this.loadProjectData();
+        } else {
+            window.addEventListener('supabase-ready', () => {
+                this.loadProjectData();
+            });
         }
 
-        await this.loadProjectDetails(slug);
-        this.isInitialized = true;
+        // Inicializar animación de la bola
+        this.initBallScroll();
     }
 
-    // 🔍 OBTENER SLUG DE LA URL
-    getProjectSlugFromURL() {
+    // Obtener el slug de la URL
+    getSlugFromURL() {
         const path = window.location.pathname;
-        const match = path.match(/\/proyectos\/([^\/]+)/);
-        
-        if (match && match[1]) {
-            console.log('📝 Slug detectado:', match[1]);
-            return match[1];
-        }
-        
-        console.error('❌ No se pudo extraer slug de la URL:', path);
-        return null;
+        const slug = path.split('/').pop();
+        console.log('🔍 Slug detectado:', slug);
+        return slug;
     }
 
-    // 📥 CARGAR DETALLES DEL PROYECTO
-    async loadProjectDetails(slug) {
+    // Cargar datos del proyecto desde Supabase
+    async loadProjectData() {
         try {
-            this.showLoading(true);
-            
-            if (!window.supabase) {
-                throw new Error('Supabase no está disponible');
+            // Mostrar spinner
+            if (window.universalSpinner) {
+                window.universalSpinner.show('Cargando proyecto...');
             }
 
-            console.log('🔍 Cargando detalles del proyecto:', slug);
+            console.log('📡 Cargando proyecto con slug:', this.projectSlug);
 
-            // CONSULTA PARA OBTENER PROYECTO POR SLUG
+            // ✅ CONSULTA CORREGIDA - Sin relaciones problemáticas
             const { data: project, error } = await window.supabase
                 .from('projects')
                 .select(`
-                    id, name, slug, title, subtitle, description, 
-                    cover_image_url, status, category, technologies, 
-                    visibility, created_at, created_by,
-                    demo_url, repository_url, documentation_url,
-                    featured, tags, long_description
+                    *,
+                    project_roles(*),
+                    project_members(*),
+                    project_desired_tech(*)
                 `)
-                .eq('slug', slug)
+                .eq('slug', this.projectSlug)
                 .eq('visibility', 'public')
                 .single();
 
             if (error) {
-                console.error('❌ Error cargando proyecto:', error);
-                throw new Error('Proyecto no encontrado');
+                throw error;
             }
 
             if (!project) {
-                throw new Error('El proyecto no existe o no es público');
+                throw new Error('Proyecto no encontrado');
             }
 
             this.currentProject = project;
-            await this.loadProjectAuthor(project.created_by);
-            this.displayProjectDetails(project);
+            console.log('✅ Proyecto cargado:', project);
+
+            // ✅ Cargar información de usuarios por separado si hay miembros
+            if (project.project_members && project.project_members.length > 0) {
+                await this.loadUsersInfo(project.project_members);
+            }
+
+            // Actualizar la interfaz
+            this.updateUI();
+            this.showContent();
 
         } catch (error) {
-            console.error('❌ Error cargando detalles:', error);
-            this.showError(error.message);
+            console.error('❌ Error cargando proyecto:', error);
+            this.showError();
         } finally {
-            this.showLoading(false);
+            // Ocultar spinner
+            if (window.universalSpinner) {
+                window.universalSpinner.hide();
+            }
         }
     }
 
-    // 👤 CARGAR INFORMACIÓN DEL AUTOR
-    async loadProjectAuthor(userId) {
-        if (!userId) return;
+    // ✅ NUEVO: Cargar información de usuarios desde la tabla correcta
+    async loadUsersInfo(projectMembers) {
+        if (!projectMembers || projectMembers.length === 0) return;
 
         try {
-            console.log('👤 Cargando información del autor:', userId);
+            const userIds = projectMembers.map(member => member.user_id).filter(id => id);
+            
+            if (userIds.length === 0) return;
 
-            const { data: profile, error } = await window.supabase
+            // Consultar información de usuarios desde la tabla 'profiles'
+            const { data: users, error } = await window.supabase
                 .from('profiles')
-                .select('username, full_name, avatar_url, bio, website')
-                .eq('id', userId)
-                .single();
+                .select('*')
+                .in('id', userIds);
 
-            if (!error && profile) {
-                this.currentProject.author = profile;
-            } else {
-                this.currentProject.author = {
-                    username: 'usuario',
-                    full_name: 'Usuario',
-                    avatar_url: null
-                };
+            if (error) {
+                console.warn('⚠️ No se pudieron cargar los usuarios:', error);
+                return;
             }
+
+            // Crear mapa de usuarios para acceso rápido
+            this.userMap = {};
+            if (users) {
+                users.forEach(user => {
+                    this.userMap[user.id] = user;
+                });
+            }
+
+            console.log('✅ Usuarios cargados:', users);
+
         } catch (error) {
-            console.error('❌ Error cargando autor:', error);
-            this.currentProject.author = {
-                username: 'usuario',
-                full_name: 'Usuario',
-                avatar_url: null
-            };
+            console.warn('⚠️ Error cargando usuarios:', error);
         }
     }
 
-    // 🎨 MOSTRAR DETALLES DEL PROYECTO
-    displayProjectDetails(project) {
-        console.log('🎨 Mostrando detalles del proyecto:', project.title);
+    // Actualizar la interfaz con los datos del proyecto
+    updateUI() {
+        if (!this.currentProject) return;
+
+        const project = this.currentProject;
+
+        // Información básica - Solo mostrar si existe
+        this.updateElementIfContent('project-title', project.title);
+        this.updateElementIfContent('project-title-breadcrumb', project.title);
+        this.updateElementIfContent('project-subtitle', project.subtitle);
+        this.updateElementIfContent('project-description', project.description);
+        this.updateElementIfContent('project-problem-solution', project.problem_solution);
+
+        // Meta información
+        this.updateElementIfContent('project-created-at', `Publicado: ${this.formatDate(project.created_at)}`, 'Fecha no disponible');
+        this.updateElementIfContent('project-category', `Categoría: ${project.category}`, 'Sin categoría');
+        this.updateElementIfContent('project-time-commitment', `Tiempo: ${this.formatTimeCommitment(project.time_commitment)}`, 'No especificado');
+        this.updateElementIfContent('project-expertise-level', `Nivel: ${this.formatExpertiseLevel(project.expertise_level)}`, 'No especificado');
+
+        // Estado del proyecto
+        this.updateProjectStatus(project.status);
+
+        // Imagen de portada
+        this.updateCoverImage(project.cover_image_url);
+
+        // Sidebar information
+        this.updateElementIfContent('project-collaboration-mode', this.formatCollaborationMode(project.collaboration_mode), 'No especificado');
+        this.updateElementIfContent('project-time-commitment-sidebar', this.formatTimeCommitment(project.time_commitment), 'No especificado');
+        this.updateElementIfContent('project-expertise-level-sidebar', this.formatExpertiseLevel(project.expertise_level), 'No especificado');
+        this.updateElementIfContent('project-license', project.license, 'No especificada');
+        this.updateElementIfContent('project-needs-funding', project.needs_funding ? 'Sí requiere' : 'No requiere', 'No especificado');
+        this.updateElementIfContent('project-visibility', this.formatVisibility(project.visibility), 'No especificada');
+
+        // Elementos dinámicos - Solo mostrar si hay contenido
+        this.updateTechnologies(project.technologies);
+        this.updateDesiredTech(project.project_desired_tech);
+        this.updateTags(project.tags);
+        this.updateUSP(project.usp);
+        this.updateRoles(project.project_roles);
+        this.updateMembers(project.project_members);
+        this.updateSocialLinks(project.social_links);
+        this.updateActiveButtons(project.active_buttons);
 
         // Actualizar título de la página
-        document.title = `${project.title} - Mis Proyectos`;
-
-        // Mostrar breadcrumb
-        this.displayBreadcrumb(project);
-
-        // Mostrar header del proyecto
-        this.displayProjectHeader(project);
-
-        // Mostrar contenido principal
-        this.displayProjectContent(project);
-
-        // Mostrar sidebar
-        this.displayProjectSidebar(project);
+        if (project.title) {
+            document.title = `${project.title} | Proyecto 301`;
+        }
     }
 
-    // 📄 MOSTRAR HEADER DEL PROYECTO
-    displayProjectHeader(project) {
-        const headerElement = document.getElementById('project-header');
-        if (!headerElement) return;
-
-        headerElement.innerHTML = `
-            <div class="project-cover-container">
-                ${project.cover_image_url ? `
-                    <img src="${project.cover_image_url}" alt="${project.title}" class="project-cover-image">
-                ` : `
-                    <div class="project-cover-placeholder">
-                        <i class="fas fa-rocket"></i>
-                    </div>
-                `}
-                <div class="project-header-content">
-                    <div class="project-badge ${project.status}">
-                        <i class="fas ${this.getStatusIcon(project.status)}"></i>
-                        ${this.getStatusText(project.status)}
-                    </div>
-                    <h1 class="project-title">${project.title}</h1>
-                    <p class="project-subtitle">${project.subtitle || ''}</p>
-                    
-                    <div class="project-author-info">
-                        ${project.author?.avatar_url ? `
-                            <img src="${project.author.avatar_url}" alt="${project.author.full_name}" class="author-avatar">
-                        ` : `
-                            <div class="author-avatar placeholder">
-                                <i class="fas fa-user"></i>
-                            </div>
-                        `}
-                        <span class="author-name">${project.author?.full_name || 'Usuario'}</span>
-                        <span class="project-date">• ${this.formatDate(project.created_at)}</span>
-                    </div>
-                </div>
-            </div>
-        `;
+    // ✅ NUEVO: Helper para actualizar elementos solo si hay contenido
+    updateElementIfContent(elementId, content, fallbackText = '') {
+        const element = document.getElementById(elementId);
+        if (element) {
+            if (content) {
+                element.textContent = content;
+                element.style.display = ''; // Mostrar elemento
+            } else {
+                if (fallbackText) {
+                    element.textContent = fallbackText;
+                } else {
+                    element.style.display = 'none'; // Ocultar elemento si no hay contenido
+                }
+            }
+        }
     }
 
-    // 📝 MOSTRAR CONTENIDO PRINCIPAL
-    displayProjectContent(project) {
-        const contentElement = document.getElementById('project-content');
-        if (!contentElement) return;
-
-        contentElement.innerHTML = `
-            <div class="project-description">
-                <h2>Descripción del Proyecto</h2>
-                <div class="description-content">
-                    ${project.long_description || project.description || 'No hay descripción disponible.'}
-                </div>
-            </div>
-
-            ${project.technologies && project.technologies.length > 0 ? `
-                <div class="project-technologies">
-                    <h3>Tecnologías Utilizadas</h3>
-                    <div class="tech-tags">
-                        ${project.technologies.map(tech => `
-                            <span class="tech-tag">${tech}</span>
-                        `).join('')}
-                    </div>
-                </div>
-            ` : ''}
-
-            <div class="project-links">
-                <h3>Enlaces del Proyecto</h3>
-                <div class="links-grid">
-                    ${project.demo_url ? `
-                        <a href="${project.demo_url}" target="_blank" class="project-link demo">
-                            <i class="fas fa-external-link-alt"></i>
-                            <span>Ver Demo</span>
-                        </a>
-                    ` : ''}
-                    
-                    ${project.repository_url ? `
-                        <a href="${project.repository_url}" target="_blank" class="project-link repository">
-                            <i class="fab fa-github"></i>
-                            <span>Código Fuente</span>
-                        </a>
-                    ` : ''}
-                    
-                    ${!project.demo_url && !project.repository_url ? `
-                        <p class="no-links">No hay enlaces disponibles para este proyecto.</p>
-                    ` : ''}
-                </div>
-            </div>
-        `;
+    // Helper para actualizar elementos del DOM
+    updateElement(elementId, content) {
+        const element = document.getElementById(elementId);
+        if (element && content) {
+            element.textContent = content;
+        }
     }
 
-    // 📊 MOSTRAR SIDEBAR
-    displayProjectSidebar(project) {
-        const sidebarElement = document.getElementById('project-sidebar');
-        if (!sidebarElement) return;
-
-        sidebarElement.innerHTML = `
-            <div class="project-meta-card">
-                <h3>Información del Proyecto</h3>
-                
-                <div class="meta-item">
-                    <label><i class="fas fa-tag"></i> Categoría</label>
-                    <span>${this.getCategoryDisplayName(project.category)}</span>
-                </div>
-                
-                <div class="meta-item">
-                    <label><i class="fas fa-eye"></i> Visibilidad</label>
-                    <span class="visibility ${project.visibility}">
-                        <i class="fas ${this.getVisibilityIcon(project.visibility)}"></i>
-                        ${this.getVisibilityText(project.visibility)}
-                    </span>
-                </div>
-                
-                <div class="meta-item">
-                    <label><i class="fas fa-calendar"></i> Creado</label>
-                    <span>${this.formatDate(project.created_at)}</span>
-                </div>
-            </div>
-
-            <div class="project-actions">
-                <button class="btn btn-primary" onclick="window.history.back()">
-                    <i class="fas fa-arrow-left"></i>
-                    Volver a Proyectos
-                </button>
-            </div>
-        `;
+    // Formatear fecha
+    formatDate(dateString) {
+        if (!dateString) return null;
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        } catch (error) {
+            return null;
+        }
     }
 
-    // 🧭 MOSTRAR BREADCRUMB
-    displayBreadcrumb(project) {
-        const breadcrumbElement = document.getElementById('project-breadcrumb');
-        if (!breadcrumbElement) return;
-
-        breadcrumbElement.innerHTML = `
-            <nav class="breadcrumb">
-                <a href="/">Inicio</a>
-                <i class="fas fa-chevron-right"></i>
-                <a href="/">Proyectos</a>
-                <i class="fas fa-chevron-right"></i>
-                <span class="current">${project.title}</span>
-            </nav>
-        `;
-    }
-
-    // 🛠️ FUNCIONES AUXILIARES
-    getStatusIcon(status) {
-        const icons = {
-            'planning': 'fa-lightbulb',
-            'development': 'fa-code',
-            'launched': 'fa-rocket',
-            'completed': 'fa-check-circle',
-            'paused': 'fa-pause-circle'
+    // Formatear compromiso de tiempo
+    formatTimeCommitment(timeCommitment) {
+        if (!timeCommitment) return null;
+        const translations = {
+            'part-time': 'Tiempo parcial',
+            'full-time': 'Tiempo completo',
+            'freelance': 'Freelance'
         };
-        return icons[status] || 'fa-question';
+        return translations[timeCommitment] || timeCommitment;
     }
 
-    getStatusText(status) {
-        const texts = {
-            'planning': 'En Planificación',
-            'development': 'En Desarrollo',
-            'launched': 'Lanzado',
-            'completed': 'Completado',
-            'paused': 'En Pausa'
+    // Formatear nivel de experiencia
+    formatExpertiseLevel(level) {
+        if (!level) return null;
+        const translations = {
+            'beginner': 'Principiante',
+            'intermediate': 'Intermedio',
+            'advanced': 'Avanzado'
         };
-        return texts[status] || status;
+        return translations[level] || level;
     }
 
-    getVisibilityIcon(visibility) {
-        const icons = {
-            'public': 'fa-globe-americas',
-            'private': 'fa-lock',
-            'link-only': 'fa-link',
-            'draft': 'fa-eye-slash'
+    // Formatear modo de colaboración
+    formatCollaborationMode(mode) {
+        if (!mode) return null;
+        const translations = {
+            'remote': 'Remoto',
+            'hybrid': 'Híbrido',
+            'in-person': 'Presencial'
         };
-        return icons[visibility] || 'fa-question';
+        return translations[mode] || mode;
     }
 
-    getVisibilityText(visibility) {
-        const texts = {
+    // Formatear visibilidad
+    formatVisibility(visibility) {
+        if (!visibility) return null;
+        const translations = {
             'public': 'Público',
             'private': 'Privado',
-            'link-only': 'Solo Enlace',
-            'draft': 'Borrador'
+            'link-only': 'Solo con enlace'
         };
-        return texts[visibility] || visibility;
+        return translations[visibility] || visibility;
     }
 
-    getCategoryDisplayName(category) {
-        const categoryNames = {
-            'web-development': 'Desarrollo Web',
-            'mobile': 'Apps Móviles',
-            'ai-ml': 'IA & Machine Learning',
-            'blockchain': 'Blockchain',
-            'design': 'Diseño',
-            'games': 'Videojuegos',
-            'iot': 'IoT & Hardware',
-            'tools': 'Herramientas',
-            'education': 'Educación',
-            'business': 'Negocios',
-            'sin-categoria': 'Sin Categoría'
+    // Actualizar estado del proyecto
+    updateProjectStatus(status) {
+        const statusElement = document.getElementById('project-status');
+        if (!statusElement) return;
+
+        const statusConfig = {
+            'planning': { text: 'En Planificación', class: 'status-planning' },
+            'development': { text: 'En Desarrollo', class: 'status-development' },
+            'launched': { text: 'Lanzado', class: 'status-launched' }
         };
-        return categoryNames[category] || category;
+
+        const config = statusConfig[status] || { text: status || 'No especificado', class: 'status-planning' };
+        statusElement.textContent = config.text;
+        statusElement.className = `status-badge ${config.class}`;
     }
 
-    formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('es-ES', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
+
+// Actualizar estado del proyecto
+updateProjectStatus(status) {
+    const statusElement = document.getElementById('project-status');
+    if (!statusElement) return;
+
+    const statusConfig = {
+        'planning': { text: 'En Planificación', class: 'status-planning' },
+        'development': { text: 'En Desarrollo', class: 'status-development' },
+        'launched': { text: 'Lanzado', class: 'status-launched' }
+    };
+
+    const config = statusConfig[status] || { text: status || 'No especificado', class: 'status-planning' };
+    statusElement.textContent = config.text;
+    statusElement.className = `status-badge ${config.class}`;
+} // ✅ Esta llave cierra updateProjectStatus
+
+
+updateCoverImage(coverImageUrl) {
+    const heroSection = document.querySelector('.project-hero');
+    
+    if (!heroSection) {
+        console.log('❌ Hero section no encontrado');
+        return;
+    }
+
+    console.log('🎨 Actualizando banner del hero con:', coverImageUrl);
+
+    if (coverImageUrl && coverImageUrl.trim() !== '') {
+        // ✅ Aplicar la imagen como fondo del hero
+        const finalUrl = coverImageUrl + '?t=' + Date.now();
+        
+        heroSection.style.backgroundImage = `linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(58, 58, 58, 0.9) 100%), url('${finalUrl}')`;
+        heroSection.style.backgroundSize = 'cover';
+        heroSection.style.backgroundPosition = 'center';
+        heroSection.style.backgroundBlendMode = 'overlay';
+        
+        console.log('✅ Banner del hero actualizado con imagen del proyecto');
+        
+    } else {
+        // ✅ Usar gradiente por defecto si no hay imagen
+        heroSection.style.backgroundImage = 'linear-gradient(135deg, #000000 0%, #3a3a3ae8 100%)';
+        console.log('ℹ️ Usando gradiente por defecto (sin imagen)');
+    }
+} 
+
+    // Actualizar tecnologías
+    updateTechnologies(technologies) {
+        const container = document.getElementById('project-technologies');
+        if (!container) return;
+
+        // Ocultar sección completa si no hay tecnologías
+        const section = container.closest('.technologies-section');
+        
+        if (!technologies || !Array.isArray(technologies) || technologies.length === 0) {
+            if (section) section.style.display = 'none';
+            return;
+        }
+
+        // Mostrar sección y llenar tecnologías
+        if (section) section.style.display = '';
+        container.innerHTML = '';
+        
+        technologies.forEach(tech => {
+            if (tech) {
+                const techTag = document.createElement('span');
+                techTag.className = 'tech-tag';
+                techTag.textContent = tech;
+                container.appendChild(techTag);
+            }
         });
     }
 
-    // ⏳ MOSTRAR/OCULTAR LOADING
-    showLoading(show) {
-        const loadingElement = document.getElementById('project-loading');
-        const contentElement = document.getElementById('project-content');
+    // Actualizar tecnologías deseadas
+    updateDesiredTech(desiredTech) {
+        const container = document.getElementById('project-desired-tech');
+        if (!container) return;
+
+        // Ocultar sección completa si no hay tecnologías deseadas
+        const section = container.closest('.desired-tech-section');
         
-        if (loadingElement) {
-            loadingElement.style.display = show ? 'block' : 'none';
+        if (!desiredTech || desiredTech.length === 0) {
+            if (section) section.style.display = 'none';
+            return;
+        }
+
+        // Mostrar sección y llenar tecnologías deseadas
+        if (section) section.style.display = '';
+        container.innerHTML = '';
+
+        desiredTech.forEach(tech => {
+            if (tech && tech.technology_name) {
+                const item = document.createElement('div');
+                item.className = 'tech-priority-item';
+                
+                const name = document.createElement('span');
+                name.className = 'tech-name';
+                name.textContent = tech.technology_name;
+                
+                const priority = document.createElement('span');
+                priority.className = `priority-badge priority-${tech.priority || 'medium'}`;
+                priority.textContent = this.formatPriority(tech.priority);
+                
+                item.appendChild(name);
+                item.appendChild(priority);
+                container.appendChild(item);
+            }
+        });
+    }
+
+    // Formatear prioridad
+    formatPriority(priority) {
+        const translations = {
+            'high': 'Alta Prioridad',
+            'medium': 'Media Prioridad',
+            'low': 'Baja Prioridad'
+        };
+        return translations[priority] || 'Media Prioridad';
+    }
+
+    // Actualizar tags
+    updateTags(tags) {
+        const container = document.getElementById('project-tags');
+        if (!container) return;
+
+        // Ocultar sección completa si no hay tags
+        const section = container.closest('.tags-section');
+        
+        if (!tags || !Array.isArray(tags) || tags.length === 0) {
+            if (section) section.style.display = 'none';
+            return;
+        }
+
+        // Mostrar sección y llenar tags
+        if (section) section.style.display = '';
+        container.innerHTML = '';
+
+        tags.forEach(tag => {
+            if (tag) {
+                const tagElement = document.createElement('span');
+                tagElement.className = 'project-tag';
+                tagElement.textContent = `#${tag}`;
+                container.appendChild(tagElement);
+            }
+        });
+    }
+
+    // Actualizar USP (Unique Selling Propositions)
+    updateUSP(usp) {
+        const container = document.getElementById('project-usp');
+        if (!container) return;
+
+        // Ocultar sección completa si no hay USP
+        const section = container.closest('.usp-section');
+        
+        if (!usp || !Array.isArray(usp) || usp.length === 0) {
+            if (section) section.style.display = 'none';
+            return;
+        }
+
+        // Mostrar sección y llenar USP
+        if (section) section.style.display = '';
+        container.innerHTML = '';
+
+        usp.forEach(item => {
+            if (item && (item.title || item.description)) {
+                const uspItem = document.createElement('div');
+                uspItem.className = 'usp-item';
+                
+                uspItem.innerHTML = `
+                    <i class="fas fa-check"></i>
+                    <div>
+                        <strong>${item.title || 'Característica'}</strong>
+                        <p>${item.description || ''}</p>
+                    </div>
+                `;
+                
+                container.appendChild(uspItem);
+            }
+        });
+    }
+
+    // Actualizar roles
+    updateRoles(roles) {
+        const container = document.getElementById('project-roles');
+        if (!container) return;
+
+        // Ocultar sección completa si no hay roles
+        const section = container.closest('.project-roles-section');
+        
+        if (!roles || roles.length === 0) {
+            if (section) section.style.display = 'none';
+            return;
+        }
+
+        // Mostrar sección y llenar roles
+        if (section) section.style.display = '';
+        container.innerHTML = '';
+
+        roles.forEach(role => {
+            if (role && role.role_name) {
+                const roleItem = document.createElement('div');
+                roleItem.className = 'role-item';
+                
+                roleItem.innerHTML = `
+                    <strong>${role.role_name}</strong>
+                    <p>${role.description || 'Sin descripción adicional'}</p>
+                `;
+                
+                container.appendChild(roleItem);
+            }
+        });
+    }
+
+    // Actualizar miembros
+    updateMembers(members) {
+        const container = document.getElementById('project-members');
+        if (!container) return;
+
+        // Ocultar sección completa si no hay miembros
+        const section = container.closest('.team-section');
+        
+        if (!members || members.length === 0) {
+            if (section) section.style.display = 'none';
+            return;
+        }
+
+        // Mostrar sección y llenar miembros
+        if (section) section.style.display = '';
+        container.innerHTML = '';
+
+        members.forEach(member => {
+            if (member) {
+                const memberItem = document.createElement('div');
+                memberItem.className = 'team-member';
+                
+                // ✅ Usar userMap si está disponible, sino datos básicos
+                const user = this.userMap ? this.userMap[member.user_id] : null;
+                const avatarUrl = user?.avatar_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80';
+                const userName = user?.user_name || `Usuario ${member.user_id?.substring(0, 8)}` || 'Usuario Anónimo';
+                
+                memberItem.innerHTML = `
+                    <img src="${avatarUrl}" alt="${userName}" onerror="this.src='https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'">
+                    <div>
+                        <strong>${userName}</strong>
+                        <span class="member-role">${this.formatMemberRole(member.role)}</span>
+                        <span class="member-status ${member.is_active ? 'active' : 'inactive'}">
+                            ${member.is_active ? 'Activo' : 'Inactivo'}
+                        </span>
+                    </div>
+                `;
+                
+                container.appendChild(memberItem);
+            }
+        });
+    }
+
+    // Formatear rol del miembro
+    formatMemberRole(role) {
+        if (!role) return 'Miembro';
+        const translations = {
+            'owner': 'Propietario',
+            'admin': 'Administrador',
+            'member': 'Miembro',
+            'contributor': 'Colaborador'
+        };
+        return translations[role] || role;
+    }
+
+    // Actualizar enlaces sociales
+    updateSocialLinks(socialLinks) {
+        const container = document.getElementById('project-social-links');
+        if (!container) return;
+
+        // Ocultar sección completa si no hay enlaces sociales
+        const parentCard = container.closest('.project-info-card');
+        
+        if (!socialLinks || Object.keys(socialLinks).length === 0) {
+            if (parentCard) {
+                const socialSection = container.parentElement;
+                if (socialSection) socialSection.style.display = 'none';
+            }
+            return;
+        }
+
+        // Mostrar sección y llenar enlaces sociales
+        if (parentCard) {
+            const socialSection = container.parentElement;
+            if (socialSection) socialSection.style.display = '';
         }
         
-        if (contentElement) {
-            contentElement.style.display = show ? 'none' : 'block';
+        container.innerHTML = '';
+
+        const platforms = [
+            { key: 'github', icon: 'fab fa-github', name: 'GitHub' },
+            { key: 'website', icon: 'fas fa-globe', name: 'Sitio Web' },
+            { key: 'linkedin', icon: 'fab fa-linkedin', name: 'LinkedIn' },
+            { key: 'twitter', icon: 'fab fa-twitter', name: 'Twitter' },
+            { key: 'discord', icon: 'fab fa-discord', name: 'Discord' }
+        ];
+
+        let hasLinks = false;
+        
+        platforms.forEach(platform => {
+            if (socialLinks[platform.key]) {
+                hasLinks = true;
+                const link = document.createElement('a');
+                link.href = socialLinks[platform.key];
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.className = 'social-link';
+                link.innerHTML = `
+                    <i class="${platform.icon}"></i>
+                    ${platform.name}
+                `;
+                container.appendChild(link);
+            }
+        });
+
+        // Si no hay enlaces después de procesar, ocultar
+        if (!hasLinks && parentCard) {
+            const socialSection = container.parentElement;
+            if (socialSection) socialSection.style.display = 'none';
         }
     }
 
-    // ❌ MOSTRAR ERROR
-    showError(message) {
-        const errorElement = document.getElementById('project-error');
-        const contentElement = document.getElementById('project-content');
+    // Actualizar botones activos
+    updateActiveButtons(activeButtons) {
+        const container = document.getElementById('project-active-buttons');
+        if (!container) return;
+
+        // Ocultar sección completa si no hay botones activos
+        const parentCard = container.closest('.project-info-card');
         
-        if (errorElement) {
-            errorElement.innerHTML = `
-                <div class="error-message">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <h3>Error al cargar el proyecto</h3>
-                    <p>${message}</p>
-                    <button onclick="window.location.href='/'" class="btn btn-primary">
-                        <i class="fas fa-arrow-left"></i>
-                        Volver al Inicio
-                    </button>
-                </div>
-            `;
-            errorElement.style.display = 'block';
+        if (!activeButtons || !Array.isArray(activeButtons) || activeButtons.length === 0) {
+            if (parentCard) {
+                const actionsSection = container.parentElement;
+                if (actionsSection) actionsSection.style.display = 'none';
+            }
+            return;
+        }
+
+        // Mostrar sección y llenar botones
+        if (parentCard) {
+            const actionsSection = container.parentElement;
+            if (actionsSection) actionsSection.style.display = '';
         }
         
-        if (contentElement) {
-            contentElement.style.display = 'none';
+        container.innerHTML = '';
+
+        const buttonsConfig = {
+            'join-team': {
+                text: 'Unirse al Equipo',
+                icon: 'fas fa-users',
+                class: 'btn-primary',
+                action: 'join-team'
+            },
+            'contact-team': {
+                text: 'Contactar al Equipo',
+                icon: 'fas fa-envelope',
+                class: 'btn-secondary',
+                action: 'contact-team'
+            },
+            'view-demo': {
+                text: 'Ver Demo',
+                icon: 'fas fa-external-link-alt',
+                class: 'btn-primary',
+                action: 'view-demo'
+            }
+        };
+
+        let hasButtons = false;
+
+        activeButtons.forEach(buttonKey => {
+            const config = buttonsConfig[buttonKey];
+            if (config) {
+                hasButtons = true;
+                const button = document.createElement('button');
+                button.className = `btn btn-action ${config.class}`;
+                button.setAttribute('data-action', config.action);
+                button.innerHTML = `
+                    <i class="${config.icon}"></i>
+                    ${config.text}
+                `;
+                
+                button.addEventListener('click', () => {
+                    this.handleButtonAction(config.action);
+                });
+                
+                container.appendChild(button);
+            }
+        });
+
+        // Si no hay botones después de procesar, ocultar
+        if (!hasButtons && parentCard) {
+            const actionsSection = container.parentElement;
+            if (actionsSection) actionsSection.style.display = 'none';
         }
-        
-        this.showLoading(false);
+    }
+
+    // Manejar acciones de botones
+    handleButtonAction(action) {
+        switch (action) {
+            case 'join-team':
+                this.joinTeam();
+                break;
+            case 'contact-team':
+                this.contactTeam();
+                break;
+            case 'view-demo':
+                this.viewDemo();
+                break;
+        }
+    }
+
+    joinTeam() {
+        alert('Función: Unirse al equipo - Próximamente');
+    }
+
+    contactTeam() {
+        alert('Función: Contactar al equipo - Próximamente');
+    }
+
+    viewDemo() {
+        if (this.currentProject?.social_links?.website) {
+            window.open(this.currentProject.social_links.website, '_blank');
+        } else {
+            alert('No hay demo disponible para este proyecto');
+        }
+    }
+
+    // Mostrar contenido
+    showContent() {
+        const errorState = document.getElementById('error-state');
+        const projectContent = document.getElementById('project-content');
+
+        if (errorState) errorState.classList.add('hidden');
+        if (projectContent) projectContent.classList.remove('hidden');
+    }
+
+    // Mostrar error
+    showError() {
+        const errorState = document.getElementById('error-state');
+        const projectContent = document.getElementById('project-content');
+
+        if (errorState) errorState.classList.remove('hidden');
+        if (projectContent) projectContent.classList.add('hidden');
+    }
+
+    // Animación de la bola con scroll
+    initBallScroll() {
+        const ball = document.querySelector('.ball');
+        if (!ball) return;
+
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            const moveDown = Math.min(scrollY * 0.3, 200);
+            ball.style.transform = `translateY(${moveDown}px)`;
+        });
     }
 }
 
-// 🎯 INICIALIZACIÓN AUTOMÁTICA
+// Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
-    window.projectDetails = new ProjectDetails();
-    window.projectDetails.init();
+    new ProjectDetailsLoader();
 });

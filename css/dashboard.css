@@ -38,7 +38,8 @@
 }
 
 /* 🎪 Bola luminosa para dashboard */
-.dashboard-ball {
+.ball {
+  position: fixed; /* Cambiado de absolute a fixed */
   top: 15vh;
   left: 5%;
   width: min(350px, 80vw);
@@ -46,6 +47,8 @@
   filter: blur(70px);
   opacity: 0.3;
   z-index: 0;
+  transition: transform 0.1s ease-out; /* Suaviza el movimiento */
+  pointer-events: none; /* Evita que interfiera con clicks */
 }
 
 /* 🏆 Sección de bienvenida - Siempre centrada */
