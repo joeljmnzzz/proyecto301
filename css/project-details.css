@@ -66,29 +66,18 @@
     margin-bottom: 20px;
     line-height: 1.2;
     text-align: center;
-    color: #ffffff;
-    text-shadow: 
-        0 2px 10px rgba(0, 0, 0, 0.8),
-        0 4px 20px rgba(0, 0, 0, 0.6),
-        0 0 30px rgba(0, 0, 0, 0.4);
+    color: rgba(255, 255, 255, 1) !important;
     font-weight: 700;
     letter-spacing: -0.5px;
 }
 
 .project-subtitle {
     font-size: clamp(1rem, 3vw, 1.3rem);
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 1);
     max-width: 600px;
     margin: 0 auto 30px;
     line-height: 1.6;
-    text-shadow: 
-        0 2px 8px rgba(0, 0, 0, 0.7),
-        0 4px 15px rgba(0, 0, 0, 0.5);
     font-weight: 500;
-    backdrop-filter: blur(5px);
-    padding: 15px 20px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.08);
 }
 
 /* ✅ MEJORADO: Meta información con mejor contraste */
