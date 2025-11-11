@@ -66,9 +66,13 @@
     margin-bottom: 20px;
     line-height: 1.2;
     text-align: center;
-    color: rgba(255, 255, 255, 1) !important;
     font-weight: 700;
     letter-spacing: -0.5px;
+}
+
+#project-title {
+    color: white !important;
+    font-weight: bold;
 }
 
 .project-subtitle {
