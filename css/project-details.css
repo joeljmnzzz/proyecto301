@@ -89,41 +89,58 @@
     font-weight: 500;
 }
 
+/* === CONTENEDOR DE META ITEMS FUERA DEL HERO === */
+.project-meta-container {
+    background: var(--fondo-tarjeta);
+    border: 1px solid var(--borde-tarjeta);
+    border-radius: 20px;
+    margin: -20px auto 40px auto;
+    padding: 25px 0;
+    max-width: min(1200px, 95vw);
+    position: relative;
+    z-index: 10;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.project-meta-container .container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
 /* ✅ MEJORADO: Meta información con mejor contraste */
 .project-meta {
     display: flex;
     justify-content: center;
     gap: 30px;
     flex-wrap: wrap;
-    margin-bottom: 30px;
+    margin: 0;
 }
 
 .meta-item {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--texto-primario);
     font-size: 0.9rem;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
     padding: 10px 16px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid var(--borde-tarjeta);
     transition: all 0.3s ease;
 }
 
 .meta-item:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.1);
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    border-color: var(--borde-tarjeta-hover);
 }
 
 .meta-item i {
     color: var(--texto-destacado);
     font-size: 1rem;
 }
-
 /* ✅ MEJORADO: Badge de estado */
 .project-status-badge {
     margin-top: 20px;
@@ -195,6 +212,7 @@
     padding: 30px;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    text-align: justify; /* ✅ Justifica todo el texto del contenedor */
 }
 
 .description-section:hover {
@@ -213,12 +231,14 @@
     font-weight: 700;
     border-bottom: 1px solid var(--borde-tarjeta);
     padding-bottom: 10px;
+    text-align: left; /* ✅ El título principal se mantiene alineado a la izquierda */
 }
 
 .description-content {
     display: flex;
     flex-direction: column;
     gap: 30px;
+    text-align: justify; /* ✅ Justifica el contenido interno */
 }
 
 .description-part,
@@ -226,6 +246,7 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
+    text-align: justify; /* ✅ Asegura que ambas partes estén justificadas */
 }
 
 .description-part h3,
@@ -237,6 +258,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    text-align: left; /* ✅ Los subtítulos se mantienen alineados a la izquierda */
 }
 
 .description-part h3::before {
@@ -255,6 +277,18 @@
     line-height: 1.6;
     margin: 0;
     font-size: 0.95rem;
+    text-align: justify; /* ✅ Texto justificado */
+    text-justify: inter-word; /* ✅ Mejor distribución de palabras */
+    hyphens: auto; /* ✅ Separación silábica automática */
+}
+
+/* Asegurar que el contenido de problema/solución tenga el mismo estilo */
+.problem-solution-content {
+    text-align: justify; /* ✅ Justifica específicamente el contenido de problema/solución */
+}
+
+.problem-solution-content p {
+    text-align: justify; /* ✅ Asegura que los párrafos dentro estén justificados */
 }
 
 /* Separador visual entre las dos partes */
