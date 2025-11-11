@@ -57,78 +57,36 @@
     position: relative;
     z-index: 3;
     width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-/* ✅ MEJORADO: Breadcrumb con mejor contraste */
-.project-breadcrumb {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-}
-
-.breadcrumb-link {
-    color: rgba(255, 255, 255, 0.8);
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-    padding: 6px 12px;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-}
-
-.breadcrumb-link:hover {
-    color: var(--color-texto);
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-1px);
-}
-
-.breadcrumb-separator {
-    color: rgba(255, 255, 255, 0.6);
-    font-weight: bold;
-}
-
-.breadcrumb-current {
-    color: var(--color-texto);
-    font-weight: 700;
-    padding: 6px 12px;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
-    backdrop-filter: blur(10px);
-}
-
-/* ✅ MEJORADO: Títulos con mejor legibilidad */
-.project-details .project-title {
+/* ✅ MEJORADO: Títulos con mejor legibilidad - CLASE ACTUALIZADA */
+.project-hero .project-hero-title,
+.project-hero h1.project-hero-title {
     font-size: clamp(2rem, 5vw, 3rem);
     margin-bottom: 20px;
     line-height: 1.2;
     text-align: center;
-    color: #ffffff;
+    color: #ffffff !important;
     text-shadow: 
         0 2px 10px rgba(0, 0, 0, 0.8),
         0 4px 20px rgba(0, 0, 0, 0.6),
         0 0 30px rgba(0, 0, 0, 0.4);
     font-weight: 700;
     letter-spacing: -0.5px;
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    -webkit-text-fill-color: initial !important;
 }
 
 .project-subtitle {
     font-size: clamp(1rem, 3vw, 1.3rem);
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 1);
     max-width: 600px;
     margin: 0 auto 30px;
     line-height: 1.6;
-    text-shadow: 
-        0 2px 8px rgba(0, 0, 0, 0.7),
-        0 4px 15px rgba(0, 0, 0, 0.5);
     font-weight: 500;
-    backdrop-filter: blur(5px);
-    padding: 15px 20px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.08);
 }
 
 /* ✅ MEJORADO: Meta información con mejor contraste */
@@ -211,7 +169,6 @@
     background: rgba(52, 211, 153, 0.15);
 }
 
-
 /* === CONTENIDO PRINCIPAL === */
 .project-content {
     margin-bottom: 60px;
@@ -230,9 +187,87 @@
     gap: 40px;
 }
 
-/* Secciones de contenido */
-.description-section,
-.problem-solution-section,
+/* === SECCIÓN DE DESCRIPCIÓN COMBINADA === */
+.description-section {
+    background: var(--fondo-tarjeta);
+    border: 1px solid var(--borde-tarjeta);
+    border-radius: 20px;
+    padding: 30px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.description-section:hover {
+    border-color: var(--borde-tarjeta-hover);
+    background: var(--fondo-tarjeta-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.description-section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 25px;
+    background: var(--color-acento);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    border-bottom: 1px solid var(--borde-tarjeta);
+    padding-bottom: 10px;
+}
+
+.description-content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.description-part,
+.problem-solution-part {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.description-part h3,
+.problem-solution-part h3 {
+    font-size: 1.2rem;
+    color: var(--texto-primario);
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.description-part h3::before {
+    content: "📋";
+    font-size: 1.1rem;
+}
+
+.problem-solution-part h3::before {
+    content: "💡";
+    font-size: 1.1rem;
+}
+
+.description-part p,
+.problem-solution-content p {
+    color: var(--texto-secundario);
+    line-height: 1.6;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* Separador visual entre las dos partes */
+.description-part {
+    padding-bottom: 25px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.problem-solution-part {
+    padding-top: 5px;
+}
+
+/* === OTRAS SECCIONES === */
 .usp-section,
 .technologies-section,
 .desired-tech-section,
@@ -242,16 +277,17 @@
     border-radius: 20px;
     padding: 30px;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.description-section:hover,
-.problem-solution-section:hover,
 .usp-section:hover,
 .technologies-section:hover,
 .desired-tech-section:hover,
 .tags-section:hover {
     border-color: var(--borde-tarjeta-hover);
     background: var(--fondo-tarjeta-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .content-main h2 {
@@ -260,12 +296,14 @@
     background: var(--color-acento);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    font-weight: 700;
 }
 
 .content-main h3 {
     font-size: 1.2rem;
     margin-bottom: 15px;
     color: var(--texto-primario);
+    font-weight: 600;
 }
 
 /* Grid de USP */
@@ -283,11 +321,13 @@
     background: rgba(255, 255, 255, 0.03);
     border-radius: 12px;
     transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .usp-item:hover {
     background: rgba(255, 255, 255, 0.05);
     transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
 }
 
 .usp-item i {
@@ -301,6 +341,7 @@
     display: block;
     margin-bottom: 5px;
     color: var(--texto-primario);
+    font-weight: 600;
 }
 
 .usp-item p {
@@ -315,6 +356,23 @@
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+}
+
+.tech-tag {
+    background: rgba(106, 17, 203, 0.15);
+    color: var(--texto-destacado);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    border: 1px solid rgba(106, 17, 203, 0.3);
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.tech-tag:hover {
+    background: rgba(106, 17, 203, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(106, 17, 203, 0.2);
 }
 
 /* Tecnologías deseadas */
@@ -332,10 +390,12 @@
     background: rgba(255, 255, 255, 0.03);
     border-radius: 10px;
     transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .tech-priority-item:hover {
     background: rgba(255, 255, 255, 0.05);
+    transform: translateX(5px);
 }
 
 .tech-name {
@@ -407,11 +467,14 @@
     border-radius: 20px;
     padding: 30px;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .project-info-card:hover {
     border-color: var(--borde-tarjeta-hover);
     background: var(--fondo-tarjeta-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .project-info-card h4 {
@@ -420,6 +483,7 @@
     color: var(--texto-primario);
     border-bottom: 1px solid var(--borde-tarjeta);
     padding-bottom: 10px;
+    font-weight: 700;
 }
 
 .info-item {
@@ -442,6 +506,7 @@
 .info-item span {
     color: var(--texto-secundario);
     text-align: right;
+    font-weight: 500;
 }
 
 /* Acciones del proyecto */
@@ -466,6 +531,7 @@
     transition: all 0.3s ease;
     text-decoration: none;
     text-align: center;
+    font-size: 0.9rem;
 }
 
 .btn-primary {
@@ -501,6 +567,7 @@
     border-radius: 8px;
     transition: all 0.3s ease;
     border: 1px solid transparent;
+    font-weight: 500;
 }
 
 .social-link:hover {
@@ -522,11 +589,14 @@
     border-radius: 20px;
     padding: 30px;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .project-roles-section:hover {
     border-color: var(--borde-tarjeta-hover);
     background: var(--fondo-tarjeta-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .project-roles-section h4 {
@@ -535,6 +605,7 @@
     color: var(--texto-primario);
     border-bottom: 1px solid var(--borde-tarjeta);
     padding-bottom: 10px;
+    font-weight: 700;
 }
 
 .roles-list {
@@ -548,6 +619,7 @@
     background: rgba(255, 255, 255, 0.03);
     border-radius: 10px;
     transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .role-item:hover {
@@ -559,12 +631,14 @@
     display: block;
     color: var(--texto-primario);
     margin-bottom: 5px;
+    font-weight: 600;
 }
 
 .role-item p {
     margin: 0;
     color: var(--texto-secundario);
     font-size: 0.9rem;
+    line-height: 1.5;
 }
 
 /* Equipo del proyecto */
@@ -574,11 +648,14 @@
     border-radius: 20px;
     padding: 30px;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .team-section:hover {
     border-color: var(--borde-tarjeta-hover);
     background: var(--fondo-tarjeta-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .team-section h4 {
@@ -587,6 +664,7 @@
     color: var(--texto-primario);
     border-bottom: 1px solid var(--borde-tarjeta);
     padding-bottom: 10px;
+    font-weight: 700;
 }
 
 .team-members {
@@ -603,6 +681,7 @@
     background: rgba(255, 255, 255, 0.03);
     border-radius: 10px;
     transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .team-member:hover {
@@ -626,6 +705,7 @@
     color: var(--texto-primario);
     font-size: 0.9rem;
     margin-bottom: 2px;
+    font-weight: 600;
 }
 
 .member-role {
@@ -658,6 +738,32 @@
     background: var(--color-acento);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    font-weight: 700;
+}
+
+/* === ESTADO DE ERROR === */
+.error-state {
+    text-align: center;
+    padding: 60px 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.error-state i {
+    font-size: 4rem;
+    color: var(--color-advertencia);
+    margin-bottom: 20px;
+}
+
+.error-state h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: var(--texto-primario);
+}
+
+.error-state p {
+    color: var(--texto-secundario);
+    margin-bottom: 30px;
 }
 
 /* === RESPONSIVE === */
@@ -697,7 +803,12 @@
     .content-main,
     .project-info-card,
     .project-roles-section,
-    .team-section {
+    .team-section,
+    .description-section,
+    .usp-section,
+    .technologies-section,
+    .desired-tech-section,
+    .tags-section {
         padding: 20px;
     }
     
@@ -705,15 +816,18 @@
         grid-template-columns: 1fr;
     }
     
-    .thumbnail {
-        width: 80px;
-        height: 60px;
+    .description-content {
+        gap: 20px;
+    }
+    
+    .description-part {
+        padding-bottom: 20px;
     }
 }
 
 /* Móviles pequeños */
 @media screen and (max-width: 480px) {
-    .project-details .project-title {
+    .project-hero-title {
         font-size: 1.8rem;
     }
     
@@ -734,7 +848,12 @@
     .content-main,
     .project-info-card,
     .project-roles-section,
-    .team-section {
+    .team-section,
+    .description-section,
+    .usp-section,
+    .technologies-section,
+    .desired-tech-section,
+    .tags-section {
         padding: 15px;
     }
     
@@ -751,5 +870,25 @@
     .btn-action {
         padding: 10px 15px;
         font-size: 0.9rem;
+    }
+    
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .info-item span {
+        text-align: left;
+    }
+    
+    .description-part h3,
+    .problem-solution-part h3 {
+        font-size: 1.1rem;
+    }
+    
+    .description-part h3::before,
+    .problem-solution-part h3::before {
+        font-size: 1rem;
     }
 }
