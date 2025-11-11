@@ -159,7 +159,7 @@ class ProjectDetailsLoader {
         this.updateTags(project.tags);
         this.updateUSP(project.usp);
         this.updateRoles(project.project_roles);
-        this.updateMembers(project.project_members); // 🔥 ACTUALIZADO
+        this.updateMembers(project.project_members);
         this.updateSocialLinks(project.social_links);
         this.updateActiveButtons(project.active_buttons);
 
@@ -492,11 +492,11 @@ class ProjectDetailsLoader {
                 const memberItem = document.createElement('div');
                 memberItem.className = 'team-member';
                 
-                // 🔥 OBTENER DATOS DEL USUARIO CORRECTAMENTE
+                // OBTENER DATOS DEL USUARIO
                 const avatarUrl = user?.avatar_url || '../assets/elements/default-avatar.png';
                 const username = user?.username || 'Usuario';
                 const fullName = user?.full_name || '';
-                const displayName = fullName || `@${username}`;
+                const displayName = fullName
                 
                 memberItem.innerHTML = `
                     <div class="member-avatar">
