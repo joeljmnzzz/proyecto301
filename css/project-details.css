@@ -16,6 +16,7 @@
   opacity: 0.3;
   z-index: 0;
 }
+
 /* === HERO SECTION === */
 .project-hero {
     background: linear-gradient(135deg, #000000 0%, #3a3a3ae8 100%);
@@ -61,18 +62,22 @@
 }
 
 /* ✅ MEJORADO: Títulos con mejor legibilidad - CLASE ACTUALIZADA */
-.project-hero-title {
+.project-hero .project-hero-title,
+.project-hero h1.project-hero-title {
     font-size: clamp(2rem, 5vw, 3rem);
     margin-bottom: 20px;
     line-height: 1.2;
     text-align: center;
+    color: #ffffff !important;
+    text-shadow: 
+        0 2px 10px rgba(0, 0, 0, 0.8),
+        0 4px 20px rgba(0, 0, 0, 0.6),
+        0 0 30px rgba(0, 0, 0, 0.4);
     font-weight: 700;
     letter-spacing: -0.5px;
-}
-
-#project-title {
-    color: white !important;
-    font-weight: bold;
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    -webkit-text-fill-color: initial !important;
 }
 
 .project-subtitle {
@@ -182,27 +187,87 @@
     gap: 40px;
 }
 
-/* === CONTENIDO PRINCIPAL === */
-.project-content {
-    margin-bottom: 60px;
+/* === SECCIÓN DE DESCRIPCIÓN COMBINADA === */
+.description-section {
+    background: var(--fondo-tarjeta);
+    border: 1px solid var(--borde-tarjeta);
+    border-radius: 20px;
+    padding: 30px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.content-grid {
-    display: grid;
-    grid-template-columns: 1fr 400px;
-    gap: 40px;
-    align-items: start;
+.description-section:hover {
+    border-color: var(--borde-tarjeta-hover);
+    background: var(--fondo-tarjeta-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
-.content-main {
+.description-section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 25px;
+    background: var(--color-acento);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    border-bottom: 1px solid var(--borde-tarjeta);
+    padding-bottom: 10px;
+}
+
+.description-content {
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: 30px;
 }
 
-/* Secciones de contenido */
-.description-section,
-.problem-solution-section,
+.description-part,
+.problem-solution-part {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.description-part h3,
+.problem-solution-part h3 {
+    font-size: 1.2rem;
+    color: var(--texto-primario);
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.description-part h3::before {
+    content: "📋";
+    font-size: 1.1rem;
+}
+
+.problem-solution-part h3::before {
+    content: "💡";
+    font-size: 1.1rem;
+}
+
+.description-part p,
+.problem-solution-content p {
+    color: var(--texto-secundario);
+    line-height: 1.6;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* Separador visual entre las dos partes */
+.description-part {
+    padding-bottom: 25px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.problem-solution-part {
+    padding-top: 5px;
+}
+
+/* === OTRAS SECCIONES === */
 .usp-section,
 .technologies-section,
 .desired-tech-section,
@@ -215,8 +280,6 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.description-section:hover,
-.problem-solution-section:hover,
 .usp-section:hover,
 .technologies-section:hover,
 .desired-tech-section:hover,
@@ -740,7 +803,12 @@
     .content-main,
     .project-info-card,
     .project-roles-section,
-    .team-section {
+    .team-section,
+    .description-section,
+    .usp-section,
+    .technologies-section,
+    .desired-tech-section,
+    .tags-section {
         padding: 20px;
     }
     
@@ -748,9 +816,12 @@
         grid-template-columns: 1fr;
     }
     
-    .thumbnail {
-        width: 80px;
-        height: 60px;
+    .description-content {
+        gap: 20px;
+    }
+    
+    .description-part {
+        padding-bottom: 20px;
     }
 }
 
@@ -777,7 +848,12 @@
     .content-main,
     .project-info-card,
     .project-roles-section,
-    .team-section {
+    .team-section,
+    .description-section,
+    .usp-section,
+    .technologies-section,
+    .desired-tech-section,
+    .tags-section {
         padding: 15px;
     }
     
@@ -804,5 +880,15 @@
     
     .info-item span {
         text-align: left;
+    }
+    
+    .description-part h3,
+    .problem-solution-part h3 {
+        font-size: 1.1rem;
+    }
+    
+    .description-part h3::before,
+    .problem-solution-part h3::before {
+        font-size: 1rem;
     }
 }
