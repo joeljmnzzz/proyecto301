@@ -62,7 +62,7 @@
 }
 
 /* ✅ MEJORADO: Títulos con mejor legibilidad */
-.project-details .project-title {
+.project-details .project-title-overlay {
     font-size: clamp(2rem, 5vw, 3rem);
     margin-bottom: 20px;
     line-height: 1.2;
@@ -746,7 +746,7 @@
 
 /* Móviles pequeños */
 @media screen and (max-width: 480px) {
-    .project-details .project-title {
+    .project-details .project-title-overlay {
         font-size: 1.8rem;
     }
     
