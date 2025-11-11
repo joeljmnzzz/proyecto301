@@ -59,54 +59,13 @@
     width: 100%;
 }
 
-/* ✅ MEJORADO: Breadcrumb con mejor contraste */
-.project-breadcrumb {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-}
-
-.breadcrumb-link {
-    color: rgba(255, 255, 255, 0.8);
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-    padding: 6px 12px;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-}
-
-.breadcrumb-link:hover {
-    color: var(--color-texto);
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-1px);
-}
-
-.breadcrumb-separator {
-    color: rgba(255, 255, 255, 0.6);
-    font-weight: bold;
-}
-
-.breadcrumb-current {
-    color: var(--color-texto);
-    font-weight: 700;
-    padding: 6px 12px;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
-    backdrop-filter: blur(10px);
-}
-
 /* ✅ MEJORADO: Títulos con mejor legibilidad */
 .project-details .project-title {
     font-size: clamp(2rem, 5vw, 3rem);
     margin-bottom: 20px;
     line-height: 1.2;
     text-align: center;
-    color: #ffffff;
+    color: #ffffff !important;
     text-shadow: 
         0 2px 10px rgba(0, 0, 0, 0.8),
         0 4px 20px rgba(0, 0, 0, 0.6),

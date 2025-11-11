@@ -126,7 +126,6 @@ class ProjectDetailsLoader {
 
         // Información básica - Solo mostrar si existe
         this.updateElementIfContent('project-title', project.title);
-        this.updateElementIfContent('project-title-breadcrumb', project.title);
         this.updateElementIfContent('project-subtitle', project.subtitle);
         this.updateElementIfContent('project-description', project.description);
         this.updateElementIfContent('project-problem-solution', project.problem_solution);
