@@ -57,6 +57,8 @@
     position: relative;
     z-index: 3;
     width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 /* ✅ MEJORADO: Títulos con mejor legibilidad */
@@ -65,7 +67,7 @@
     margin-bottom: 20px;
     line-height: 1.2;
     text-align: center;
-    color: #ffffff !important;
+    color: #ffffff;
     text-shadow: 
         0 2px 10px rgba(0, 0, 0, 0.8),
         0 4px 20px rgba(0, 0, 0, 0.6),
@@ -170,7 +172,6 @@
     background: rgba(52, 211, 153, 0.15);
 }
 
-
 /* === CONTENIDO PRINCIPAL === */
 .project-content {
     margin-bottom: 60px;
@@ -201,6 +202,7 @@
     border-radius: 20px;
     padding: 30px;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .description-section:hover,
@@ -211,6 +213,8 @@
 .tags-section:hover {
     border-color: var(--borde-tarjeta-hover);
     background: var(--fondo-tarjeta-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .content-main h2 {
@@ -219,12 +223,14 @@
     background: var(--color-acento);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    font-weight: 700;
 }
 
 .content-main h3 {
     font-size: 1.2rem;
     margin-bottom: 15px;
     color: var(--texto-primario);
+    font-weight: 600;
 }
 
 /* Grid de USP */
@@ -242,11 +248,13 @@
     background: rgba(255, 255, 255, 0.03);
     border-radius: 12px;
     transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .usp-item:hover {
     background: rgba(255, 255, 255, 0.05);
     transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
 }
 
 .usp-item i {
@@ -260,6 +268,7 @@
     display: block;
     margin-bottom: 5px;
     color: var(--texto-primario);
+    font-weight: 600;
 }
 
 .usp-item p {
@@ -274,6 +283,23 @@
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+}
+
+.tech-tag {
+    background: rgba(106, 17, 203, 0.15);
+    color: var(--texto-destacado);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    border: 1px solid rgba(106, 17, 203, 0.3);
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.tech-tag:hover {
+    background: rgba(106, 17, 203, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(106, 17, 203, 0.2);
 }
 
 /* Tecnologías deseadas */
@@ -291,10 +317,12 @@
     background: rgba(255, 255, 255, 0.03);
     border-radius: 10px;
     transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .tech-priority-item:hover {
     background: rgba(255, 255, 255, 0.05);
+    transform: translateX(5px);
 }
 
 .tech-name {
@@ -366,11 +394,14 @@
     border-radius: 20px;
     padding: 30px;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .project-info-card:hover {
     border-color: var(--borde-tarjeta-hover);
     background: var(--fondo-tarjeta-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .project-info-card h4 {
@@ -379,6 +410,7 @@
     color: var(--texto-primario);
     border-bottom: 1px solid var(--borde-tarjeta);
     padding-bottom: 10px;
+    font-weight: 700;
 }
 
 .info-item {
@@ -401,6 +433,7 @@
 .info-item span {
     color: var(--texto-secundario);
     text-align: right;
+    font-weight: 500;
 }
 
 /* Acciones del proyecto */
@@ -425,6 +458,7 @@
     transition: all 0.3s ease;
     text-decoration: none;
     text-align: center;
+    font-size: 0.9rem;
 }
 
 .btn-primary {
@@ -460,6 +494,7 @@
     border-radius: 8px;
     transition: all 0.3s ease;
     border: 1px solid transparent;
+    font-weight: 500;
 }
 
 .social-link:hover {
@@ -481,11 +516,14 @@
     border-radius: 20px;
     padding: 30px;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .project-roles-section:hover {
     border-color: var(--borde-tarjeta-hover);
     background: var(--fondo-tarjeta-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .project-roles-section h4 {
@@ -494,6 +532,7 @@
     color: var(--texto-primario);
     border-bottom: 1px solid var(--borde-tarjeta);
     padding-bottom: 10px;
+    font-weight: 700;
 }
 
 .roles-list {
@@ -507,6 +546,7 @@
     background: rgba(255, 255, 255, 0.03);
     border-radius: 10px;
     transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .role-item:hover {
@@ -518,12 +558,14 @@
     display: block;
     color: var(--texto-primario);
     margin-bottom: 5px;
+    font-weight: 600;
 }
 
 .role-item p {
     margin: 0;
     color: var(--texto-secundario);
     font-size: 0.9rem;
+    line-height: 1.5;
 }
 
 /* Equipo del proyecto */
@@ -533,11 +575,14 @@
     border-radius: 20px;
     padding: 30px;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .team-section:hover {
     border-color: var(--borde-tarjeta-hover);
     background: var(--fondo-tarjeta-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .team-section h4 {
@@ -546,6 +591,7 @@
     color: var(--texto-primario);
     border-bottom: 1px solid var(--borde-tarjeta);
     padding-bottom: 10px;
+    font-weight: 700;
 }
 
 .team-members {
@@ -562,6 +608,7 @@
     background: rgba(255, 255, 255, 0.03);
     border-radius: 10px;
     transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .team-member:hover {
@@ -585,6 +632,7 @@
     color: var(--texto-primario);
     font-size: 0.9rem;
     margin-bottom: 2px;
+    font-weight: 600;
 }
 
 .member-role {
@@ -617,6 +665,32 @@
     background: var(--color-acento);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    font-weight: 700;
+}
+
+/* === ESTADO DE ERROR === */
+.error-state {
+    text-align: center;
+    padding: 60px 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.error-state i {
+    font-size: 4rem;
+    color: var(--color-advertencia);
+    margin-bottom: 20px;
+}
+
+.error-state h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: var(--texto-primario);
+}
+
+.error-state p {
+    color: var(--texto-secundario);
+    margin-bottom: 30px;
 }
 
 /* === RESPONSIVE === */
@@ -710,5 +784,15 @@
     .btn-action {
         padding: 10px 15px;
         font-size: 0.9rem;
+    }
+    
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .info-item span {
+        text-align: left;
     }
 }
