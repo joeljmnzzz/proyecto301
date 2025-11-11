@@ -1,15 +1,38 @@
-<!-- navbar.html -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css">
 <nav class="navbar">
-<div class="nav-left">
-  <a href="../index.html">
-    <img src="../assets/logos/logo-darkmode.png" alt="Logo Proyecto 301" class="logo logo-dark" id="logo-alt">
-  </a>
-</div>
-
+  <div class="nav-left">
+    <a href="../index.html">
+      <img src="../assets/logos/logo-darkmode.png" alt="Logo Proyecto 301" class="logo logo-dark" id="logo-alt">
+    </a>
+  </div>
 
   <div class="nav-right">
-    <a href="../login.html" class="login-icon" title="Login">
+    <!-- Menú de usuario (se muestra cuando está logueado) -->
+    <div class="user-menu-container" id="user-menu-container" style="display: none;">
+      <div class="user-trigger" id="user-trigger">
+        <img src="" alt="Avatar" class="user-avatar" id="user-avatar">
+        <span class="user-name" id="user-name"></span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="user-menu" id="user-menu">
+        <a href="../html/profile.html" class="user-menu-item">
+          <i class="fas fa-user"></i>
+          Mi Perfil
+        </a>
+        <a href="/html/dashboard.html" class="user-menu-item">
+          <i class="fas fa-folder"></i>
+          Dashboard
+        </a>
+        <div class="user-menu-divider"></div>
+        <button class="user-menu-item" id="logout-btn">
+          <i class="fas fa-sign-out-alt"></i>
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+
+    <!-- Icono de login (se muestra cuando NO está logueado) -->
+    <a href="../login.html" class="login-icon" id="login-icon" title="Login">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
         stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>

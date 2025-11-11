@@ -504,11 +504,11 @@ updateCoverImage(coverImageUrl) {
                 
                 // ✅ Usar userMap si está disponible, sino datos básicos
                 const user = this.userMap ? this.userMap[member.user_id] : null;
-                const avatarUrl = user?.avatar_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80';
+                const avatarUrl = user?.avatar_url || '../assets/elements/default-avatar.png';
                 const userName = user?.user_name || `Usuario ${member.user_id?.substring(0, 8)}` || 'Usuario Anónimo';
                 
                 memberItem.innerHTML = `
-                    <img src="${avatarUrl}" alt="${userName}" onerror="this.src='https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'">
+                    <img src="${avatarUrl}" alt="${userName}" onerror="this.src='../assets/elements/default-avatar.png'">
                     <div>
                         <strong>${userName}</strong>
                         <span class="member-role">${this.formatMemberRole(member.role)}</span>
