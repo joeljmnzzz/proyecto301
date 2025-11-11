@@ -1,0 +1,12 @@
+{
+  "name": "proyecto301-dev",
+  "version": "1.0.0",
+  "description": "Servidor de desarrollo para Proyecto 301",
+  "scripts": {
+    "dev": "node dev-server.js",
+    "start": "node dev-server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

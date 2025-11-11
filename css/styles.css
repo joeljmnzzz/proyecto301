@@ -57,7 +57,7 @@ body {
   background-size: cover;
   filter: blur(60px);
   border-radius: 50%;
-  z-index: 1;
+  z-index: -1;
   /* SIN ANIMACIÓN */
 }
 
@@ -1159,3 +1159,106 @@ footer {
     --texto-destacado: #6a11cb;
   }
 }
+
+/* ===== ESTILOS ESPECÍFICOS PARA PÁGINA DE DETALLES ===== */
+
+.project-details-page {
+    min-height: 100vh;
+    background: var(--color-fondo);
+}
+
+/* Header del proyecto */
+.project-header {
+    background: var(--color-navbar);
+    backdrop-filter: blur(14px) saturate(180%);
+    border-bottom: 1px solid var(--borde-tarjeta);
+    padding: 2rem 0;
+}
+
+.breadcrumb-container {
+    margin-bottom: 1.5rem;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-texto);
+    font-size: 0.9rem;
+}
+
+.breadcrumb a {
+    color: var(--color-secundario);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb a:hover {
+    color: var(--color-texto);
+}
+
+.breadcrumb .current {
+    color: var(--color-texto);
+    font-weight: 600;
+}
+
+.breadcrumb i {
+    font-size: 0.7rem;
+    opacity: 0.7;
+}
+
+/* Cover del proyecto */
+.project-cover-container {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    margin-bottom: 2rem;
+}
+
+.project-cover-image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+}
+
+.project-cover-placeholder {
+    width: 100%;
+    height: 400px;
+    background: var(--color-acento);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--texto-primario);
+    font-size: 4rem;
+}
+
+.project-header-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    color: var(--texto-primario);
+    padding: 2rem;
+}
+
+.project-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+    color: var(--texto-primario);
+}
+
+.project-badge.planning { background: rgba(245, 158, 11, 0.8); }
+.project-badge.development { background: rgba(59, 130, 246, 0.8); }
+.project-badge.launched { background: rgba(16, 185, 129, 0.8); }
+.project-badge.completed { background: rgba(14, 165, 233, 0.8); }
+.project-badge.paused { background: rgba(139, 92, 246, 0.8); }
+
