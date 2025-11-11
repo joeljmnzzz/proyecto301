@@ -16,7 +16,6 @@
   opacity: 0.3;
   z-index: 0;
 }
-
 /* === HERO SECTION === */
 .project-hero {
     background: linear-gradient(135deg, #000000 0%, #3a3a3ae8 100%);
@@ -61,8 +60,8 @@
     margin: 0 auto;
 }
 
-/* ✅ MEJORADO: Títulos con mejor legibilidad */
-.project-details .project-title-overlay {
+/* ✅ MEJORADO: Títulos con mejor legibilidad - CLASE ACTUALIZADA */
+.project-hero-title {
     font-size: clamp(2rem, 5vw, 3rem);
     margin-bottom: 20px;
     line-height: 1.2;
@@ -170,6 +169,24 @@
     color: #34d399;
     border-color: rgba(52, 211, 153, 0.5);
     background: rgba(52, 211, 153, 0.15);
+}
+
+/* === CONTENIDO PRINCIPAL === */
+.project-content {
+    margin-bottom: 60px;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 40px;
+    align-items: start;
+}
+
+.content-main {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
 }
 
 /* === CONTENIDO PRINCIPAL === */
@@ -746,7 +763,7 @@
 
 /* Móviles pequeños */
 @media screen and (max-width: 480px) {
-    .project-details .project-title-overlay {
+    .project-hero-title {
         font-size: 1.8rem;
     }
     
