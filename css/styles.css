@@ -94,6 +94,111 @@ body {
   transform: scale(1.05);
 }
 
+/* === MENÚ DE USUARIO === */
+.user-menu-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.user-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-trigger:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.user-name {
+  color: var(--color-texto);
+  font-size: 0.9rem;
+  font-weight: 500;
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-trigger i {
+  color: var(--color-secundario);
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+}
+
+.user-menu-container.active .user-trigger i {
+  transform: rotate(180deg);
+}
+
+.user-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: rgba(30, 30, 30, 0.95);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  padding: 8px 0;
+  display: none;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  min-width: 200px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 5px;
+}
+
+.user-menu-container.active .user-menu {
+  display: block;
+}
+
+.user-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  color: var(--color-texto);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background 0.2s ease;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-family: "JetBrains Mono", monospace;
+}
+
+.user-menu-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.user-menu-item i {
+  width: 16px;
+  text-align: center;
+  color: var(--texto-destacado);
+}
+
+.user-menu-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 8px 0;
+}
+
 /* === 🌌 Contenido principal === */
 main {
   padding: clamp(90px, 15vw, 110px) clamp(16px, 4vw, 24px) clamp(40px, 8vw, 60px);
