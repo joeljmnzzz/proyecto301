@@ -1,4 +1,4 @@
-// create-project-modal.js - VERSIÓN COMPLETA CORREGIDA CON SUPABASE
+// create-project-modal.js - VERSIÓN COMPLETA CON BUSCADOR DE USUARIOS
 class CreateProjectModal {
     constructor() {
         console.log('🔄 CreateProjectModal constructor ejecutándose...');
@@ -332,7 +332,240 @@ class CreateProjectModal {
             });
         });
 
+        // 🔥 INICIALIZAR BUSCADOR DE USUARIOS
+        this.initUserSearch();
+
         console.log('✅ Funcionalidades del formulario inicializadas');
+    }
+
+    // 🔥 FUNCIONES PARA EL BUSCADOR DE USUARIOS
+    initUserSearch() {
+        const searchInput = document.getElementById('userSearchInput');
+        const searchResults = document.getElementById('userSearchResults');
+        
+        if (!searchInput) return;
+
+        let searchTimeout;
+        let currentSearchTerm = '';
+
+        searchInput.addEventListener('input', (e) => {
+            const value = e.target.value.trim();
+            
+            clearTimeout(searchTimeout);
+            
+            if (!value) {
+                this.hideSearchResults();
+                return;
+            }
+
+            if (value.startsWith('@')) {
+                const searchTerm = value.substring(1);
+                
+                if (searchTerm.length >= 2) {
+                    currentSearchTerm = searchTerm;
+                    searchTimeout = setTimeout(() => {
+                        this.searchUsers(searchTerm);
+                    }, 300);
+                } else {
+                    this.hideSearchResults();
+                }
+            } else {
+                this.hideSearchResults();
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                this.hideSearchResults();
+            }
+        });
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.hideSearchResults();
+            }
+        });
+    }
+
+    async searchUsers(searchTerm) {
+        const searchResults = document.getElementById('userSearchResults');
+        
+        if (!searchTerm) {
+            this.hideSearchResults();
+            return;
+        }
+
+        try {
+            searchResults.innerHTML = `
+                <div class="search-loading">
+                    <i class="fas fa-spinner fa-spin"></i> Buscando usuarios...
+                </div>
+            `;
+            searchResults.style.display = 'block';
+
+            const { data: users, error } = await window.supabase
+                .from('profiles')
+                .select('id, username, full_name, avatar_url')
+                .ilike('username', `%${searchTerm}%`)
+                .limit(10);
+
+            if (error) {
+                console.error('Error buscando usuarios:', error);
+                this.showSearchError();
+                return;
+            }
+
+            this.displaySearchResults(users, searchTerm);
+            
+        } catch (error) {
+            console.error('Error en búsqueda:', error);
+            this.showSearchError();
+        }
+    }
+
+    displaySearchResults(users, searchTerm) {
+        const searchResults = document.getElementById('userSearchResults');
+        
+        if (!users || users.length === 0) {
+            searchResults.innerHTML = `
+                <div class="no-results">
+                    No se encontraron usuarios con "@${searchTerm}"
+                </div>
+            `;
+            searchResults.style.display = 'block';
+            return;
+        }
+
+        const resultsHTML = users.map(user => `
+            <div class="search-result-item" data-user-id="${user.id}">
+                <div class="user-avatar">
+                    ${user.avatar_url ? 
+                        `<img src="${user.avatar_url}" alt="${user.username}" style="width: 100%; height: 100%; border-radius: 50%;">` : 
+                        `<i class="fas fa-user"></i>`
+                    }
+                </div>
+                <div class="user-info">
+                    <div class="user-username">@${user.username}</div>
+                    ${user.full_name ? `<div class="user-fullname">${user.full_name}</div>` : ''}
+                </div>
+            </div>
+        `).join('');
+
+        searchResults.innerHTML = resultsHTML;
+        searchResults.style.display = 'block';
+        this.bindSearchResultEvents();
+    }
+
+    bindSearchResultEvents() {
+        const searchResults = document.getElementById('userSearchResults');
+        const resultItems = searchResults.querySelectorAll('.search-result-item');
+        
+        resultItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const userId = item.dataset.userId;
+                const username = item.querySelector('.user-username').textContent.replace('@', '');
+                const fullName = item.querySelector('.user-fullname')?.textContent || '';
+                
+                this.addTeamMember(userId, username, fullName);
+                this.hideSearchResults();
+                this.clearSearchInput();
+            });
+        });
+    }
+
+    addTeamMember(userId, username, fullName) {
+        const existingMember = this.projectData.team.members.find(member => member.id === userId);
+        if (existingMember) {
+            this.showNotification('Este usuario ya está en el equipo', 'warning');
+            return;
+        }
+
+        this.projectData.team.members.push({
+            id: userId,
+            username: username,
+            full_name: fullName,
+            role: 'collaborator',
+            joined_at: new Date().toISOString()
+        });
+
+        this.updateSelectedMembersDisplay();
+        this.showNotification(`@${username} agregado al equipo`, 'success');
+    }
+
+    updateSelectedMembersDisplay() {
+        const selectedMembersContainer = document.getElementById('selectedMembers');
+        
+        if (!selectedMembersContainer) return;
+
+        const ownerCard = selectedMembersContainer.querySelector('.owner');
+        selectedMembersContainer.innerHTML = '';
+        selectedMembersContainer.appendChild(ownerCard);
+
+        this.projectData.team.members.forEach(member => {
+            const memberCard = document.createElement('div');
+            memberCard.className = 'member-card added';
+            memberCard.innerHTML = `
+                <div class="member-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="member-info">
+                    <span class="member-name">@${member.username}</span>
+                    <span class="member-role">${member.full_name || 'Colaborador'}</span>
+                </div>
+                <button type="button" class="remove-member" data-user-id="${member.id}">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            selectedMembersContainer.appendChild(memberCard);
+        });
+
+        this.bindRemoveMemberEvents();
+    }
+
+    bindRemoveMemberEvents() {
+        const removeButtons = document.querySelectorAll('.remove-member');
+        
+        removeButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const userId = button.dataset.userId;
+                this.removeTeamMember(userId);
+            });
+        });
+    }
+
+    removeTeamMember(userId) {
+        const member = this.projectData.team.members.find(m => m.id === userId);
+        
+        if (member) {
+            this.projectData.team.members = this.projectData.team.members.filter(m => m.id !== userId);
+            this.updateSelectedMembersDisplay();
+            this.showNotification(`@${member.username} removido del equipo`, 'info');
+        }
+    }
+
+    hideSearchResults() {
+        const searchResults = document.getElementById('userSearchResults');
+        if (searchResults) {
+            searchResults.style.display = 'none';
+        }
+    }
+
+    clearSearchInput() {
+        const searchInput = document.getElementById('userSearchInput');
+        if (searchInput) {
+            searchInput.value = '';
+        }
+    }
+
+    showSearchError() {
+        const searchResults = document.getElementById('userSearchResults');
+        searchResults.innerHTML = `
+            <div class="no-results">
+                <i class="fas fa-exclamation-triangle"></i> Error al buscar usuarios
+            </div>
+        `;
+        searchResults.style.display = 'block';
     }
 
     // 🔥 FUNCIONES PARA MANEJAR TAGS Y ROLES
@@ -1294,6 +1527,11 @@ class CreateProjectModal {
         this.updateRolesDisplay();
         this.updateCurrentTechDisplay();
         this.updateDesiredTechDisplay();
+        
+        // 🔥 LIMPIAR BUSCADOR DE USUARIOS
+        this.clearSearchInput();
+        this.hideSearchResults();
+        this.updateSelectedMembersDisplay();
         
         // Limpiar inputs del formulario
         const inputs = document.querySelectorAll('input, textarea, select');

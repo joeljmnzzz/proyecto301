@@ -160,106 +160,116 @@
         </div>
       </div>
 
-      <!-- Paso 3: Equipo y Colaboración -->
-      <div class="form-step" data-step="3">
-        <div class="step-header">
-          <h3>Construye tu Equipo</h3>
-          <p>Invita colaboradores y define los roles necesarios.</p>
+  <!-- Paso 3: Equipo y Colaboración - VERSIÓN CORREGIDA -->
+<div class="form-step" data-step="3">
+  <div class="step-header">
+    <h3>Construye tu Equipo</h3>
+    <p>Invita colaboradores y define los roles necesarios.</p>
+  </div>
+
+  <div class="team-form">
+    <!-- 🔥 BUSCADOR DE USUARIOS CORREGIDO -->
+    <div class="form-group">
+      <label for="userSearchInput">Agregar miembros al equipo</label>
+      <div class="user-search-container">
+        <div class="search-input-wrapper">
+          <input 
+            type="text" 
+            id="userSearchInput" 
+            class="user-search-input" 
+            placeholder="Buscar usuarios por @username..."
+            autocomplete="off"
+          >
+          <div class="search-icon">
+            <i class="fas fa-search"></i>
+          </div>
         </div>
+        <div class="search-results" id="userSearchResults" style="display: none;"></div>
+      </div>
+      <small class="field-hint">Escribe @ seguido del nombre de usuario para buscar en la base de datos</small>
+    </div>
 
-        <div class="team-form">
-          <!-- Miembros actuales -->
-          <div class="form-group">
-            <label>Miembros del Equipo</label>
-            <div class="current-members">
-              <div class="member-card owner">
-                <div class="member-avatar">
-                  <i class="fas fa-crown"></i>
-                </div>
-                <div class="member-info">
-                  <span class="member-name">Tú (Creador)</span>
-                  <span class="member-role">Fundador/Owner</span>
-                </div>
-              </div>
-            </div>
-            <small class="field-hint">Puedes agregar miembros más tarde</small>
+    <!-- 🔥 MIEMBROS AGREGADOS CORREGIDO -->
+    <div class="form-group">
+      <label>Miembros del equipo</label>
+      <div class="selected-members" id="selectedMembers">
+        <div class="member-card owner">
+          <div class="member-avatar">
+            <i class="fas fa-crown"></i>
           </div>
-
-          <!-- Buscador de usuarios -->
-          <div class="form-group">
-            <label for="userSearchInput">Agregar miembros</label>
-            <div class="user-search">
-              <input type="text" id="userSearchInput" class="user-search-input" placeholder="Buscar usuarios por nombre, email o skills...">
-              <div class="search-results"></div>
-            </div>
-            <small class="field-hint">Busca usuarios para invitarlos a tu equipo</small>
-          </div>
-
-          <!-- Roles buscados -->
-          <div class="form-group">
-            <label>Roles que estás buscando</label>
-            <div class="roles-needed">
-              <div class="role-tags"></div>
-              <select class="role-select" id="roleSelect">
-                <option value="">Selecciona un rol...</option>
-                <option value="frontend">Frontend Developer</option>
-                <option value="backend">Backend Developer</option>
-                <option value="fullstack">Full Stack Developer</option>
-                <option value="ui-ux">UI/UX Designer</option>
-                <option value="devops">DevOps Engineer</option>
-                <option value="data-scientist">Data Scientist</option>
-                <option value="product-manager">Product Manager</option>
-                <option value="qa">QA Tester</option>
-              </select>
-            </div>
-            <small class="field-hint">Especifica los roles que necesitas</small>
-          </div>
-
-          <div class="collaboration-settings">
-            <div class="form-group">
-              <label>Modo de Colaboración</label>
-              <div class="collaboration-options">
-                <label class="option-card">
-                  <input type="radio" name="collaboration-mode" value="remote" checked>
-                  <i class="fas fa-laptop"></i>
-                  <span>Remoto</span>
-                </label>
-                <label class="option-card">
-                  <input type="radio" name="collaboration-mode" value="hybrid">
-                  <i class="fas fa-balance-scale"></i>
-                  <span>Híbrido</span>
-                </label>
-                <label class="option-card">
-                  <input type="radio" name="collaboration-mode" value="in-person">
-                  <i class="fas fa-building"></i>
-                  <span>Presencial</span>
-                </label>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>Compromiso Temporal</label>
-              <div class="commitment-options">
-                <label class="option-card">
-                  <input type="radio" name="time-commitment" value="part-time" checked>
-                  <i class="fas fa-clock"></i>
-                  <span>Part-time</span>
-                </label>
-                <label class="option-card">
-                  <input type="radio" name="time-commitment" value="full-time">
-                  <i class="fas fa-briefcase"></i>
-                  <span>Full-time</span>
-                </label>
-                <label class="option-card">
-                  <input type="radio" name="time-commitment" value="freelance">
-                  <i class="fas fa-calendar"></i>
-                  <span>Freelance</span>
-                </label>
-              </div>
-            </div>
+          <div class="member-info">
+            <span class="member-name">Tú (Creador)</span>
+            <span class="member-role">Fundador/Owner</span>
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Roles buscados -->
+    <div class="form-group">
+      <label>Roles que estás buscando</label>
+      <div class="roles-needed">
+        <div class="role-tags"></div>
+        <select class="role-select" id="roleSelect">
+          <option value="">Selecciona un rol...</option>
+          <option value="frontend">Frontend Developer</option>
+          <option value="backend">Backend Developer</option>
+          <option value="fullstack">Full Stack Developer</option>
+          <option value="ui-ux">UI/UX Designer</option>
+          <option value="devops">DevOps Engineer</option>
+          <option value="data-scientist">Data Scientist</option>
+          <option value="product-manager">Product Manager</option>
+          <option value="qa">QA Tester</option>
+        </select>
+      </div>
+      <small class="field-hint">Especifica los roles que necesitas</small>
+    </div>
+
+    <div class="collaboration-settings">
+      <div class="form-group">
+        <label>Modo de Colaboración</label>
+        <div class="collaboration-options">
+          <label class="option-card">
+            <input type="radio" name="collaboration-mode" value="remote" checked>
+            <i class="fas fa-laptop"></i>
+            <span>Remoto</span>
+          </label>
+          <label class="option-card">
+            <input type="radio" name="collaboration-mode" value="hybrid">
+            <i class="fas fa-balance-scale"></i>
+            <span>Híbrido</span>
+          </label>
+          <label class="option-card">
+            <input type="radio" name="collaboration-mode" value="in-person">
+            <i class="fas fa-building"></i>
+            <span>Presencial</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Compromiso Temporal</label>
+        <div class="commitment-options">
+          <label class="option-card">
+            <input type="radio" name="time-commitment" value="part-time" checked>
+            <i class="fas fa-clock"></i>
+            <span>Part-time</span>
+          </label>
+          <label class="option-card">
+            <input type="radio" name="time-commitment" value="full-time">
+            <i class="fas fa-briefcase"></i>
+            <span>Full-time</span>
+          </label>
+          <label class="option-card">
+            <input type="radio" name="time-commitment" value="freelance">
+            <i class="fas fa-calendar"></i>
+            <span>Freelance</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
       <!-- Paso 4: Stack Tecnológico -->
       <div class="form-step" data-step="4">

@@ -1020,3 +1020,178 @@
     border-color: var(--borde-tarjeta);
   }
 }
+
+/* Estilos para el buscador de usuarios */
+.user-search-container {
+  position: relative;
+  width: 100%;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.user-search-input {
+  width: 100%;
+  padding: 12px 45px 12px 16px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-family: 'JetBrains Mono', monospace;
+  transition: all 0.3s ease;
+}
+
+.user-search-input:focus {
+  border-color: #6a11cb;
+  background: rgba(255, 255, 255, 0.08);
+  outline: none;
+}
+
+.search-icon {
+  position: absolute;
+  right: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #1a1a2e;
+  border: 2px solid rgba(106, 17, 203, 0.3);
+  border-radius: 8px;
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background 0.2s ease;
+}
+
+.search-result-item:hover {
+  background: rgba(106, 17, 203, 0.2);
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  font-size: 14px;
+  color: white;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-username {
+  font-weight: 600;
+  color: white;
+  font-size: 14px;
+}
+
+.user-fullname {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.no-results {
+  padding: 16px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+}
+
+.search-loading {
+  padding: 16px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Estilos para miembros seleccionados */
+.selected-members {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.member-card {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.member-card.added {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.member-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  color: white;
+}
+
+.member-info {
+  flex: 1;
+}
+
+.member-name {
+  font-weight: 600;
+  color: white;
+  display: block;
+}
+
+.member-role {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.remove-member {
+  background: rgba(239, 68, 68, 0.2);
+  border: none;
+  color: #ef4444;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.remove-member:hover {
+  background: rgba(239, 68, 68, 0.3);
+}
