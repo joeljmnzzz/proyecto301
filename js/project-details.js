@@ -296,22 +296,22 @@ updateCoverImage(coverImageUrl) {
     console.log('🎨 Actualizando banner del hero con:', coverImageUrl);
 
     if (coverImageUrl && coverImageUrl.trim() !== '') {
-        // ✅ Aplicar la imagen como fondo del hero
+        // ✅ SOLO la imagen - el overlay viene del CSS ::before
         const finalUrl = coverImageUrl + '?t=' + Date.now();
         
-        heroSection.style.backgroundImage = `linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(58, 58, 58, 0.9) 100%), url('${finalUrl}')`;
+        heroSection.style.backgroundImage = `url('${finalUrl}')`;
         heroSection.style.backgroundSize = 'cover';
         heroSection.style.backgroundPosition = 'center';
-        heroSection.style.backgroundBlendMode = 'overlay';
+        // ❌ NO usar backgroundBlendMode ni gradiente aquí
         
-        console.log('✅ Banner del hero actualizado con imagen del proyecto');
+        console.log('✅ Imagen aplicada (overlay desde CSS)');
         
     } else {
-        // ✅ Usar gradiente por defecto si no hay imagen
+        // ✅ Solo gradiente si no hay imagen
         heroSection.style.backgroundImage = 'linear-gradient(135deg, #000000 0%, #3a3a3ae8 100%)';
-        console.log('ℹ️ Usando gradiente por defecto (sin imagen)');
+        console.log('ℹ️ Usando gradiente por defecto');
     }
-} 
+}
 
     // Actualizar tecnologías
     updateTechnologies(technologies) {

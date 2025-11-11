@@ -36,7 +36,6 @@
     background-repeat: no-repeat;
 }
 
-/* ✅ MEJORADO: Overlay oscuro para mejor contraste */
 .project-hero::before {
     content: '';
     position: absolute;
@@ -53,19 +52,6 @@
     );
     z-index: 1;
 }
-
-/* ✅ ELIMINAR: Este ::after duplicado 
-.project-hero::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, #000000 0%, #3a3a3ae8 100%);
-    opacity: 0.1;
-    z-index: 1;
-}*/
 
 .project-hero .container {
     position: relative;
