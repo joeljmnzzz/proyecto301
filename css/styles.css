@@ -1247,23 +1247,7 @@ footer {
   }
 }
 
-/* Soporte para modo oscuro del sistema */
-@media (prefers-color-scheme: light) {
-  :root {
-    --color-fondo: #f5f5f5;
-    --color-texto: #333333;
-    --color-secundario: #666666;
-    --color-navbar: rgba(245, 245, 245, 0.85);
-    --color-placeholder: rgba(100, 100, 100, 0.6);
-    --fondo-tarjeta: rgba(0, 0, 0, 0.03);
-    --fondo-tarjeta-hover: rgba(0, 0, 0, 0.06);
-    --borde-tarjeta: rgba(0, 0, 0, 0.1);
-    --borde-tarjeta-hover: rgba(106, 17, 203, 0.3);
-    --texto-primario: #1a1a1a;
-    --texto-secundario: rgba(0, 0, 0, 0.7);
-    --texto-destacado: #6a11cb;
-  }
-}
+
 
 /* ===== ESTILOS ESPECÍFICOS PARA PÁGINA DE DETALLES ===== */
 
