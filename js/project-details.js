@@ -39,7 +39,7 @@ class ProjectDetailsLoader {
 
             console.log('📡 Cargando proyecto con slug:', this.projectSlug);
 
-            // ✅ CONSULTA CORREGIDA - Sin relaciones problemáticas
+            // ✅ CONSULTA CORREGIDA - Incluyendo project_members
             const { data: project, error } = await window.supabase
                 .from('projects')
                 .select(`
@@ -62,6 +62,7 @@ class ProjectDetailsLoader {
 
             this.currentProject = project;
             console.log('✅ Proyecto cargado:', project);
+            console.log('👥 Miembros del proyecto:', project.project_members);
 
             // ✅ Cargar información de usuarios por separado si hay miembros
             if (project.project_members && project.project_members.length > 0) {
@@ -84,39 +85,42 @@ class ProjectDetailsLoader {
     }
 
     // ✅ NUEVO: Cargar información de usuarios desde la tabla correcta
-    async loadUsersInfo(projectMembers) {
-        if (!projectMembers || projectMembers.length === 0) return;
+    // ✅ NUEVO: Cargar información de usuarios desde la tabla correcta
+async loadUsersInfo(projectMembers) {
+    if (!projectMembers || projectMembers.length === 0) return;
 
-        try {
-            const userIds = projectMembers.map(member => member.user_id).filter(id => id);
-            
-            if (userIds.length === 0) return;
+    try {
+        const userIds = projectMembers.map(member => member.user_id).filter(id => id);
+        
+        if (userIds.length === 0) return;
 
-            // Consultar información de usuarios desde la tabla 'profiles'
-            const { data: users, error } = await window.supabase
-                .from('profiles')
-                .select('*')
-                .in('id', userIds);
+        console.log('👤 IDs de usuarios a cargar:', userIds);
 
-            if (error) {
-                console.warn('⚠️ No se pudieron cargar los usuarios:', error);
-                return;
-            }
+        // Consultar información de usuarios desde la tabla 'profiles'
+        const { data: users, error } = await window.supabase
+            .from('profiles')
+            .select('id, username, full_name, avatar_url')
+            .in('id', userIds);
 
-            // Crear mapa de usuarios para acceso rápido
-            this.userMap = {};
-            if (users) {
-                users.forEach(user => {
-                    this.userMap[user.id] = user;
-                });
-            }
-
-            console.log('✅ Usuarios cargados:', users);
-
-        } catch (error) {
-            console.warn('⚠️ Error cargando usuarios:', error);
+        if (error) {
+            console.warn('⚠️ No se pudieron cargar los usuarios:', error);
+            return;
         }
+
+        // Crear mapa de usuarios para acceso rápido
+        this.userMap = {};
+        if (users) {
+            users.forEach(user => {
+                this.userMap[user.id] = user;
+            });
+        }
+
+        console.log('✅ Usuarios cargados:', users);
+
+    } catch (error) {
+        console.warn('⚠️ Error cargando usuarios:', error);
     }
+}
 
     // Actualizar la interfaz con los datos del proyecto
     updateUI() {
@@ -180,14 +184,6 @@ class ProjectDetailsLoader {
                     element.style.display = 'none'; // Ocultar elemento si no hay contenido
                 }
             }
-        }
-    }
-
-    // Helper para actualizar elementos del DOM
-    updateElement(elementId, content) {
-        const element = document.getElementById(elementId);
-        if (element && content) {
-            element.textContent = content;
         }
     }
 
@@ -266,51 +262,33 @@ class ProjectDetailsLoader {
         statusElement.className = `status-badge ${config.class}`;
     }
 
+    updateCoverImage(coverImageUrl) {
+        const heroSection = document.querySelector('.project-hero');
+        
+        if (!heroSection) {
+            console.log('❌ Hero section no encontrado');
+            return;
+        }
 
-// Actualizar estado del proyecto
-updateProjectStatus(status) {
-    const statusElement = document.getElementById('project-status');
-    if (!statusElement) return;
+        console.log('🎨 Actualizando banner del hero con:', coverImageUrl);
 
-    const statusConfig = {
-        'planning': { text: 'En Planificación', class: 'status-planning' },
-        'development': { text: 'En Desarrollo', class: 'status-development' },
-        'launched': { text: 'Lanzado', class: 'status-launched' }
-    };
-
-    const config = statusConfig[status] || { text: status || 'No especificado', class: 'status-planning' };
-    statusElement.textContent = config.text;
-    statusElement.className = `status-badge ${config.class}`;
-} // ✅ Esta llave cierra updateProjectStatus
-
-
-updateCoverImage(coverImageUrl) {
-    const heroSection = document.querySelector('.project-hero');
-    
-    if (!heroSection) {
-        console.log('❌ Hero section no encontrado');
-        return;
+        if (coverImageUrl && coverImageUrl.trim() !== '') {
+            // ✅ SOLO la imagen - el overlay viene del CSS ::before
+            const finalUrl = coverImageUrl + '?t=' + Date.now();
+            
+            heroSection.style.backgroundImage = `url('${finalUrl}')`;
+            heroSection.style.backgroundSize = 'cover';
+            heroSection.style.backgroundPosition = 'center';
+            // ❌ NO usar backgroundBlendMode ni gradiente aquí
+            
+            console.log('✅ Imagen aplicada (overlay desde CSS)');
+            
+        } else {
+            // ✅ Solo gradiente si no hay imagen
+            heroSection.style.backgroundImage = 'linear-gradient(135deg, #000000 0%, #3a3a3ae8 100%)';
+            console.log('ℹ️ Usando gradiente por defecto');
+        }
     }
-
-    console.log('🎨 Actualizando banner del hero con:', coverImageUrl);
-
-    if (coverImageUrl && coverImageUrl.trim() !== '') {
-        // ✅ SOLO la imagen - el overlay viene del CSS ::before
-        const finalUrl = coverImageUrl + '?t=' + Date.now();
-        
-        heroSection.style.backgroundImage = `url('${finalUrl}')`;
-        heroSection.style.backgroundSize = 'cover';
-        heroSection.style.backgroundPosition = 'center';
-        // ❌ NO usar backgroundBlendMode ni gradiente aquí
-        
-        console.log('✅ Imagen aplicada (overlay desde CSS)');
-        
-    } else {
-        // ✅ Solo gradiente si no hay imagen
-        heroSection.style.backgroundImage = 'linear-gradient(135deg, #000000 0%, #3a3a3ae8 100%)';
-        console.log('ℹ️ Usando gradiente por defecto');
-    }
-}
 
     // Actualizar tecnologías
     updateTechnologies(technologies) {
@@ -480,48 +458,105 @@ updateCoverImage(coverImageUrl) {
         });
     }
 
-    // Actualizar miembros
-    updateMembers(members) {
-        const container = document.getElementById('project-members');
-        if (!container) return;
+    // 🔥 ACTUALIZADO: Actualizar miembros - MOSTRAR TODOS LOS MIEMBROS
+    // 🔥 ACTUALIZADO: Actualizar miembros - CON ENLACES A PERFILES
+updateMembers(members) {
+    const container = document.getElementById('project-members');
+    if (!container) return;
 
-        // Ocultar sección completa si no hay miembros
-        const section = container.closest('.team-section');
-        
-        if (!members || members.length === 0) {
-            if (section) section.style.display = 'none';
-            return;
-        }
+    console.log('👥 Actualizando miembros:', members);
+    console.log('🗺️ UserMap disponible:', this.userMap);
 
-        // Mostrar sección y llenar miembros
-        if (section) section.style.display = '';
-        container.innerHTML = '';
-
-        members.forEach(member => {
-            if (member) {
-                const memberItem = document.createElement('div');
-                memberItem.className = 'team-member';
-                
-                // ✅ Usar userMap si está disponible, sino datos básicos
-                const user = this.userMap ? this.userMap[member.user_id] : null;
-                const avatarUrl = user?.avatar_url || '../assets/elements/default-avatar.png';
-                const userName = user?.user_name || `Usuario ${member.user_id?.substring(0, 8)}` || 'Usuario Anónimo';
-                
-                memberItem.innerHTML = `
-                    <img src="${avatarUrl}" alt="${userName}" onerror="this.src='../assets/elements/default-avatar.png'">
-                    <div>
-                        <strong>${userName}</strong>
-                        <span class="member-role">${this.formatMemberRole(member.role)}</span>
-                        <span class="member-status ${member.is_active ? 'active' : 'inactive'}">
-                            ${member.is_active ? 'Activo' : 'Inactivo'}
-                        </span>
-                    </div>
-                `;
-                
-                container.appendChild(memberItem);
-            }
-        });
+    // Ocultar sección completa si no hay miembros
+    const section = container.closest('.team-section');
+    
+    if (!members || members.length === 0) {
+        if (section) section.style.display = 'none';
+        console.log('ℹ️ No hay miembros para mostrar');
+        return;
     }
+
+    // Mostrar sección y llenar miembros
+    if (section) section.style.display = '';
+    container.innerHTML = '';
+
+    let membersFound = false;
+
+    members.forEach(member => {
+        if (member && member.user_id) {
+            membersFound = true;
+            
+            // ✅ Usar userMap para obtener información del usuario
+            const user = this.userMap ? this.userMap[member.user_id] : null;
+            
+            console.log(`👤 Procesando miembro ${member.user_id}:`, user);
+            
+            const memberItem = document.createElement('div');
+            memberItem.className = 'team-member';
+            memberItem.style.cursor = 'pointer';
+            
+            // OBTENER DATOS DEL USUARIO
+            const avatarUrl = user?.avatar_url || '../assets/elements/default-avatar.png';
+            const username = user?.username || 'Usuario';
+            const fullName = user?.full_name || '';
+            const displayName = fullName || username;
+            
+            memberItem.innerHTML = `
+                <div class="member-avatar">
+                    <img src="${avatarUrl}" alt="${displayName}" 
+                         onerror="this.src='../assets/elements/default-avatar.png'">
+                </div>
+                <div class="member-info">
+                    <strong class="member-name">${displayName}</strong>
+                    ${username ? `<span class="member-username">@${username}</span>` : ''}
+                    <span class="member-role">${this.formatMemberRole(member.role)}</span>
+                    <span class="member-status ${member.is_active !== false ? 'active' : 'inactive'}">
+                        ${member.is_active !== false ? 'Activo' : 'Inactivo'}
+                    </span>
+                </div>
+            `;
+            
+            // 🔥 AGREGAR EVENTO CLICK PARA IR AL PERFIL
+            memberItem.addEventListener('click', () => {
+                this.navigateToProfile(user?.username || user?.id);
+            });
+            
+            // 🔥 AGREGAR HOVER EFFECT
+            memberItem.addEventListener('mouseenter', () => {
+                memberItem.style.backgroundColor = 'rgba(106, 17, 203, 0.1)';
+            });
+            
+            memberItem.addEventListener('mouseleave', () => {
+                memberItem.style.backgroundColor = '';
+            });
+            
+            container.appendChild(memberItem);
+        }
+    });
+
+    // Si no se encontraron miembros válidos, ocultar sección
+    if (!membersFound) {
+        if (section) section.style.display = 'none';
+        console.log('ℹ️ No se encontraron miembros válidos');
+    } else {
+        console.log(`✅ Se mostraron ${members.length} miembros con enlaces a perfiles`);
+    }
+}
+
+// 🔥 NUEVA FUNCIÓN: Navegar al perfil del usuario
+navigateToProfile(userIdentifier) {
+    if (!userIdentifier) {
+        console.warn('No se puede navegar al perfil: identificador de usuario no disponible');
+        return;
+    }
+
+    // Construir la URL del perfil
+    const profileUrl = `/perfiles/${userIdentifier}`;
+    console.log('🔗 Navegando al perfil:', profileUrl);
+    
+    // Navegar a la página del perfil
+    window.location.href = profileUrl;
+}
 
     // Formatear rol del miembro
     formatMemberRole(role) {
@@ -530,7 +565,8 @@ updateCoverImage(coverImageUrl) {
             'owner': 'Propietario',
             'admin': 'Administrador',
             'member': 'Miembro',
-            'contributor': 'Colaborador'
+            'collaborator': 'Colaborador',
+            'contributor': 'Contribuidor'
         };
         return translations[role] || role;
     }
