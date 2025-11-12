@@ -36,7 +36,7 @@ class ProfileManager {
         console.log('🔍 Segmentos de URL:', segments);
         
         // Buscar el segmento "perfiles" en la URL
-        const perfilesIndex = segments.indexOf('profile');
+        const perfilesIndex = segments.indexOf('perfiles');
         
         if (perfilesIndex !== -1 && segments[perfilesIndex + 1]) {
             const profileIdentifier = segments[perfilesIndex + 1];
@@ -723,7 +723,7 @@ async updateAboutSection() {
         this.userProjects.forEach(project => {
             const projectCard = document.createElement('a');
             // 🔥 CORREGIR RUTA - ahora estamos en html/profile.html
-            projectCard.href = `../project-details.html?slug=${project.slug}`;
+            projectCard.href = `../projectos/${project.slug}`;
             projectCard.className = 'project-mini-card';
             
             projectCard.innerHTML = `
@@ -952,7 +952,7 @@ updateProjectsSection() {
     this.userProjects.forEach(project => {
         const projectCard = document.createElement('a');
         // 🔥 CORREGIR RUTA - ahora estamos en html/profile.html
-        projectCard.href = `../project-details.html?slug=${project.slug}`;
+        projectCard.href = `../proyectos/${project.slug}`;
         projectCard.className = 'project-mini-card';
         
         projectCard.innerHTML = `

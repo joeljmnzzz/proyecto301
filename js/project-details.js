@@ -541,7 +541,7 @@ navigateToProfile(userIdentifier) {
     }
 
     // Construir la URL del perfil - usar username
-    const profileUrl = `/profile/${userIdentifier}`;
+    const profileUrl = `/perfiles/${userIdentifier}`;
     console.log('🔗 Navegando al perfil:', profileUrl);
     window.location.href = profileUrl;
 }
