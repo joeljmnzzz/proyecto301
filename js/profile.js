@@ -210,13 +210,13 @@ class ProfileManager {
         
         if (loginBtn) {
             loginBtn.addEventListener('click', () => {
-                window.location.href = '../auth/login.html';
+                window.location.href = '../login.html';
             });
         }
         
         if (registerBtn) {
             registerBtn.addEventListener('click', () => {
-                window.location.href = '../auth/login.html';
+                window.location.href = '../login.html';
             });
         }
     }
