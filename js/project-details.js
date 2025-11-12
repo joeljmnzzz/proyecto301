@@ -85,41 +85,42 @@ class ProjectDetailsLoader {
     }
 
     // ✅ NUEVO: Cargar información de usuarios desde la tabla correcta
-    async loadUsersInfo(projectMembers) {
-        if (!projectMembers || projectMembers.length === 0) return;
+    // ✅ NUEVO: Cargar información de usuarios desde la tabla correcta
+async loadUsersInfo(projectMembers) {
+    if (!projectMembers || projectMembers.length === 0) return;
 
-        try {
-            const userIds = projectMembers.map(member => member.user_id).filter(id => id);
-            
-            if (userIds.length === 0) return;
+    try {
+        const userIds = projectMembers.map(member => member.user_id).filter(id => id);
+        
+        if (userIds.length === 0) return;
 
-            console.log('👤 IDs de usuarios a cargar:', userIds);
+        console.log('👤 IDs de usuarios a cargar:', userIds);
 
-            // Consultar información de usuarios desde la tabla 'profiles'
-            const { data: users, error } = await window.supabase
-                .from('profiles')
-                .select('id, username, full_name, avatar_url')
-                .in('id', userIds);
+        // Consultar información de usuarios desde la tabla 'profiles'
+        const { data: users, error } = await window.supabase
+            .from('profiles')
+            .select('id, username, full_name, avatar_url')
+            .in('id', userIds);
 
-            if (error) {
-                console.warn('⚠️ No se pudieron cargar los usuarios:', error);
-                return;
-            }
-
-            // Crear mapa de usuarios para acceso rápido
-            this.userMap = {};
-            if (users) {
-                users.forEach(user => {
-                    this.userMap[user.id] = user;
-                });
-            }
-
-            console.log('✅ Usuarios cargados:', users);
-
-        } catch (error) {
-            console.warn('⚠️ Error cargando usuarios:', error);
+        if (error) {
+            console.warn('⚠️ No se pudieron cargar los usuarios:', error);
+            return;
         }
+
+        // Crear mapa de usuarios para acceso rápido
+        this.userMap = {};
+        if (users) {
+            users.forEach(user => {
+                this.userMap[user.id] = user;
+            });
+        }
+
+        console.log('✅ Usuarios cargados:', users);
+
+    } catch (error) {
+        console.warn('⚠️ Error cargando usuarios:', error);
     }
+}
 
     // Actualizar la interfaz con los datos del proyecto
     updateUI() {
@@ -458,73 +459,104 @@ class ProjectDetailsLoader {
     }
 
     // 🔥 ACTUALIZADO: Actualizar miembros - MOSTRAR TODOS LOS MIEMBROS
-    updateMembers(members) {
-        const container = document.getElementById('project-members');
-        if (!container) return;
+    // 🔥 ACTUALIZADO: Actualizar miembros - CON ENLACES A PERFILES
+updateMembers(members) {
+    const container = document.getElementById('project-members');
+    if (!container) return;
 
-        console.log('👥 Actualizando miembros:', members);
-        console.log('🗺️ UserMap disponible:', this.userMap);
+    console.log('👥 Actualizando miembros:', members);
+    console.log('🗺️ UserMap disponible:', this.userMap);
 
-        // Ocultar sección completa si no hay miembros
-        const section = container.closest('.team-section');
-        
-        if (!members || members.length === 0) {
-            if (section) section.style.display = 'none';
-            console.log('ℹ️ No hay miembros para mostrar');
-            return;
-        }
-
-        // Mostrar sección y llenar miembros
-        if (section) section.style.display = '';
-        container.innerHTML = '';
-
-        let membersFound = false;
-
-        members.forEach(member => {
-            if (member && member.user_id) {
-                membersFound = true;
-                
-                // ✅ Usar userMap para obtener información del usuario
-                const user = this.userMap ? this.userMap[member.user_id] : null;
-                
-                console.log(`👤 Procesando miembro ${member.user_id}:`, user);
-                
-                const memberItem = document.createElement('div');
-                memberItem.className = 'team-member';
-                
-                // OBTENER DATOS DEL USUARIO
-                const avatarUrl = user?.avatar_url || '../assets/elements/default-avatar.png';
-                const username = user?.username || 'Usuario';
-                const fullName = user?.full_name || '';
-                const displayName = fullName
-                
-                memberItem.innerHTML = `
-                    <div class="member-avatar">
-                        <img src="${avatarUrl}" alt="${displayName}" 
-                             onerror="this.src='../assets/elements/default-avatar.png'">
-                    </div>
-                    <div class="member-info">
-                        <strong class="member-name">${displayName}</strong>
-                        ${username ? `<span class="member-username">@${username}</span>` : ''}
-                        <span class="member-role">${this.formatMemberRole(member.role)}</span>
-                        <span class="member-status ${member.is_active !== false ? 'active' : 'inactive'}">
-                            ${member.is_active !== false ? 'Activo' : 'Inactivo'}
-                        </span>
-                    </div>
-                `;
-                
-                container.appendChild(memberItem);
-            }
-        });
-
-        // Si no se encontraron miembros válidos, ocultar sección
-        if (!membersFound) {
-            if (section) section.style.display = 'none';
-            console.log('ℹ️ No se encontraron miembros válidos');
-        } else {
-            console.log(`✅ Se mostraron ${members.length} miembros`);
-        }
+    // Ocultar sección completa si no hay miembros
+    const section = container.closest('.team-section');
+    
+    if (!members || members.length === 0) {
+        if (section) section.style.display = 'none';
+        console.log('ℹ️ No hay miembros para mostrar');
+        return;
     }
+
+    // Mostrar sección y llenar miembros
+    if (section) section.style.display = '';
+    container.innerHTML = '';
+
+    let membersFound = false;
+
+    members.forEach(member => {
+        if (member && member.user_id) {
+            membersFound = true;
+            
+            // ✅ Usar userMap para obtener información del usuario
+            const user = this.userMap ? this.userMap[member.user_id] : null;
+            
+            console.log(`👤 Procesando miembro ${member.user_id}:`, user);
+            
+            const memberItem = document.createElement('div');
+            memberItem.className = 'team-member';
+            memberItem.style.cursor = 'pointer';
+            
+            // OBTENER DATOS DEL USUARIO
+            const avatarUrl = user?.avatar_url || '../assets/elements/default-avatar.png';
+            const username = user?.username || 'Usuario';
+            const fullName = user?.full_name || '';
+            const displayName = fullName || username;
+            
+            memberItem.innerHTML = `
+                <div class="member-avatar">
+                    <img src="${avatarUrl}" alt="${displayName}" 
+                         onerror="this.src='../assets/elements/default-avatar.png'">
+                </div>
+                <div class="member-info">
+                    <strong class="member-name">${displayName}</strong>
+                    ${username ? `<span class="member-username">@${username}</span>` : ''}
+                    <span class="member-role">${this.formatMemberRole(member.role)}</span>
+                    <span class="member-status ${member.is_active !== false ? 'active' : 'inactive'}">
+                        ${member.is_active !== false ? 'Activo' : 'Inactivo'}
+                    </span>
+                </div>
+            `;
+            
+            // 🔥 AGREGAR EVENTO CLICK PARA IR AL PERFIL
+            memberItem.addEventListener('click', () => {
+                this.navigateToProfile(user?.username || user?.id);
+            });
+            
+            // 🔥 AGREGAR HOVER EFFECT
+            memberItem.addEventListener('mouseenter', () => {
+                memberItem.style.backgroundColor = 'rgba(106, 17, 203, 0.1)';
+            });
+            
+            memberItem.addEventListener('mouseleave', () => {
+                memberItem.style.backgroundColor = '';
+            });
+            
+            container.appendChild(memberItem);
+        }
+    });
+
+    // Si no se encontraron miembros válidos, ocultar sección
+    if (!membersFound) {
+        if (section) section.style.display = 'none';
+        console.log('ℹ️ No se encontraron miembros válidos');
+    } else {
+        console.log(`✅ Se mostraron ${members.length} miembros con enlaces a perfiles`);
+    }
+}
+
+// 🔥 NUEVA FUNCIÓN: Navegar al perfil del usuario
+navigateToProfile(userIdentifier) {
+    if (!userIdentifier) {
+        console.warn('No se puede navegar al perfil: identificador de usuario no disponible');
+        return;
+    }
+
+    // Construir la URL del perfil
+    const profileUrl = `/perfiles/${userIdentifier}`;
+    console.log('🔗 Navegando al perfil:', profileUrl);
+    
+    // Navegar a la página del perfil
+    window.location.href = profileUrl;
+}
 
     // Formatear rol del miembro
     formatMemberRole(role) {
