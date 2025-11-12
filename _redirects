@@ -1,6 +1,6 @@
-# _redirects - En la raíz de tu proyecto
+# _redirects - En la raíz
 /css/*    /css/:splat    200
 /js/*     /js/:splat     200
 /proyectos/*    /project-details.html    200
-/perfiles/*     /index/profile.html    200
+/perfiles/*     /html/profile.html    200
 /*             /index.html   200

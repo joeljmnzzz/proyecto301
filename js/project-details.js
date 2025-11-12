@@ -543,17 +543,16 @@ updateMembers(members) {
     }
 }
 
+// 🔥 SOLUCIÓN CORREGIDA: Usar la ruta correcta
 navigateToProfile(userIdentifier) {
     if (!userIdentifier) {
         console.warn('No se puede navegar al perfil: identificador de usuario no disponible');
         return;
     }
 
-    // Construir la URL del perfil - apuntar a la ubicación correcta
+    // Usar la ruta correcta con las redirecciones
     const profileUrl = `/perfiles/${userIdentifier}`;
-    console.log('🔗 Navegando al perfil:', profileUrl);
-    
-    // Navegar a la página del perfil
+    console.log('🔗 Navegando a perfil:', profileUrl);
     window.location.href = profileUrl;
 }
 

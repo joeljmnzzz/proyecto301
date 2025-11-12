@@ -340,43 +340,43 @@ showProfileNotFound() {
     }
 
     // Actualizar sección de proyectos
-updateProjectsSection() {
-    const projectsGrid = document.getElementById('profile-projects');
-    if (!projectsGrid) return;
+    updateProjectsSection() {
+        const projectsGrid = document.getElementById('profile-projects');
+        if (!projectsGrid) return;
 
-    projectsGrid.innerHTML = '';
+        projectsGrid.innerHTML = '';
 
-    if (!this.userProjects || this.userProjects.length === 0) {
-        projectsGrid.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-rocket"></i>
-                <p>${this.isOwnProfile ? 'Crea tu primer proyecto' : 'No hay proyectos públicos'}</p>
-                ${this.isOwnProfile ? 
-                    '<a href="../dashboard.html" class="btn-primary" style="margin-top: 10px;">Crear Proyecto</a>' : 
-                    ''
-                }
-            </div>
-        `;
-        return;
+        if (!this.userProjects || this.userProjects.length === 0) {
+            projectsGrid.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-rocket"></i>
+                    <p>${this.isOwnProfile ? 'Crea tu primer proyecto' : 'No hay proyectos públicos'}</p>
+                    ${this.isOwnProfile ? 
+                        '<a href="../dashboard.html" class="btn-primary" style="margin-top: 10px;">Crear Proyecto</a>' : 
+                        ''
+                    }
+                </div>
+            `;
+            return;
+        }
+
+        this.userProjects.forEach(project => {
+            const projectCard = document.createElement('a');
+            // 🔥 CORREGIR RUTA - ahora estamos en html/profile.html
+            projectCard.href = `../project-details.html?slug=${project.slug}`;
+            projectCard.className = 'project-mini-card';
+            
+            projectCard.innerHTML = `
+                <h4 class="project-mini-title">${project.title}</h4>
+                <p class="project-mini-description">${project.subtitle || 'Sin descripción'}</p>
+                <div class="project-mini-meta">
+                    <span class="project-status ${project.status}">${this.formatProjectStatus(project.status)}</span>
+                </div>
+            `;
+            
+            projectsGrid.appendChild(projectCard);
+        });
     }
-
-    this.userProjects.forEach(project => {
-        const projectCard = document.createElement('a');
-        // 🔥 CORREGIR RUTA - ahora estamos en index/profile.html
-        projectCard.href = `../project-details.html?slug=${project.slug}`;
-        projectCard.className = 'project-mini-card';
-        
-        projectCard.innerHTML = `
-            <h4 class="project-mini-title">${project.title}</h4>
-            <p class="project-mini-description">${project.subtitle || 'Sin descripción'}</p>
-            <div class="project-mini-meta">
-                <span class="project-status ${project.status}">${this.formatProjectStatus(project.status)}</span>
-            </div>
-        `;
-        
-        projectsGrid.appendChild(projectCard);
-    });
-}
 
     // Actualizar estadísticas sociales
     updateSocialStats() {
@@ -568,6 +568,46 @@ updateProjectsSection() {
     }
 
     // Mostrar error
+// En updateProjectsSection - corregir rutas
+updateProjectsSection() {
+    const projectsGrid = document.getElementById('profile-projects');
+    if (!projectsGrid) return;
+
+    projectsGrid.innerHTML = '';
+
+    if (!this.userProjects || this.userProjects.length === 0) {
+        projectsGrid.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-rocket"></i>
+                <p>${this.isOwnProfile ? 'Crea tu primer proyecto' : 'No hay proyectos públicos'}</p>
+                ${this.isOwnProfile ? 
+                    '<a href="../dashboard.html" class="btn-primary" style="margin-top: 10px;">Crear Proyecto</a>' : 
+                    ''
+                }
+            </div>
+        `;
+        return;
+    }
+
+    this.userProjects.forEach(project => {
+        const projectCard = document.createElement('a');
+        // 🔥 CORREGIR RUTA - ahora estamos en html/profile.html
+        projectCard.href = `../project-details.html?slug=${project.slug}`;
+        projectCard.className = 'project-mini-card';
+        
+        projectCard.innerHTML = `
+            <h4 class="project-mini-title">${project.title}</h4>
+            <p class="project-mini-description">${project.subtitle || 'Sin descripción'}</p>
+            <div class="project-mini-meta">
+                <span class="project-status ${project.status}">${this.formatProjectStatus(project.status)}</span>
+            </div>
+        `;
+        
+        projectsGrid.appendChild(projectCard);
+    });
+}
+
+// En showError - corregir ruta
     showError() {
         const main = document.querySelector('.profile-main');
         if (main) {

@@ -9,7 +9,7 @@
 # 🔥 CORREGIR - apuntar a la ubicación correcta
 [[redirects]]
   from = "/perfiles/*"
-  to = "/index/profile.html"
+  to = "/html/profile.html"
   status = 200
 
 [[redirects]]
