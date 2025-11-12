@@ -2,6 +2,7 @@
 class TimelineRenderer {
     constructor() {
         this.experiences = [];
+        this.isOwnProfile = false; // 🔥 NUEVO: Propiedad para tracking
         this.init();
     }
 
@@ -12,7 +13,28 @@ class TimelineRenderer {
             this.renderTimeline();
         });
         
+        // 🔥 NUEVO: Escuchar cambios en el perfil
+        window.addEventListener('profile-loaded', () => {
+            this.updateProfileOwnership();
+        });
+        
         console.log('✅ TimelineRenderer inicializado');
+    }
+
+    // 🔥 NUEVO: Actualizar propiedad del perfil
+    updateProfileOwnership() {
+        if (window.profileManager) {
+            this.isOwnProfile = window.profileManager.isOwnProfile;
+            console.log('🔄 TimelineRenderer - Actualizado estado de propiedad:', this.isOwnProfile);
+        } else if (window.experienceManager) {
+            this.isOwnProfile = window.experienceManager.isOwnProfile;
+        }
+    }
+
+    // Verificar si es perfil propio
+    isOwnProfile() {
+        // 🔥 CORREGIDO: Usar la propiedad interna actualizada
+        return this.isOwnProfile;
     }
 
     // Renderizar la línea de tiempo
@@ -24,6 +46,7 @@ class TimelineRenderer {
         }
 
         console.log('🎨 Renderizando timeline con:', this.experiences.length, 'experiencias');
+        console.log('🔍 Es perfil propio?:', this.isOwnProfile());
 
         if (this.experiences.length === 0) {
             this.renderEmptyState(container);
@@ -35,11 +58,16 @@ class TimelineRenderer {
 
     // Renderizar estado vacío
     renderEmptyState(container) {
+        // 🔥 CORREGIDO: Usar this.isOwnProfile directamente
+        const isOwn = this.isOwnProfile();
+        
+        console.log('🔍 TimelineRenderer - Renderizando empty state, es perfil propio?:', isOwn);
+        
         container.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-briefcase"></i>
-                <p>${this.isOwnProfile() ? 'Agrega tu primera experiencia profesional' : 'No hay experiencias mostradas'}</p>
-                ${this.isOwnProfile() ? 
+                <p>${isOwn ? 'Agrega tu primera experiencia profesional' : 'No hay experiencias mostradas'}</p>
+                ${isOwn ? 
                     '<button class="btn-primary" id="add-first-experience" style="margin-top: 10px;">Agregar Experiencia</button>' : 
                     ''
                 }
@@ -55,7 +83,7 @@ class TimelineRenderer {
         }
     }
 
-    // Renderizar línea de tiempo vertical
+    // Resto del código permanece igual...
     renderTimelineVertical(container) {
         container.innerHTML = '';
 
@@ -172,7 +200,7 @@ class TimelineRenderer {
         return contentHTML;
     }
 
-    // Obtener icono según tipo de experiencia
+    // Resto de métodos helper permanecen igual...
     getExperienceIcon(type) {
         const icons = {
             'work': 'fas fa-building',
@@ -184,14 +212,12 @@ class TimelineRenderer {
         return icons[type] || 'fas fa-briefcase';
     }
 
-    // Formatear rango de fechas
     formatDateRange(startDate, endDate, isCurrent = false) {
         const start = this.formatDate(startDate);
         const end = isCurrent ? 'Presente' : (endDate ? this.formatDate(endDate) : 'Fecha no especificada');
         return `${start} - ${end}`;
     }
 
-    // Formatear fecha
     formatDate(dateString) {
         if (!dateString) return 'Fecha no especificada';
         
@@ -206,7 +232,6 @@ class TimelineRenderer {
         }
     }
 
-    // Obtener título de la experiencia
     getExperienceTitle(experience) {
         switch (experience.type) {
             case 'work':
@@ -224,7 +249,6 @@ class TimelineRenderer {
         }
     }
 
-    // Obtener subtítulo de la experiencia
     getExperienceSubtitle(experience) {
         switch (experience.type) {
             case 'work':
@@ -242,7 +266,6 @@ class TimelineRenderer {
         }
     }
 
-    // Formatear modalidad
     formatModality(modality) {
         const modalities = {
             'remote': '🌐 Remoto',
@@ -252,13 +275,11 @@ class TimelineRenderer {
         return modalities[modality] || modality;
     }
 
-    // Formatear logros (convertir saltos de línea en HTML)
     formatAchievements(achievements) {
         if (!achievements) return '';
         return achievements.replace(/\n/g, '<br>');
     }
 
-    // Renderizar tecnologías
     renderTechnologies(technologies) {
         if (!technologies || !Array.isArray(technologies) || technologies.length === 0) {
             return '';
@@ -275,7 +296,6 @@ class TimelineRenderer {
         `;
     }
 
-    // Renderizar enlaces de proyectos
     renderProjectLinks(projectLinks) {
         if (!projectLinks || !Array.isArray(projectLinks) || projectLinks.length === 0) {
             return '';
@@ -295,7 +315,6 @@ class TimelineRenderer {
         `;
     }
 
-    // Extraer dominio de URL para mostrar de forma más legible
     getDomainFromUrl(url) {
         try {
             const domain = new URL(url).hostname.replace('www.', '');
@@ -305,7 +324,6 @@ class TimelineRenderer {
         }
     }
 
-    // Renderizar acciones (solo para perfil propio)
     renderExperienceActions(experienceId) {
         return `
             <div class="timeline-actions">
@@ -349,13 +367,6 @@ class TimelineRenderer {
         if (window.experienceManager) {
             await window.experienceManager.deleteExperience(experienceId);
         }
-    }
-
-    // Verificar si es perfil propio
-    isOwnProfile() {
-        // Integrar con ProfileManager para detectar si es el perfil propio
-        return window.ProfileManager && window.ProfileManager.instance ? 
-            window.ProfileManager.instance.isOwnProfile : true;
     }
 }
 
