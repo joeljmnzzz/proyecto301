@@ -543,14 +543,13 @@ updateMembers(members) {
     }
 }
 
-// 🔥 NUEVA FUNCIÓN: Navegar al perfil del usuario
 navigateToProfile(userIdentifier) {
     if (!userIdentifier) {
         console.warn('No se puede navegar al perfil: identificador de usuario no disponible');
         return;
     }
 
-    // Construir la URL del perfil - usar username si está disponible
+    // Construir la URL del perfil - apuntar a la ubicación correcta
     const profileUrl = `/perfiles/${userIdentifier}`;
     console.log('🔗 Navegando al perfil:', profileUrl);
     

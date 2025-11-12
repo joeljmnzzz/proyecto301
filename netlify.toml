@@ -6,10 +6,10 @@
   to = "/project-details.html"
   status = 200
 
-# ✅ AGREGAR ESTA NUEVA RUTA PARA PERFILES
+# 🔥 CORREGIR - apuntar a la ubicación correcta
 [[redirects]]
   from = "/perfiles/*"
-  to = "/profile.html"
+  to = "/index/profile.html"
   status = 200
 
 [[redirects]]
@@ -17,7 +17,6 @@
   to = "/index.html"
   status = 200
 
-# Headers para archivos estáticos
 [[headers]]
   for = "/*.js"
   [headers.values]
@@ -25,15 +24,5 @@
 
 [[headers]]
   for = "/*.css"
-  [headers.values]
-    Cache-Control = "public, max-age=3600"
-
-[[headers]]
-  for = "/css/*"
-  [headers.values]
-    Cache-Control = "public, max-age=3600"
-
-[[headers]]
-  for = "/js/*"
   [headers.values]
     Cache-Control = "public, max-age=3600"
