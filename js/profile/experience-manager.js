@@ -4,6 +4,7 @@ class ExperienceManager {
         this.modal = null;
         this.experiences = [];
         this.currentUserId = null;
+        this.isOwnProfile = false;
         this.init();
     }
 
@@ -14,7 +15,18 @@ class ExperienceManager {
         // Obtener usuario actual
         await this.getCurrentUser();
         
+        // 🔥 NUEVO: Verificar si es perfil propio
+        this.checkProfileOwnership();
+        
         console.log('✅ ExperienceManager inicializado');
+    }
+
+    // 🔥 NUEVO: Verificar propiedad del perfil
+    checkProfileOwnership() {
+        if (window.profileManager) {
+            this.isOwnProfile = window.profileManager.isOwnProfile;
+            console.log('🔍 ExperienceManager - ¿Es perfil propio?:', this.isOwnProfile);
+        }
     }
 
     // Obtener usuario actual
@@ -29,8 +41,15 @@ class ExperienceManager {
 
     // Abrir modal para agregar/editar experiencia
     openExperienceModal(experienceData = null) {
+        // 🔥 CORREGIDO: Verificar propiedad del perfil
         if (!this.currentUserId) {
             alert('Debes iniciar sesión para gestionar experiencias');
+            return;
+        }
+
+        if (!this.isOwnProfile) {
+            console.warn('❌ Intento de editar experiencia en perfil ajeno');
+            alert('No tienes permisos para editar las experiencias de este perfil');
             return;
         }
 
@@ -39,7 +58,6 @@ class ExperienceManager {
         }
     }
 
-    
     // Cargar experiencias del usuario
     async loadExperiences(userId = null) {
         try {
@@ -65,6 +83,9 @@ class ExperienceManager {
             this.experiences = experiences || [];
             console.log('✅ Experiencias cargadas:', this.experiences);
 
+            // 🔥 NUEVO: Actualizar estado de propiedad
+            this.checkProfileOwnership();
+
             // Disparar evento para que timeline-renderer se actualice
             this.dispatchExperiencesLoaded();
 
@@ -77,8 +98,13 @@ class ExperienceManager {
     // Guardar experiencia (crear o actualizar)
     async saveExperience(experienceData) {
         try {
+            // 🔥 CORREGIDO: Verificar propiedad del perfil
             if (!this.currentUserId) {
                 throw new Error('Usuario no autenticado');
+            }
+
+            if (!this.isOwnProfile) {
+                throw new Error('No tienes permisos para modificar experiencias en este perfil');
             }
 
             // Preparar datos para Supabase
@@ -127,13 +153,88 @@ class ExperienceManager {
 
         } catch (error) {
             console.error('❌ Error guardando experiencia:', error);
+            
+            // 🔥 NUEVO: Mostrar mensaje de error específico
+            if (error.message.includes('permisos')) {
+                alert('Error de permisos: ' + error.message);
+            } else {
+                alert('Error al guardar la experiencia: ' + error.message);
+            }
+            
             throw error;
         }
     }
 
-    // 🔥 SINCRONIZAR SKILLS DESDE EXPERIENCIA
+    // Eliminar experiencia
+    async deleteExperience(experienceId) {
+        try {
+            // 🔥 CORREGIDO: Verificar propiedad del perfil
+            if (!this.currentUserId) {
+                throw new Error('Usuario no autenticado');
+            }
+
+            if (!this.isOwnProfile) {
+                throw new Error('No tienes permisos para eliminar experiencias en este perfil');
+            }
+
+            if (!confirm('¿Estás seguro de que quieres eliminar esta experiencia?')) {
+                return;
+            }
+
+            const { error } = await window.supabase
+                .from('experiences')
+                .delete()
+                .eq('id', experienceId)
+                .eq('user_id', this.currentUserId);
+
+            if (error) {
+                throw error;
+            }
+
+            console.log('🗑️ Experiencia eliminada:', experienceId);
+
+            // Recargar experiencias
+            await this.loadExperiences();
+
+            this.showSuccessMessage('Experiencia eliminada');
+
+        } catch (error) {
+            console.error('❌ Error eliminando experiencia:', error);
+            
+            // 🔥 NUEVO: Mostrar mensaje de error específico
+            if (error.message.includes('permisos')) {
+                alert('Error de permisos: ' + error.message);
+            } else {
+                alert('Error al eliminar la experiencia: ' + error.message);
+            }
+        }
+    }
+
+    // 🔥 NUEVO: Método para verificar permisos antes de cualquier acción
+    checkPermissions() {
+        if (!this.currentUserId) {
+            throw new Error('Debes iniciar sesión para realizar esta acción');
+        }
+
+        if (!this.isOwnProfile) {
+            throw new Error('No tienes permisos para modificar este perfil');
+        }
+
+        return true;
+    }
+
+    // 🔥 NUEVO: Actualizar estado de propiedad cuando cambie el perfil
+    updateProfileOwnership(isOwnProfile) {
+        this.isOwnProfile = isOwnProfile;
+        console.log('🔄 ExperienceManager - Actualizado estado de propiedad:', this.isOwnProfile);
+    }
+
+    // 🔄 SINCRONIZAR SKILLS DESDE EXPERIENCIA
     async syncSkillsFromExperience(experienceData) {
         try {
+            // 🔥 CORREGIDO: Verificar permisos
+            this.checkPermissions();
+
             if (!experienceData.technologies || !Array.isArray(experienceData.technologies)) {
                 return;
             }
@@ -160,6 +261,9 @@ class ExperienceManager {
     // Backup básico para guardar skills en el perfil
     async saveSkillsToProfile(technologies) {
         try {
+            // 🔥 CORREGIDO: Verificar permisos
+            this.checkPermissions();
+
             // Obtener skills actuales del perfil
             const { data: profile, error: profileError } = await window.supabase
                 .from('profiles')
@@ -191,40 +295,6 @@ class ExperienceManager {
 
         } catch (error) {
             console.error('❌ Error guardando skills en perfil:', error);
-        }
-    }
-
-    // Eliminar experiencia
-    async deleteExperience(experienceId) {
-        try {
-            if (!this.currentUserId) {
-                throw new Error('Usuario no autenticado');
-            }
-
-            if (!confirm('¿Estás seguro de que quieres eliminar esta experiencia?')) {
-                return;
-            }
-
-            const { error } = await window.supabase
-                .from('experiences')
-                .delete()
-                .eq('id', experienceId)
-                .eq('user_id', this.currentUserId);
-
-            if (error) {
-                throw error;
-            }
-
-            console.log('🗑️ Experiencia eliminada:', experienceId);
-
-            // Recargar experiencias
-            await this.loadExperiences();
-
-            this.showSuccessMessage('Experiencia eliminada');
-
-        } catch (error) {
-            console.error('❌ Error eliminando experiencia:', error);
-            alert('Error al eliminar la experiencia: ' + error.message);
         }
     }
 
@@ -323,8 +393,6 @@ class ExperienceManager {
     }
 }
 
-
-
 // Inicializar automáticamente cuando se carga el script
 let experienceManager;
 
@@ -332,6 +400,13 @@ document.addEventListener('DOMContentLoaded', () => {
     experienceManager = new ExperienceManager();
     window.experienceManager = experienceManager;
     console.log('🚀 ExperienceManager listo');
+
+    // 🔥 NUEVO: Escuchar cambios en el estado del perfil
+    window.addEventListener('profile-loaded', () => {
+        if (window.experienceManager && window.profileManager) {
+            window.experienceManager.updateProfileOwnership(window.profileManager.isOwnProfile);
+        }
+    });
 });
 
 // Exportar para uso global

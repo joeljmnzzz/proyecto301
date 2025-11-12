@@ -347,9 +347,14 @@ class ProfileManager {
 
 setupEditButtons() {
     const editButtons = document.querySelectorAll('.btn-edit');
+    const addExperienceBtn = document.querySelector('.btn-add-experience');
     
     editButtons.forEach(button => {
-        if (!this.isOwnProfile) return;
+        // 🔥 CORREGIDO: Verificar si es perfil propio antes de agregar event listeners
+        if (!this.isOwnProfile) {
+            button.style.display = 'none';
+            return;
+        }
         
         button.addEventListener('click', (e) => {
             const section = e.currentTarget.dataset.section;
@@ -366,9 +371,27 @@ setupEditButtons() {
         });
     });
 
-    // Editar avatar¿
+    // 🔥 NUEVO: Configurar botón de agregar experiencia
+    if (addExperienceBtn) {
+        if (!this.isOwnProfile) {
+            addExperienceBtn.style.display = 'none';
+        } else {
+            addExperienceBtn.addEventListener('click', () => {
+                if (window.experienceManager) {
+                    window.experienceManager.openExperienceModal();
+                }
+            });
+        }
+    }
+
+    // Editar avatar
     const avatarEditBtn = document.getElementById('avatar-edit-btn');
-    if (avatarEditBtn && this.isOwnProfile) {
+    if (avatarEditBtn) {
+        if (!this.isOwnProfile) {
+            avatarEditBtn.style.display = 'none';
+            return;
+        }
+        
         // Limpiar event listeners anteriores
         avatarEditBtn.replaceWith(avatarEditBtn.cloneNode(true));
         const newAvatarBtn = document.getElementById('avatar-edit-btn');
@@ -797,19 +820,28 @@ async updateAboutSection() {
         this.setupActionButtons();
     }
 
-    // Configurar visibilidad de elementos de edición
+
+// Configurar visibilidad de elementos de edición
     setupProfileVisibility() {
         const editButtons = document.querySelectorAll('.btn-edit');
         const avatarEditBtn = document.getElementById('avatar-edit-btn');
+        
+        // 🔥 NUEVO: Obtener el botón de agregar experiencia
+        const addExperienceBtn = document.querySelector('.btn-add-experience');
+        const experienceEditBtn = document.querySelector('[data-section="experience"]');
 
         if (this.isOwnProfile) {
             // Mostrar elementos de edición
             editButtons.forEach(btn => btn.style.display = 'flex');
             if (avatarEditBtn) avatarEditBtn.style.display = 'flex';
+            if (addExperienceBtn) addExperienceBtn.style.display = 'flex';
+            if (experienceEditBtn) experienceEditBtn.style.display = 'flex';
         } else {
             // Ocultar elementos de edición
             editButtons.forEach(btn => btn.style.display = 'none');
             if (avatarEditBtn) avatarEditBtn.style.display = 'none';
+            if (addExperienceBtn) addExperienceBtn.style.display = 'none';
+            if (experienceEditBtn) experienceEditBtn.style.display = 'none';
         }
     }
 
