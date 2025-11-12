@@ -52,102 +52,87 @@ getProfileIdFromURL() {
 }
 
     // Cargar perfil
-    async loadProfile() {
-        try {
-            if (window.universalSpinner) {
-                window.universalSpinner.show('Cargando perfil...');
-            }
+ // Cargar perfil
+async loadProfile() {
+    try {
+        if (window.universalSpinner) {
+            window.universalSpinner.show('Cargando perfil...');
+        }
 
-            // Obtener usuario actual
-            const { data: { user }, error: userError } = await window.supabase.auth.getUser();
-            if (userError) throw userError;
+        // Obtener usuario actual
+        const { data: { user }, error: userError } = await window.supabase.auth.getUser();
+        if (userError) throw userError;
 
-            this.currentUserId = user?.id || null;
+        this.currentUserId = user?.id || null;
 
-            // Determinar qué perfil cargar
-            const profileIdToLoad = this.currentProfileId || this.currentUserId;
-            
-            if (!profileIdToLoad) {
-                throw new Error('No se pudo determinar el perfil a cargar');
-            }
+        // Determinar qué perfil cargar
+        const profileIdToLoad = this.currentProfileId || this.currentUserId;
+        
+        if (!profileIdToLoad) {
+            throw new Error('No se pudo determinar el perfil a cargar');
+        }
 
-            // Verificar si es el perfil propio
-            this.isOwnProfile = profileIdToLoad === this.currentUserId;
+        console.log('🔍 ProfileIdToLoad:', profileIdToLoad);
 
-            // Cargar datos del perfil
-            await this.loadProfileData(profileIdToLoad);
-            
-            // Cargar datos adicionales
-            await this.loadAdditionalData(profileIdToLoad);
+        // 🔥 VERIFICAR SI EL USUARIO EXISTE
+        if (this.currentProfileId) {
+            const userExists = await this.checkUserExists(this.currentProfileId);
+            console.log('🔍 ¿Usuario existe en DB?:', userExists);
+        }
 
-            await this.updateUI();
-            this.setupProfileVisibility();
+        // Verificar si es el perfil propio
+        this.isOwnProfile = profileIdToLoad === this.currentUserId;
 
-        } catch (error) {
-            console.error('Error cargando perfil:', error);
-            this.showError();
-        } finally {
-            if (window.universalSpinner) {
-                window.universalSpinner.hide();
-            }
+        // Cargar datos del perfil
+        await this.loadProfileData(profileIdToLoad);
+        
+        // Cargar datos adicionales
+        await this.loadAdditionalData(profileIdToLoad);
+
+        await this.updateUI();
+        this.setupProfileVisibility();
+
+    } catch (error) {
+        console.error('Error cargando perfil:', error);
+        this.showError();
+    } finally {
+        if (window.universalSpinner) {
+            window.universalSpinner.hide();
         }
     }
+}
 
 // Cargar datos básicos del perfil
 async loadProfileData(profileIdentifier) {
     console.log('🔍 Buscando perfil con identificador:', profileIdentifier);
-    console.log('🔍 Tipo de identificador:', typeof profileIdentifier);
     
-    // 🔥 DETECCIÓN MEJORADA - Verificar si es un UUID válido
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    const isUUID = uuidRegex.test(profileIdentifier);
-    
-    console.log('🔍 ¿Es UUID?:', isUUID);
-    console.log('🔍 Longitud del identificador:', profileIdentifier.length);
-    
-    let profile = null;
-    let error = null;
+    // 🔥 SIEMPRE buscar primero por username
+    console.log('🔍 Buscando por username...');
+    let { data: profile, error } = await window.supabase
+        .from('profiles')
+        .select('*')
+        .eq('username', profileIdentifier)
+        .single();
 
-    if (isUUID) {
-        // 🔥 BUSCAR SOLO POR ID si es un UUID válido
-        console.log('🔍 Buscando por UUID...');
-        ({ data: profile, error } = await window.supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', profileIdentifier)
-            .single());
-            
-        if (error && error.code === 'PGRST116') {
-            console.log('🔍 No encontrado por UUID, intentando por username...');
-            // Si no se encuentra por UUID, intentar por username
-            ({ data: profile, error } = await window.supabase
-                .from('profiles')
-                .select('*')
-                .eq('username', profileIdentifier)
-                .single());
-        }
-    } else {
-        // 🔥 BUSCAR SOLO POR USERNAME si no es UUID
-        console.log('🔍 Buscando por username...');
-        ({ data: profile, error } = await window.supabase
-            .from('profiles')
-            .select('*')
-            .eq('username', profileIdentifier)
-            .single());
-            
-        if (error && error.code === 'PGRST116') {
-            console.log('🔍 No encontrado por username, intentando por UUID...');
-            // Si no se encuentra por username, intentar por UUID
+    console.log('🔍 Resultado búsqueda por username:', { profile, error });
+
+    // Si no se encuentra por username, intentar por ID (solo si parece UUID)
+    if (error && error.code === 'PGRST116') {
+        console.log('🔍 No encontrado por username, verificando si es UUID...');
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(profileIdentifier);
+        
+        if (isUUID) {
+            console.log('🔍 Es UUID, buscando por ID...');
             ({ data: profile, error } = await window.supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', profileIdentifier)
                 .single());
+            console.log('🔍 Resultado búsqueda por ID:', { profile, error });
         }
     }
 
     if (error) {
-        // Si no existe el perfil, mostrar error
         if (error.code === 'PGRST116') {
             console.error('❌ Perfil no encontrado:', profileIdentifier);
             this.showProfileNotFound();
@@ -179,6 +164,28 @@ debugProfileLoading() {
                 console.log('Resultado búsqueda por username:', data);
                 console.log('Error búsqueda por username:', error);
             });
+    }
+}
+
+// 🔥 FUNCIÓN PARA VERIFICAR SI EL USUARIO EXISTE
+async checkUserExists(username) {
+    try {
+        const { data, error } = await window.supabase
+            .from('profiles')
+            .select('username, full_name')
+            .eq('username', username)
+            .single();
+
+        if (error) {
+            console.log('🔍 Usuario no encontrado en DB:', username);
+            return false;
+        }
+
+        console.log('🔍 Usuario encontrado en DB:', data);
+        return true;
+    } catch (error) {
+        console.error('Error verificando usuario:', error);
+        return false;
     }
 }
 
