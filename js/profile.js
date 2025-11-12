@@ -879,12 +879,6 @@ async updateAboutSection() {
         alert(`Editando ${section} - Próximamente`);
     }
 
-    // Editar avatar
-    editAvatar() {
-        console.log('Abrir editor de avatar');
-        // Por implementar: upload de imagen
-        alert('Funcionalidad de cambio de avatar - Próximamente');
-    }
 
     // Compartir perfil
     shareProfile() {
