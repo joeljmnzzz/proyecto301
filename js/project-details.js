@@ -458,14 +458,28 @@ async loadUsersInfo(projectMembers) {
         });
     }
 
-    // 🔥 ACTUALIZADO: Actualizar miembros - MOSTRAR TODOS LOS MIEMBROS
+ 
+// 🔥 CORREGIDO: Actualizar miembros - MOSTRAR TODOS LOS MIEMBROS
 updateMembers(members) {
     const container = document.getElementById('project-members');
     if (!container) return;
 
     console.log('👥 Actualizando miembros:', members);
 
-    // ... código existente ...
+    // Ocultar sección completa si no hay miembros
+    const section = container.closest('.team-members-section');
+    
+    if (!members || members.length === 0) {
+        if (section) section.style.display = 'none';
+        return;
+    }
+
+    // ✅ DECLARAR LA VARIABLE membersFound
+    let membersFound = false;
+    
+    // Mostrar sección y limpiar contenedor
+    if (section) section.style.display = '';
+    container.innerHTML = '';
 
     members.forEach(member => {
         if (member && member.user_id) {
@@ -509,7 +523,6 @@ updateMembers(members) {
             container.appendChild(memberItem);
         }
     });
-
 
     // Si no se encontraron miembros válidos, ocultar sección
     if (!membersFound) {
