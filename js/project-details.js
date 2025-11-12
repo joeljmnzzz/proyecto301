@@ -84,7 +84,7 @@ class ProjectDetailsLoader {
         }
     }
 
- // ✅ NUEVO: Cargar información de usuarios desde la tabla correcta
+ // ✅ Cargar información de usuarios desde la tabla correcta
 async loadUsersInfo(projectMembers) {
     if (!projectMembers || projectMembers.length === 0) return;
 
@@ -111,7 +111,7 @@ async loadUsersInfo(projectMembers) {
         if (users) {
             users.forEach(user => {
                 this.userMap[user.id] = user;
-                console.log(`👤 Usuario ${user.id}: username = ${user.username}`);
+                console.log(`👤 Usuario ${user.id}: username = "${user.username}", full_name = "${user.full_name}"`);
             });
         }
 
@@ -459,34 +459,18 @@ async loadUsersInfo(projectMembers) {
     }
 
     // 🔥 ACTUALIZADO: Actualizar miembros - MOSTRAR TODOS LOS MIEMBROS
-    // 🔥 ACTUALIZADO: Actualizar miembros - CON ENLACES A PERFILES
 updateMembers(members) {
     const container = document.getElementById('project-members');
     if (!container) return;
 
     console.log('👥 Actualizando miembros:', members);
-    console.log('🗺️ UserMap disponible:', this.userMap);
 
-    // Ocultar sección completa si no hay miembros
-    const section = container.closest('.team-section');
-    
-    if (!members || members.length === 0) {
-        if (section) section.style.display = 'none';
-        console.log('ℹ️ No hay miembros para mostrar');
-        return;
-    }
-
-    // Mostrar sección y llenar miembros
-    if (section) section.style.display = '';
-    container.innerHTML = '';
-
-    let membersFound = false;
+    // ... código existente ...
 
     members.forEach(member => {
         if (member && member.user_id) {
             membersFound = true;
             
-            // ✅ Usar userMap para obtener información del usuario
             const user = this.userMap ? this.userMap[member.user_id] : null;
             
             console.log(`👤 Procesando miembro ${member.user_id}:`, user);
@@ -516,23 +500,16 @@ updateMembers(members) {
                 </div>
             `;
             
-            // 🔥 AGREGAR EVENTO CLICK PARA IR AL PERFIL
+            // 🔥 USAR USERNAME PARA EL ENLACE, NO FULL_NAME
+            const profileIdentifier = username || user?.id;
             memberItem.addEventListener('click', () => {
-                this.navigateToProfile(user?.username || user?.id);
-            });
-            
-            // 🔥 AGREGAR HOVER EFFECT
-            memberItem.addEventListener('mouseenter', () => {
-                memberItem.style.backgroundColor = 'rgba(106, 17, 203, 0.1)';
-            });
-            
-            memberItem.addEventListener('mouseleave', () => {
-                memberItem.style.backgroundColor = '';
+                this.navigateToProfile(profileIdentifier);
             });
             
             container.appendChild(memberItem);
         }
     });
+
 
     // Si no se encontraron miembros válidos, ocultar sección
     if (!membersFound) {
@@ -543,16 +520,16 @@ updateMembers(members) {
     }
 }
 
-// 🔥 SOLUCIÓN CORREGIDA: Usar la ruta correcta
+//  Navegar al perfil del usuario
 navigateToProfile(userIdentifier) {
     if (!userIdentifier) {
         console.warn('No se puede navegar al perfil: identificador de usuario no disponible');
         return;
     }
 
-    // Usar la ruta correcta con las redirecciones
+    // Construir la URL del perfil - usar username
     const profileUrl = `/perfiles/${userIdentifier}`;
-    console.log('🔗 Navegando a perfil:', profileUrl);
+    console.log('🔗 Navegando al perfil:', profileUrl);
     window.location.href = profileUrl;
 }
 

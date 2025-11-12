@@ -90,21 +90,29 @@ getProfileIdFromURL() {
         }
     }
 
-    // Cargar datos básicos del perfil
 // Cargar datos básicos del perfil
 async loadProfileData(profileIdentifier) {
     console.log('🔍 Buscando perfil con identificador:', profileIdentifier);
+    console.log('🔍 Tipo de identificador:', typeof profileIdentifier);
     
-    // Primero intentar buscar por ID (UUID)
-    let { data: profile, error } = await window.supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', profileIdentifier)
-        .single();
+    // Verificar si es un UUID válido (contiene guiones y tiene longitud específica)
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(profileIdentifier);
+    console.log('🔍 ¿Es UUID?:', isUUID);
+    
+    let profile = null;
+    let error = null;
 
-    // Si no se encuentra por ID, buscar por username
-    if (error && error.code === 'PGRST116') {
-        console.log('🔍 No encontrado por ID, buscando por username...');
+    if (isUUID) {
+        // Buscar por ID (UUID)
+        console.log('🔍 Buscando por UUID...');
+        ({ data: profile, error } = await window.supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', profileIdentifier)
+            .single());
+    } else {
+        // Buscar por username (no es UUID)
+        console.log('🔍 Buscando por username...');
         ({ data: profile, error } = await window.supabase
             .from('profiles')
             .select('*')
