@@ -210,13 +210,13 @@ class ProfileManager {
         
         if (loginBtn) {
             loginBtn.addEventListener('click', () => {
-                window.location.href = '../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
+                window.location.href = '../auth/login.html';
             });
         }
         
         if (registerBtn) {
             registerBtn.addEventListener('click', () => {
-                window.location.href = '../auth/register.html?redirect=' + encodeURIComponent(window.location.href);
+                window.location.href = '../auth/login.html';
             });
         }
     }
@@ -226,136 +226,258 @@ class ProfileManager {
         const style = document.createElement('style');
         style.textContent = `
             .profile-content-blurred {
-                filter: blur(8px);
-                pointer-events: none;
-                user-select: none;
-                opacity: 0.7;
-                transition: all 0.3s ease;
+            filter: blur(8px);
+            pointer-events: none;
+            user-select: none;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .registration-wall {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(14, 14, 14, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+        }
+
+        .registration-modal {
+            background: var(--color-primario);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 480px;
+            width: 90%;
+            animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid var(--borde-tarjeta);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .registration-modal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--color-acento);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .registration-modal:hover::before {
+            transform: scaleX(1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
             }
-            
-            .registration-wall {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.7);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 1000;
-                backdrop-filter: blur(4px);
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
             }
-            
+        }
+
+        .registration-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            background: var(--color-acento);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .registration-modal h2 {
+            color: var(--texto-primario);
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: "JetBrains Mono", monospace;
+        }
+
+        .registration-subtitle {
+            color: var(--texto-destacado);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            font-family: "JetBrains Mono", monospace;
+        }
+
+        .registration-description {
+            color: var(--texto-secundario);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            font-family: "JetBrains Mono", monospace;
+        }
+
+        .registration-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-login, .btn-register {
+            padding: 0.875rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            min-width: 140px;
+            font-family: "JetBrains Mono", monospace;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-login {
+            background: var(--color-acento);
+            color: var(--texto-primario);
+            box-shadow: 0 8px 25px rgba(140, 82, 255, 0.3);
+        }
+
+        .btn-login:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(140, 82, 255, 0.4);
+        }
+
+        .btn-register {
+            background: var(--fondo-tarjeta);
+            color: var(--texto-primario);
+            border: 1px solid var(--borde-tarjeta);
+        }
+
+        .btn-register:hover {
+            background: var(--fondo-tarjeta-hover);
+            border-color: var(--borde-tarjeta-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .registration-note {
+            color: var(--texto-secundario);
+            font-size: 0.8rem;
+            margin-top: 1rem;
+            font-family: "JetBrains Mono", monospace;
+            opacity: 0.8;
+        }
+
+        /* Efectos de brillo al hover */
+        .btn-login::after, .btn-register::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-login:hover::after, .btn-register:hover::after {
+            left: 100%;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
             .registration-modal {
-                background: white;
-                padding: 40px;
-                border-radius: 16px;
-                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-                text-align: center;
-                max-width: 450px;
-                width: 90%;
-                animation: slideUp 0.5s ease-out;
-            }
-            
-            @keyframes slideUp {
-                from {
-                    opacity: 0;
-                    transform: translateY(30px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-            
-            .registration-icon {
-                font-size: 48px;
-                color: #3B82F6;
-                margin-bottom: 20px;
-            }
-            
-            .registration-modal h2 {
-                color: #1F2937;
-                margin-bottom: 8px;
-                font-size: 24px;
-                font-weight: 600;
-            }
-            
-            .registration-subtitle {
-                color: #6B7280;
-                font-size: 16px;
-                margin-bottom: 20px;
-                font-weight: 500;
-            }
-            
-            .registration-description {
-                color: #6B7280;
-                margin-bottom: 30px;
-                line-height: 1.5;
-                font-size: 14px;
+                padding: 2.5rem 2rem;
+                margin: 1rem;
             }
             
             .registration-actions {
-                display: flex;
-                gap: 12px;
-                margin-bottom: 20px;
-                flex-wrap: wrap;
-                justify-content: center;
+                flex-direction: column;
+                width: 100%;
             }
             
             .btn-login, .btn-register {
-                padding: 12px 24px;
-                border-radius: 8px;
-                font-weight: 500;
-                font-size: 14px;
-                transition: all 0.2s ease;
-                min-width: 140px;
+                width: 100%;
+                min-width: auto;
             }
             
-            .btn-login {
-                background: #3B82F6;
-                color: white;
-                border: none;
+            .registration-modal h2 {
+                font-size: 1.5rem;
             }
             
-            .btn-login:hover {
-                background: #2563EB;
-                transform: translateY(-1px);
+            .registration-subtitle {
+                font-size: 1rem;
+            }
+            
+            .registration-icon {
+                font-size: 3.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .registration-modal {
+                padding: 2rem 1.5rem;
+            }
+            
+            .registration-modal h2 {
+                font-size: 1.3rem;
+            }
+            
+            .registration-subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .registration-description {
+                font-size: 0.85rem;
+            }
+            
+            .btn-login, .btn-register {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Soporte para alto contraste */
+        @media (prefers-contrast: high) {
+            .registration-modal {
+                border: 2px solid var(--texto-primario);
+                background: var(--color-fondo);
             }
             
             .btn-register {
-                background: white;
-                color: #374151;
-                border: 1px solid #D1D5DB;
+                border: 2px solid var(--texto-primario);
+            }
+        }
+
+        /* Reducción de movimiento */
+        @media (prefers-reduced-motion: reduce) {
+            .registration-modal {
+                animation: none;
             }
             
-            .btn-register:hover {
-                background: #F9FAFB;
-                border-color: #9CA3AF;
-                transform: translateY(-1px);
+            .btn-login, .btn-register {
+                transition: none;
             }
             
-            .registration-note {
-                color: #9CA3AF;
-                font-size: 12px;
-                margin-top: 16px;
+            .btn-login:hover, .btn-register:hover {
+                transform: none;
             }
             
-            @media (max-width: 480px) {
-                .registration-modal {
-                    padding: 30px 20px;
-                    margin: 20px;
-                }
-                
-                .registration-actions {
-                    flex-direction: column;
-                }
-                
-                .btn-login, .btn-register {
-                    width: 100%;
-                }
+            .btn-login::after, .btn-register::after {
+                display: none;
             }
+            
+            .registration-modal::before {
+                display: none;
+            }
+        }
         `;
         
         document.head.appendChild(style);
