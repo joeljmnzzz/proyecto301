@@ -673,26 +673,27 @@ async checkBasicProfileComplete(userId) {
         return email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
     }
 
-    // ✅ CORREGIDO: Mostrar/ocultar spinner de carga - AHORA USA SPINNER UNIVERSAL
-    showSpinner(show, textKey = 'spinner.loading') {
-        if (window.universalSpinner) {
-            if (show) {
-                universalSpinner.show(textKey);
-            } else {
-                universalSpinner.hide();
-            }
+
+showSpinner(show, textKey = 'spinner.loading') {
+    // ✅ VERIFICAR DISPONIBILIDAD PRIMERO
+    if (window.universalSpinner && universalSpinner.isAvailable && universalSpinner.isAvailable()) {
+        if (show) {
+            universalSpinner.show(textKey);
         } else {
-            console.warn('⚠️ Spinner universal no disponible, usando fallback');
-            // Fallback básico si el spinner universal no está disponible
-            this.showSpinnerFallback(show);
+            universalSpinner.hide();
         }
-        
-        // Deshabilitar/habilitar botones mientras carga
-        const buttons = document.querySelectorAll('.login-box button[type="submit"]');
-        buttons.forEach(button => {
-            button.disabled = show;
-        });
+    } else {
+        console.warn('⚠️ Spinner universal no disponible, usando fallback');
+        // Usar el fallback que ya tienes
+        this.showSpinnerFallback(show);
     }
+    
+    // Deshabilitar/habilitar botones mientras carga
+    const buttons = document.querySelectorAll('.login-box button[type="submit"]');
+    buttons.forEach(button => {
+        button.disabled = show;
+    });
+}
 
     // ✅ NUEVA FUNCIÓN: Fallback para spinner (solo si spinner universal no está disponible)
     showSpinnerFallback(show) {
