@@ -19,7 +19,21 @@
 .profile-header {
   margin-bottom: clamp(20px, 4vw, 35px);
 }
-
+.ball.profile-ball {
+  position: absolute;
+  top: 50%; /* Centrado vertical respecto al header */
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  width: min(300px, 80vw);
+  height: min(300px, 80vw);
+  background: url('/assets/elements/gradient-ball.png') no-repeat center center;
+  background-size: cover;
+  filter: blur(60px);
+  border-radius: 50%;
+  z-index: 0; /* Cambiado a 0 para estar detrás del contenido pero sobre el fondo */
+  opacity: 0.8;
+  mix-blend-mode: screen; /* Mejor blending con el fondo */
+}
 .profile-hero {
   background: var(--fondo-tarjeta);
   border: 1px solid var(--borde-tarjeta);
@@ -534,7 +548,7 @@
   transform: translateY(-1px);
 }
 
-/* Experiencia - ALINEACIÓN MEJORADA */
+/* === EXPERIENCIA - ESTILOS INTEGRADOS CON TIMELINE === */
 .experience-list {
   display: flex;
   flex-direction: column;
@@ -548,61 +562,163 @@
   border-radius: 12px;
   padding: 16px;
   transition: all 0.3s ease;
+  position: relative;
   width: 100%;
 }
 
 .experience-item:hover {
   background: rgba(255, 255, 255, 0.05);
   border-color: var(--borde-tarjeta-hover);
+  transform: translateY(-2px);
 }
 
 .experience-header {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 8px;
-  flex-wrap: wrap;
-  gap: 8px;
-  width: 100%;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
-.experience-header h3 {
+.experience-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   font-size: 1rem;
-  color: var(--texto-primario);
-  margin: 0;
-  font-weight: 600;
-  word-wrap: break-word;
-  text-align: left;
+}
+
+.experience-icon.work {
+  background: rgba(25, 118, 210, 0.15);
+  color: #1976d2;
+}
+
+.experience-icon.freelance {
+  background: rgba(123, 31, 162, 0.15);
+  color: #7b1fa2;
+}
+
+.experience-icon.personal {
+  background: rgba(56, 142, 60, 0.15);
+  color: #388e3c;
+}
+
+.experience-icon.volunteer {
+  background: rgba(245, 124, 0, 0.15);
+  color: #f57c00;
+}
+
+.experience-icon.education {
+  background: rgba(2, 136, 209, 0.15);
+  color: #0288d1;
+}
+
+.experience-content {
   flex: 1;
-  min-width: 200px;
+  min-width: 0;
+}
+
+.experience-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--texto-primario);
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+  word-wrap: break-word;
+}
+
+.experience-subtitle {
+  font-size: 0.9rem;
+  color: var(--texto-destacado);
+  margin: 0 0 8px 0;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.experience-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
 }
 
 .experience-date {
+  font-size: 0.8rem;
   color: var(--texto-secundario);
-  font-size: 0.85rem;
-  white-space: nowrap;
-  flex-shrink: 0;
-  text-align: right;
 }
 
-.experience-company {
-  color: var(--texto-destacado);
-  font-size: 0.9rem;
-  margin: 0 0 8px 0;
-  font-weight: 500;
-  text-align: left;
-  width: 100%;
+.experience-modality {
+  font-size: 0.75rem;
+  color: var(--texto-secundario);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
-.experience-description {
-  color: var(--texto-secundario);
+.experience-achievements {
   font-size: 0.85rem;
-  line-height: 1.5;
-  margin: 0;
+  color: var(--texto-secundario);
+  line-height: 1.4;
+  margin-bottom: 12px;
   word-wrap: break-word;
-  text-align: left;
-  width: 100%;
 }
+
+.experience-technologies {
+  margin-bottom: 12px;
+}
+
+.tech-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tech-tag {
+  background: rgba(25, 118, 210, 0.15);
+  color: #1976d2;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  border: 1px solid rgba(25, 118, 210, 0.3);
+}
+
+.experience-links {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.project-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--texto-destacado);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.project-link:hover {
+  color: var(--texto-primario);
+  text-decoration: underline;
+}
+
+.experience-actions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.experience-item:hover .experience-actions {
+  opacity: 1;
+}
+
 
 /* Acciones sociales */
 .social-actions-section {
@@ -842,6 +958,7 @@
   font-style: italic;
 }
 
+
 /* Mejoras de accesibilidad y alineación */
 .profile-page footer {
   margin-top: auto;
@@ -960,6 +1077,20 @@
     text-align: left;
     align-self: flex-start;
   }
+  
+  /* Modal responsive */
+  .experience-form .form-row {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .modal-actions {
+    flex-direction: column;
+  }
+  
+  .modal-actions button {
+    width: 100%;
+  }
 }
 
 @media screen and (max-width: 480px) {
@@ -1014,6 +1145,19 @@
     width: 100%;
     justify-content: center;
   }
+  
+  .experience-modal {
+    padding: 10px;
+  }
+  
+  .modal-content {
+    border-radius: 12px;
+  }
+  
+  .modal-header,
+  .modal-body {
+    padding: 15px;
+  }
 }
 
 /* Correcciones específicas para textos largos */
@@ -1041,6 +1185,10 @@
   .btn-icon {
     border: 2px solid currentColor;
   }
+  
+  .experience-modal .modal-content {
+    border: 2px solid var(--borde-tarjeta);
+  }
 }
 
 /* Prevenir problemas de scroll en móviles */
@@ -1050,3 +1198,4 @@
     padding-right: 10px;
   }
 }
+

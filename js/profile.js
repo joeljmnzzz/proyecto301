@@ -1,3 +1,4 @@
+
 class ProfileManager {
     constructor() {
         this.currentProfileId = this.getProfileIdFromURL();
@@ -344,34 +345,43 @@ class ProfileManager {
         }
     }
 
-    // 🔥 ACTUALIZADO: Configurar botones de edición con funcionalidad de avatar
-    setupEditButtons() {
-        const editButtons = document.querySelectorAll('.btn-edit');
+setupEditButtons() {
+    const editButtons = document.querySelectorAll('.btn-edit');
+    
+    editButtons.forEach(button => {
+        if (!this.isOwnProfile) return;
         
-        editButtons.forEach(button => {
-            if (!this.isOwnProfile) return;
+        button.addEventListener('click', (e) => {
+            const section = e.currentTarget.dataset.section;
             
-            button.addEventListener('click', (e) => {
-                const section = e.currentTarget.dataset.section;
-                this.editSection(section);
-            });
+            // Manejar experiencia de forma modular
+            if (section === 'experience') {
+                if (window.experienceManager) {
+                    window.experienceManager.openExperienceModal();
+                }
+                return;
+            }
+            
+            this.editSection(section);
         });
+    });
 
-        // Editar avatar - AHORA CON FUNCIONALIDAD REAL
-        const avatarEditBtn = document.getElementById('avatar-edit-btn');
-        if (avatarEditBtn && this.isOwnProfile) {
-            // Limpiar event listeners anteriores
-            avatarEditBtn.replaceWith(avatarEditBtn.cloneNode(true));
-            const newAvatarBtn = document.getElementById('avatar-edit-btn');
-            
-            newAvatarBtn.addEventListener('click', () => this.editAvatar());
-            
-            // 🔥 AGREGAR MENÚ CONTEXTUAL PARA ELIMINAR
-            this.setupAvatarContextMenu(newAvatarBtn);
-        }
+    // Editar avatar¿
+    const avatarEditBtn = document.getElementById('avatar-edit-btn');
+    if (avatarEditBtn && this.isOwnProfile) {
+        // Limpiar event listeners anteriores
+        avatarEditBtn.replaceWith(avatarEditBtn.cloneNode(true));
+        const newAvatarBtn = document.getElementById('avatar-edit-btn');
+        
+        newAvatarBtn.addEventListener('click', () => this.editAvatar());
+        
+        // AGREGAR MENÚ CONTEXTUAL PARA ELIMINAR
+        this.setupAvatarContextMenu(newAvatarBtn);
     }
+}
 
-    // 🔥 NUEVA FUNCIÓN: Menú contextual para avatar (editar/eliminar)
+
+    // Menú contextual para avatar (editar/eliminar)
     setupAvatarContextMenu(avatarButton) {
         avatarButton.addEventListener('contextmenu', (e) => {
             e.preventDefault();
@@ -524,13 +534,20 @@ showProfileNotFound() {
         console.log('✅ Perfil básico creado');
     }
 
-    // Cargar datos adicionales
     async loadAdditionalData(profileId) {
         await Promise.all([
             this.loadUserProjects(profileId),
             this.loadUserStats(profileId),
-            this.loadSocialStats(profileId)
+            this.loadSocialStats(profileId),
+            this.loadUserExperiences(profileId)
         ]);
+    }
+
+    // Cargar experiencias
+    async loadUserExperiences(userId) {
+        if (window.experienceManager) {
+            await window.experienceManager.loadExperiences(userId);
+        }
     }
 
     // Cargar proyectos del usuario
@@ -593,7 +610,11 @@ showProfileNotFound() {
         this.updateSocialStats();
         this.updateActionButtons();
         
-        // Actualizar título de la página
+        // Actualizar timeline de experiencias
+        if (window.timelineRenderer) {
+            await window.timelineRenderer.renderTimeline();
+        }
+        
         document.title = `${this.profileData.full_name || this.profileData.username} - Proyecto 301`;
     }
 
@@ -825,25 +846,6 @@ async updateAboutSection() {
         }
     }
 
-    // Configurar botones de edición
-    setupEditButtons() {
-        const editButtons = document.querySelectorAll('.btn-edit');
-        
-        editButtons.forEach(button => {
-            if (!this.isOwnProfile) return;
-            
-            button.addEventListener('click', (e) => {
-                const section = e.currentTarget.dataset.section;
-                this.editSection(section);
-            });
-        });
-
-        // Editar avatar
-        const avatarEditBtn = document.getElementById('avatar-edit-btn');
-        if (avatarEditBtn && this.isOwnProfile) {
-            avatarEditBtn.addEventListener('click', () => this.editAvatar());
-        }
-    }
 
     // Helper para actualizar elementos del DOM
     updateElement(elementId, content) {

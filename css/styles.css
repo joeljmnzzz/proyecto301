@@ -57,7 +57,7 @@ body {
   background-size: cover;
   filter: blur(60px);
   border-radius: 50%;
-  z-index: -1;
+  z-index: -1 !important;
   /* SIN ANIMACIÓN */
 }
 

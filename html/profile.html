@@ -7,6 +7,8 @@
 
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="../css/profile.css">
+  <link rel="stylesheet" href="../css/modals/experience-modal.css".css">
+  <link rel="stylesheet" href="../css/experiences-timeline.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -15,22 +17,30 @@
   
   <script src="../js/supabase-client.js" defer></script>
   <script src="../js/load-navbar.js" defer></script>
-  <script src="../js/profile.js" defer></script>
   <script src="../js/spinner.js" defer></script>
+  
+  <!-- 🔥 ORDEN CORREGIDO: Primero el modal, luego el manager -->
+  <script src="../js/modals/experience-modal.js" defer></script>
+  <script src="../js/profile/experience-manager.js" defer></script>
+  <script src="../js/profile/timeline-renderer.js" defer></script>
+  <script src="../js/profile.js" defer></script>
+
 </head>
 <body class="profile-page">
 
   <div id="navbar-placeholder"></div>
   
-  <div class="ball profile-ball"></div>
+
 
   <main class="profile-main">
     
     <!-- Header del perfil -->
     <section class="profile-header">
       <div class="profile-hero">
+
         <div class="profile-avatar-section">
           <div class="avatar-container">
+            <div class="ball profile-ball"></div>
             <img src="" alt="Avatar" class="profile-avatar" id="profile-avatar">
             <button class="avatar-edit-btn" id="avatar-edit-btn">
               <i class="fas fa-camera"></i>
@@ -95,6 +105,17 @@
           </div>
         </section>
 
+                <!-- Experiencia -->
+        <section class="profile-card experience-section">
+          <div class="card-header">
+            <h2><i class="fas fa-briefcase"></i> Experiencia</h2>
+            <button class="btn-edit" data-section="experience" id="edit-experience-btn">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+          <div class="experience-list" id="experience-list"></div>
+        </section>
+        
         <!-- Habilidades y Tecnologías -->
         <section class="profile-card skills-section">
           <div class="card-header">
@@ -108,16 +129,6 @@
           </div>
         </section>
 
-        <!-- Experiencia -->
-        <section class="profile-card experience-section">
-          <div class="card-header">
-            <h2><i class="fas fa-briefcase"></i> Experiencia</h2>
-            <button class="btn-edit" data-section="experience" id="edit-experience-btn">
-              <i class="fas fa-plus"></i>
-            </button>
-          </div>
-          <div class="experience-list" id="experience-list"></div>
-        </section>
 
       </div>
 
