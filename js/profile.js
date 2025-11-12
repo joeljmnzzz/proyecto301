@@ -8,22 +8,25 @@ class ProfileManager {
         this.init();
     }
 
-    async init() {
-        try {
-            // Esperar a que Supabase esté listo
-            if (!window.supabase) {
-                window.addEventListener('supabase-ready', () => this.loadProfile());
-                return;
+        async init() {
+            try {
+                // Esperar a que Supabase esté listo
+                if (!window.supabase) {
+                    window.addEventListener('supabase-ready', () => this.loadProfile());
+                    return;
+                }
+                
+                // 🔥 DEBUG TEMPORAL
+                this.debugProfileLoading();
+                
+                await this.loadProfile();
+                this.setupEventListeners();
+                
+            } catch (error) {
+                console.error('Error inicializando ProfileManager:', error);
+                this.showError();
             }
-            
-            await this.loadProfile();
-            this.setupEventListeners();
-            
-        } catch (error) {
-            console.error('Error inicializando ProfileManager:', error);
-            this.showError();
         }
-    }
 
     // Obtener ID del perfil desde la URL
     // Obtener ID del perfil desde la URL
@@ -95,29 +98,52 @@ async loadProfileData(profileIdentifier) {
     console.log('🔍 Buscando perfil con identificador:', profileIdentifier);
     console.log('🔍 Tipo de identificador:', typeof profileIdentifier);
     
-    // Verificar si es un UUID válido (contiene guiones y tiene longitud específica)
-    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(profileIdentifier);
+    // 🔥 DETECCIÓN MEJORADA - Verificar si es un UUID válido
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const isUUID = uuidRegex.test(profileIdentifier);
+    
     console.log('🔍 ¿Es UUID?:', isUUID);
+    console.log('🔍 Longitud del identificador:', profileIdentifier.length);
     
     let profile = null;
     let error = null;
 
     if (isUUID) {
-        // Buscar por ID (UUID)
+        // 🔥 BUSCAR SOLO POR ID si es un UUID válido
         console.log('🔍 Buscando por UUID...');
         ({ data: profile, error } = await window.supabase
             .from('profiles')
             .select('*')
             .eq('id', profileIdentifier)
             .single());
+            
+        if (error && error.code === 'PGRST116') {
+            console.log('🔍 No encontrado por UUID, intentando por username...');
+            // Si no se encuentra por UUID, intentar por username
+            ({ data: profile, error } = await window.supabase
+                .from('profiles')
+                .select('*')
+                .eq('username', profileIdentifier)
+                .single());
+        }
     } else {
-        // Buscar por username (no es UUID)
+        // 🔥 BUSCAR SOLO POR USERNAME si no es UUID
         console.log('🔍 Buscando por username...');
         ({ data: profile, error } = await window.supabase
             .from('profiles')
             .select('*')
             .eq('username', profileIdentifier)
             .single());
+            
+        if (error && error.code === 'PGRST116') {
+            console.log('🔍 No encontrado por username, intentando por UUID...');
+            // Si no se encuentra por username, intentar por UUID
+            ({ data: profile, error } = await window.supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', profileIdentifier)
+                .single());
+        }
     }
 
     if (error) {
@@ -127,11 +153,33 @@ async loadProfileData(profileIdentifier) {
             this.showProfileNotFound();
             return;
         }
+        console.error('❌ Error cargando perfil:', error);
         throw error;
     }
 
     this.profileData = profile;
-    console.log('✅ Perfil cargado:', profile);
+    console.log('✅ Perfil cargado exitosamente:', profile);
+}
+
+// 🔥 FUNCIÓN DE DEBUG TEMPORAL
+debugProfileLoading() {
+    console.log('=== DEBUG PROFILE LOADING ===');
+    console.log('URL completa:', window.location.href);
+    console.log('ProfileIdentifier:', this.currentProfileId);
+    console.log('Es UUID?:', /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(this.currentProfileId));
+    
+    // Verificar si el username existe en la base de datos
+    if (this.currentProfileId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(this.currentProfileId)) {
+        console.log('🔍 Verificando si el username existe en DB...');
+        window.supabase
+            .from('profiles')
+            .select('username')
+            .eq('username', this.currentProfileId)
+            .then(({ data, error }) => {
+                console.log('Resultado búsqueda por username:', data);
+                console.log('Error búsqueda por username:', error);
+            });
+    }
 }
 
 // Nueva función para mostrar error de perfil no encontrado
