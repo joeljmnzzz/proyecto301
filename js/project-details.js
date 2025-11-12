@@ -84,8 +84,7 @@ class ProjectDetailsLoader {
         }
     }
 
-    // ✅ NUEVO: Cargar información de usuarios desde la tabla correcta
-    // ✅ NUEVO: Cargar información de usuarios desde la tabla correcta
+ // ✅ NUEVO: Cargar información de usuarios desde la tabla correcta
 async loadUsersInfo(projectMembers) {
     if (!projectMembers || projectMembers.length === 0) return;
 
@@ -112,6 +111,7 @@ async loadUsersInfo(projectMembers) {
         if (users) {
             users.forEach(user => {
                 this.userMap[user.id] = user;
+                console.log(`👤 Usuario ${user.id}: username = ${user.username}`);
             });
         }
 
@@ -550,7 +550,7 @@ navigateToProfile(userIdentifier) {
         return;
     }
 
-    // Construir la URL del perfil
+    // Construir la URL del perfil - usar username si está disponible
     const profileUrl = `/perfiles/${userIdentifier}`;
     console.log('🔗 Navegando al perfil:', profileUrl);
     

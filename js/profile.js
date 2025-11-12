@@ -26,21 +26,27 @@ class ProfileManager {
     }
 
     // Obtener ID del perfil desde la URL
-    getProfileIdFromURL() {
-        const path = window.location.pathname;
-        const segments = path.split('/');
-        const profileSegment = segments.find(seg => seg === 'profile.html');
-        
-        if (profileSegment) {
-            const index = segments.indexOf(profileSegment);
-            if (segments[index + 1]) {
-                return segments[index + 1];
-            }
-        }
-        
-        // Si no hay ID en la URL, será el perfil del usuario actual
-        return null;
+    // Obtener ID del perfil desde la URL
+getProfileIdFromURL() {
+    const path = window.location.pathname;
+    console.log('🔍 URL completa:', path);
+    
+    const segments = path.split('/').filter(segment => segment !== '');
+    console.log('🔍 Segmentos de URL:', segments);
+    
+    // Buscar el segmento "perfiles" en la URL
+    const perfilesIndex = segments.indexOf('perfiles');
+    
+    if (perfilesIndex !== -1 && segments[perfilesIndex + 1]) {
+        const profileIdentifier = segments[perfilesIndex + 1];
+        console.log('✅ Identificador de perfil encontrado:', profileIdentifier);
+        return profileIdentifier;
     }
+    
+    // Si no hay ID en la URL, será el perfil del usuario actual
+    console.log('ℹ️ No se encontró identificador en URL, será perfil actual');
+    return null;
+}
 
     // Cargar perfil
     async loadProfile() {
@@ -85,26 +91,55 @@ class ProfileManager {
     }
 
     // Cargar datos básicos del perfil
-    async loadProfileData(profileId) {
-        const { data: profile, error } = await window.supabase
+// Cargar datos básicos del perfil
+async loadProfileData(profileIdentifier) {
+    console.log('🔍 Buscando perfil con identificador:', profileIdentifier);
+    
+    // Primero intentar buscar por ID (UUID)
+    let { data: profile, error } = await window.supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', profileIdentifier)
+        .single();
+
+    // Si no se encuentra por ID, buscar por username
+    if (error && error.code === 'PGRST116') {
+        console.log('🔍 No encontrado por ID, buscando por username...');
+        ({ data: profile, error } = await window.supabase
             .from('profiles')
             .select('*')
-            .eq('id', profileId)
-            .single();
-
-        if (error) {
-            // Si no existe el perfil, crear uno básico
-            if (error.code === 'PGRST116') {
-                await this.createBasicProfile(profileId);
-                return this.loadProfileData(profileId); // Recargar
-            }
-            throw error;
-        }
-
-        this.profileData = profile;
-        console.log('✅ Perfil cargado:', profile);
+            .eq('username', profileIdentifier)
+            .single());
     }
 
+    if (error) {
+        // Si no existe el perfil, mostrar error
+        if (error.code === 'PGRST116') {
+            console.error('❌ Perfil no encontrado:', profileIdentifier);
+            this.showProfileNotFound();
+            return;
+        }
+        throw error;
+    }
+
+    this.profileData = profile;
+    console.log('✅ Perfil cargado:', profile);
+}
+
+// Nueva función para mostrar error de perfil no encontrado
+showProfileNotFound() {
+    const main = document.querySelector('.profile-main');
+    if (main) {
+        main.innerHTML = `
+            <div class="error-state">
+                <i class="fas fa-user-slash"></i>
+                <h3>Perfil no encontrado</h3>
+                <p>El perfil que buscas no existe o ha sido eliminado.</p>
+                <a href="../index.html" class="btn-primary">Volver al Inicio</a>
+            </div>
+        `;
+    }
+}
     // Crear perfil básico si no existe
     async createBasicProfile(userId) {
         const { data: { user }, error: userError } = await window.supabase.auth.getUser();
