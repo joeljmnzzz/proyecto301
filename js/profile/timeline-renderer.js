@@ -2,7 +2,7 @@
 class TimelineRenderer {
     constructor() {
         this.experiences = [];
-        this.isOwnProfile = false; // 🔥 NUEVO: Propiedad para tracking
+        this._isOwnProfile = false; // 🔥 CAMBIO: Usar _isOwnProfile para evitar conflicto
         this.init();
     }
 
@@ -24,17 +24,16 @@ class TimelineRenderer {
     // 🔥 NUEVO: Actualizar propiedad del perfil
     updateProfileOwnership() {
         if (window.profileManager) {
-            this.isOwnProfile = window.profileManager.isOwnProfile;
-            console.log('🔄 TimelineRenderer - Actualizado estado de propiedad:', this.isOwnProfile);
+            this._isOwnProfile = window.profileManager.isOwnProfile;
+            console.log('🔄 TimelineRenderer - Actualizado estado de propiedad:', this._isOwnProfile);
         } else if (window.experienceManager) {
-            this.isOwnProfile = window.experienceManager.isOwnProfile;
+            this._isOwnProfile = window.experienceManager.isOwnProfile;
         }
     }
 
-    // Verificar si es perfil propio
+    // 🔥 CORREGIDO: Método para verificar si es perfil propio
     isOwnProfile() {
-        // 🔥 CORREGIDO: Usar la propiedad interna actualizada
-        return this.isOwnProfile;
+        return this._isOwnProfile;
     }
 
     // Renderizar la línea de tiempo
@@ -46,7 +45,7 @@ class TimelineRenderer {
         }
 
         console.log('🎨 Renderizando timeline con:', this.experiences.length, 'experiencias');
-        console.log('🔍 Es perfil propio?:', this.isOwnProfile());
+        console.log('🔍 Es perfil propio?:', this.isOwnProfile()); // 🔥 CORREGIDO: usar método
 
         if (this.experiences.length === 0) {
             this.renderEmptyState(container);
@@ -58,7 +57,7 @@ class TimelineRenderer {
 
     // Renderizar estado vacío
     renderEmptyState(container) {
-        // 🔥 CORREGIDO: Usar this.isOwnProfile directamente
+        // 🔥 CORREGIDO: Usar this.isOwnProfile() (método)
         const isOwn = this.isOwnProfile();
         
         console.log('🔍 TimelineRenderer - Renderizando empty state, es perfil propio?:', isOwn);
@@ -193,7 +192,7 @@ class TimelineRenderer {
         }
 
         // Acciones (solo para perfil propio)
-        if (this.isOwnProfile()) {
+        if (this.isOwnProfile()) { // 🔥 CORREGIDO: usar método
             contentHTML += this.renderExperienceActions(experience.id);
         }
 
