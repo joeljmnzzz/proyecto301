@@ -1,4 +1,3 @@
-
 class ProfileManager {
     constructor() {
         this.currentProfileId = this.getProfileIdFromURL();
@@ -59,6 +58,14 @@ class ProfileManager {
 
             // Obtener usuario actual
             const { data: { user }, error: userError } = await window.supabase.auth.getUser();
+            
+            // 🔥 NUEVO: Si hay error de autenticación y es un perfil ajeno, mostrar pantalla de registro
+            if (userError && this.currentProfileId) {
+                console.log('🔐 Usuario no autenticado intentando ver perfil ajeno');
+                this.showRegistrationWall();
+                return;
+            }
+
             if (userError) throw userError;
 
             this.currentUserId = user?.id || null;
@@ -92,6 +99,13 @@ class ProfileManager {
 
         } catch (error) {
             console.error('Error cargando perfil:', error);
+            
+            // 🔥 NUEVO: Si es error de autenticación y perfil ajeno, mostrar registro
+            if (error.message.includes('Auth session missing') && this.currentProfileId) {
+                this.showRegistrationWall();
+                return;
+            }
+            
             this.showError();
         } finally {
             if (window.universalSpinner) {
@@ -142,6 +156,209 @@ class ProfileManager {
 
         this.profileData = profile;
         console.log('✅ Perfil cargado exitosamente:', profile);
+    }
+
+    // 🔥 NUEVA FUNCIÓN: Mostrar pantalla de registro para usuarios no autenticados
+    showRegistrationWall() {
+        const main = document.querySelector('.profile-main');
+        if (!main) return;
+
+        // Aplicar efecto blur al contenido existente
+        const existingContent = main.innerHTML;
+        
+        main.innerHTML = `
+            <div class="profile-content-blurred">
+                ${existingContent}
+            </div>
+            <div class="registration-wall">
+                <div class="registration-modal">
+                    <div class="registration-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h2>Regístrate para ver este perfil</h2>
+                    <p class="registration-subtitle">Explora Proyecto 301 al máximo</p>
+                    <p class="registration-description">
+                        Descubre proyectos increíbles, conecta con otros desarrolladores 
+                        y comparte tus experiencias profesionales.
+                    </p>
+                    <div class="registration-actions">
+                        <button class="btn-primary btn-login" id="login-btn">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                        </button>
+                        <button class="btn-secondary btn-register" id="register-btn">
+                            <i class="fas fa-user-plus"></i> Crear Cuenta
+                        </button>
+                    </div>
+                    <p class="registration-note">
+                        ¿Ya tienes una cuenta? Inicia sesión para ver el contenido completo.
+                    </p>
+                </div>
+            </div>
+        `;
+
+        // Configurar event listeners para los botones
+        this.setupRegistrationWallListeners();
+        
+        // Aplicar estilos CSS dinámicamente
+        this.applyRegistrationWallStyles();
+    }
+
+    // 🔥 NUEVA FUNCIÓN: Configurar listeners para la pantalla de registro
+    setupRegistrationWallListeners() {
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        
+        if (loginBtn) {
+            loginBtn.addEventListener('click', () => {
+                window.location.href = '../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
+            });
+        }
+        
+        if (registerBtn) {
+            registerBtn.addEventListener('click', () => {
+                window.location.href = '../auth/register.html?redirect=' + encodeURIComponent(window.location.href);
+            });
+        }
+    }
+
+    // 🔥 NUEVA FUNCIÓN: Aplicar estilos CSS para la pantalla de registro
+    applyRegistrationWallStyles() {
+        const style = document.createElement('style');
+        style.textContent = `
+            .profile-content-blurred {
+                filter: blur(8px);
+                pointer-events: none;
+                user-select: none;
+                opacity: 0.7;
+                transition: all 0.3s ease;
+            }
+            
+            .registration-wall {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                backdrop-filter: blur(4px);
+            }
+            
+            .registration-modal {
+                background: white;
+                padding: 40px;
+                border-radius: 16px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                text-align: center;
+                max-width: 450px;
+                width: 90%;
+                animation: slideUp 0.5s ease-out;
+            }
+            
+            @keyframes slideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            
+            .registration-icon {
+                font-size: 48px;
+                color: #3B82F6;
+                margin-bottom: 20px;
+            }
+            
+            .registration-modal h2 {
+                color: #1F2937;
+                margin-bottom: 8px;
+                font-size: 24px;
+                font-weight: 600;
+            }
+            
+            .registration-subtitle {
+                color: #6B7280;
+                font-size: 16px;
+                margin-bottom: 20px;
+                font-weight: 500;
+            }
+            
+            .registration-description {
+                color: #6B7280;
+                margin-bottom: 30px;
+                line-height: 1.5;
+                font-size: 14px;
+            }
+            
+            .registration-actions {
+                display: flex;
+                gap: 12px;
+                margin-bottom: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .btn-login, .btn-register {
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-weight: 500;
+                font-size: 14px;
+                transition: all 0.2s ease;
+                min-width: 140px;
+            }
+            
+            .btn-login {
+                background: #3B82F6;
+                color: white;
+                border: none;
+            }
+            
+            .btn-login:hover {
+                background: #2563EB;
+                transform: translateY(-1px);
+            }
+            
+            .btn-register {
+                background: white;
+                color: #374151;
+                border: 1px solid #D1D5DB;
+            }
+            
+            .btn-register:hover {
+                background: #F9FAFB;
+                border-color: #9CA3AF;
+                transform: translateY(-1px);
+            }
+            
+            .registration-note {
+                color: #9CA3AF;
+                font-size: 12px;
+                margin-top: 16px;
+            }
+            
+            @media (max-width: 480px) {
+                .registration-modal {
+                    padding: 30px 20px;
+                    margin: 20px;
+                }
+                
+                .registration-actions {
+                    flex-direction: column;
+                }
+                
+                .btn-login, .btn-register {
+                    width: 100%;
+                }
+            }
+        `;
+        
+        document.head.appendChild(style);
     }
 
     // 🔥 NUEVA FUNCIÓN: Subir foto de perfil
@@ -345,64 +562,63 @@ class ProfileManager {
         }
     }
 
-setupEditButtons() {
-    const editButtons = document.querySelectorAll('.btn-edit');
-    const addExperienceBtn = document.querySelector('.btn-add-experience');
-    
-    editButtons.forEach(button => {
-        // 🔥 CORREGIDO: Verificar si es perfil propio antes de agregar event listeners
-        if (!this.isOwnProfile) {
-            button.style.display = 'none';
-            return;
-        }
+    setupEditButtons() {
+        const editButtons = document.querySelectorAll('.btn-edit');
+        const addExperienceBtn = document.querySelector('.btn-add-experience');
         
-        button.addEventListener('click', (e) => {
-            const section = e.currentTarget.dataset.section;
-            
-            // Manejar experiencia de forma modular
-            if (section === 'experience') {
-                if (window.experienceManager) {
-                    window.experienceManager.openExperienceModal();
-                }
+        editButtons.forEach(button => {
+            // 🔥 CORREGIDO: Verificar si es perfil propio antes de agregar event listeners
+            if (!this.isOwnProfile) {
+                button.style.display = 'none';
                 return;
             }
             
-            this.editSection(section);
-        });
-    });
-
-    // 🔥 NUEVO: Configurar botón de agregar experiencia
-    if (addExperienceBtn) {
-        if (!this.isOwnProfile) {
-            addExperienceBtn.style.display = 'none';
-        } else {
-            addExperienceBtn.addEventListener('click', () => {
-                if (window.experienceManager) {
-                    window.experienceManager.openExperienceModal();
+            button.addEventListener('click', (e) => {
+                const section = e.currentTarget.dataset.section;
+                
+                // Manejar experiencia de forma modular
+                if (section === 'experience') {
+                    if (window.experienceManager) {
+                        window.experienceManager.openExperienceModal();
+                    }
+                    return;
                 }
+                
+                this.editSection(section);
             });
+        });
+
+        // 🔥 NUEVO: Configurar botón de agregar experiencia
+        if (addExperienceBtn) {
+            if (!this.isOwnProfile) {
+                addExperienceBtn.style.display = 'none';
+            } else {
+                addExperienceBtn.addEventListener('click', () => {
+                    if (window.experienceManager) {
+                        window.experienceManager.openExperienceModal();
+                    }
+                });
+            }
+        }
+
+        // Editar avatar
+        const avatarEditBtn = document.getElementById('avatar-edit-btn');
+        if (avatarEditBtn) {
+            if (!this.isOwnProfile) {
+                avatarEditBtn.style.display = 'none';
+                return;
+            }
+            
+            // Limpiar event listeners anteriores
+            avatarEditBtn.replaceWith(avatarEditBtn.cloneNode(true));
+            const newAvatarBtn = document.getElementById('avatar-edit-btn');
+            
+            newAvatarBtn.addEventListener('click', () => this.editAvatar());
+            
+            // AGREGAR MENÚ CONTEXTUAL PARA ELIMINAR
+            this.setupAvatarContextMenu(newAvatarBtn);
         }
     }
-
-    // Editar avatar
-    const avatarEditBtn = document.getElementById('avatar-edit-btn');
-    if (avatarEditBtn) {
-        if (!this.isOwnProfile) {
-            avatarEditBtn.style.display = 'none';
-            return;
-        }
-        
-        // Limpiar event listeners anteriores
-        avatarEditBtn.replaceWith(avatarEditBtn.cloneNode(true));
-        const newAvatarBtn = document.getElementById('avatar-edit-btn');
-        
-        newAvatarBtn.addEventListener('click', () => this.editAvatar());
-        
-        // AGREGAR MENÚ CONTEXTUAL PARA ELIMINAR
-        this.setupAvatarContextMenu(newAvatarBtn);
-    }
-}
-
 
     // Menú contextual para avatar (editar/eliminar)
     setupAvatarContextMenu(avatarButton) {
@@ -522,20 +738,6 @@ setupEditButtons() {
         }
     }
 
-// Nueva función para mostrar error de perfil no encontrado
-showProfileNotFound() {
-    const main = document.querySelector('.profile-main');
-    if (main) {
-        main.innerHTML = `
-            <div class="error-state">
-                <i class="fas fa-user-slash"></i>
-                <h3>Perfil no encontrado</h3>
-                <p>El perfil que buscas no existe o ha sido eliminado.</p>
-                <a href="../index.html" class="btn-primary">Volver al Inicio</a>
-            </div>
-        `;
-    }
-}
     // Crear perfil básico si no existe
     async createBasicProfile(userId) {
         const { data: { user }, error: userError } = await window.supabase.auth.getUser();
@@ -558,16 +760,33 @@ showProfileNotFound() {
     }
 
     async loadAdditionalData(profileId) {
-        await Promise.all([
-            this.loadUserProjects(profileId),
-            this.loadUserStats(profileId),
-            this.loadSocialStats(profileId),
-            this.loadUserExperiences(profileId)
-        ]);
+        try {
+            // 🔥 NUEVO: Solo cargar datos adicionales si hay usuario autenticado
+            if (!this.currentUserId && this.currentProfileId) {
+                console.log('🔐 Usuario no autenticado, omitiendo carga de datos adicionales');
+                return;
+            }
+            
+            await Promise.all([
+                this.loadUserProjects(profileId),
+                this.loadUserStats(profileId),
+                this.loadSocialStats(profileId),
+                this.loadUserExperiences(profileId)
+            ]);
+        } catch (error) {
+            console.warn('Error cargando datos adicionales:', error);
+            // No lanzar error para no interrumpir el flujo
+        }
     }
 
     // Cargar experiencias
     async loadUserExperiences(userId) {
+        // 🔥 NUEVO: Solo cargar experiencias si hay usuario autenticado
+        if (!this.currentUserId && this.currentProfileId) {
+            console.log('🔐 Usuario no autenticado, omitiendo carga de experiencias');
+            return;
+        }
+        
         if (window.experienceManager) {
             await window.experienceManager.loadExperiences(userId);
         }
@@ -661,34 +880,35 @@ showProfileNotFound() {
         this.updateElement('following-count', this.userStats?.following || 0);
     }
 
-// Actualizar sección "Acerca de mí"
-async updateAboutSection() {
-    this.updateElement('profile-bio', this.profileData.bio || 'Este usuario aún no ha agregado una biografía.');
-    
-    // 🔥 CORREGIDO: Eliminar completamente el campo email del DOM
-    const emailContainer = document.querySelector('.email-field'); // Buscar el contenedor del email
-    if (emailContainer) {
-        emailContainer.remove(); // Eliminar completamente del DOM
+    // Actualizar sección "Acerca de mí"
+    async updateAboutSection() {
+        this.updateElement('profile-bio', this.profileData.bio || 'Este usuario aún no ha agregado una biografía.');
+        
+        // 🔥 CORREGIDO: Eliminar completamente el campo email del DOM
+        const emailContainer = document.querySelector('.email-field'); // Buscar el contenedor del email
+        if (emailContainer) {
+            emailContainer.remove(); // Eliminar completamente del DOM
+        }
+        
+        const joinedDate = this.profileData.created_at ? 
+            new Date(this.profileData.created_at).toLocaleDateString('es-ES', { 
+                year: 'numeric', 
+                month: 'long' 
+            }) : 'Fecha no disponible';
+        this.updateElement('profile-joined', `Miembro desde ${joinedDate}`);
+        
+        // Website
+        const websiteLink = document.getElementById('profile-website');
+        if (websiteLink && this.profileData.social_links?.website) {
+            websiteLink.href = this.profileData.social_links.website;
+            websiteLink.textContent = this.profileData.social_links.website;
+            websiteLink.style.display = 'inline';
+        } else if (websiteLink) {
+            websiteLink.style.display = 'none';
+        }
     }
-    
-    const joinedDate = this.profileData.created_at ? 
-        new Date(this.profileData.created_at).toLocaleDateString('es-ES', { 
-            year: 'numeric', 
-            month: 'long' 
-        }) : 'Fecha no disponible';
-    this.updateElement('profile-joined', `Miembro desde ${joinedDate}`);
-    
-    // Website
-    const websiteLink = document.getElementById('profile-website');
-    if (websiteLink && this.profileData.social_links?.website) {
-        websiteLink.href = this.profileData.social_links.website;
-        websiteLink.textContent = this.profileData.social_links.website;
-        websiteLink.style.display = 'inline';
-    } else if (websiteLink) {
-        websiteLink.style.display = 'none';
-    }
-}
-// Actualizar sección de habilidades
+
+    // Actualizar sección de habilidades
     updateSkillsSection() {
         const skillsList = document.getElementById('skills-list');
         if (!skillsList) return;
@@ -705,7 +925,7 @@ async updateAboutSection() {
             return;
         }
 
-        // Agrupar habilidades por categoría (simulado por ahora)
+        // Agrupar habilidades por categoría (simulado por now)
         const frontendSkills = this.profileData.skills.filter(skill => 
             ['react', 'vue', 'angular', 'javascript', 'typescript', 'css', 'html'].includes(skill.toLowerCase())
         );
@@ -767,7 +987,7 @@ async updateAboutSection() {
         this.userProjects.forEach(project => {
             const projectCard = document.createElement('a');
             // 🔥 CORREGIR RUTA - ahora estamos en html/profile.html
-            projectCard.href = `../projectos/${project.slug}`;
+            projectCard.href = `../proyectos/${project.slug}`;
             projectCard.className = 'project-mini-card';
             
             projectCard.innerHTML = `
@@ -820,8 +1040,7 @@ async updateAboutSection() {
         this.setupActionButtons();
     }
 
-
-// Configurar visibilidad de elementos de edición
+    // Configurar visibilidad de elementos de edición
     setupProfileVisibility() {
         const editButtons = document.querySelectorAll('.btn-edit');
         const avatarEditBtn = document.getElementById('avatar-edit-btn');
@@ -878,7 +1097,6 @@ async updateAboutSection() {
         }
     }
 
-
     // Helper para actualizar elementos del DOM
     updateElement(elementId, content) {
         const element = document.getElementById(elementId);
@@ -912,7 +1130,6 @@ async updateAboutSection() {
         // Por implementar: modales específicos por sección
         alert(`Editando ${section} - Próximamente`);
     }
-
 
     // Compartir perfil
     shareProfile() {
@@ -956,47 +1173,13 @@ async updateAboutSection() {
     }
 
     // Mostrar error
-// En updateProjectsSection - corregir rutas
-updateProjectsSection() {
-    const projectsGrid = document.getElementById('profile-projects');
-    if (!projectsGrid) return;
-
-    projectsGrid.innerHTML = '';
-
-    if (!this.userProjects || this.userProjects.length === 0) {
-        projectsGrid.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-rocket"></i>
-                <p>${this.isOwnProfile ? 'Crea tu primer proyecto' : 'No hay proyectos públicos'}</p>
-                ${this.isOwnProfile ? 
-                    '<a href="../dashboard.html" class="btn-primary" style="margin-top: 10px;">Crear Proyecto</a>' : 
-                    ''
-                }
-            </div>
-        `;
-        return;
-    }
-
-    this.userProjects.forEach(project => {
-        const projectCard = document.createElement('a');
-        // 🔥 CORREGIR RUTA - ahora estamos en html/profile.html
-        projectCard.href = `../proyectos/${project.slug}`;
-        projectCard.className = 'project-mini-card';
-        
-        projectCard.innerHTML = `
-            <h4 class="project-mini-title">${project.title}</h4>
-            <p class="project-mini-description">${project.subtitle || 'Sin descripción'}</p>
-            <div class="project-mini-meta">
-                <span class="project-status ${project.status}">${this.formatProjectStatus(project.status)}</span>
-            </div>
-        `;
-        
-        projectsGrid.appendChild(projectCard);
-    });
-}
-
-// En showError - corregir ruta
     showError() {
+        // 🔥 NUEVO: Si no hay usuario autenticado y es perfil ajeno, mostrar registro en lugar de error
+        if (!this.currentUserId && this.currentProfileId) {
+            this.showRegistrationWall();
+            return;
+        }
+        
         const main = document.querySelector('.profile-main');
         if (main) {
             main.innerHTML = `
