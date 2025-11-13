@@ -1,9 +1,10 @@
-// project-details.js - Carga dinámica de proyectos desde Supabase (VERSIÓN CORREGIDA)
+// project-details.js - CON SISTEMA DE VISTAS INTEGRADO
 class ProjectDetailsLoader {
     constructor() {
         this.projectSlug = this.getSlugFromURL();
         this.currentProject = null;
         this.userMap = null;
+        this.viewTracker = new ViewTracker(); // ✅ Nuevo: tracker de vistas
         this.init();
     }
 
@@ -64,6 +65,9 @@ class ProjectDetailsLoader {
             console.log('✅ Proyecto cargado:', project);
             console.log('👥 Miembros del proyecto:', project.project_members);
 
+            // ✅ NUEVO: REGISTRAR VISTA DEL PROYECTO
+            await this.registerProjectView(project.id);
+
             // ✅ Cargar información de usuarios por separado si hay miembros
             if (project.project_members && project.project_members.length > 0) {
                 await this.loadUsersInfo(project.project_members);
@@ -84,43 +88,64 @@ class ProjectDetailsLoader {
         }
     }
 
- // ✅ Cargar información de usuarios desde la tabla correcta
-async loadUsersInfo(projectMembers) {
-    if (!projectMembers || projectMembers.length === 0) return;
-
-    try {
-        const userIds = projectMembers.map(member => member.user_id).filter(id => id);
-        
-        if (userIds.length === 0) return;
-
-        console.log('👤 IDs de usuarios a cargar:', userIds);
-
-        // Consultar información de usuarios desde la tabla 'profiles'
-        const { data: users, error } = await window.supabase
-            .from('profiles')
-            .select('id, username, full_name, avatar_url')
-            .in('id', userIds);
-
-        if (error) {
-            console.warn('⚠️ No se pudieron cargar los usuarios:', error);
-            return;
+    // ✅ NUEVO MÉTODO: Registrar vista del proyecto
+    async registerProjectView(projectId) {
+        try {
+            console.log('👀 Registrando vista para proyecto:', projectId);
+            
+            const result = await this.viewTracker.trackView(projectId);
+            
+            if (result && result.is_unique) {
+                console.log('✅ Vista única registrada');
+            } else {
+                console.log('ℹ️ Vista duplicada (no cuenta como única)');
+            }
+            
+            return result;
+        } catch (error) {
+            console.warn('⚠️ Error registrando vista:', error);
+            // No lanzar error para no afectar la experiencia del usuario
+            return null;
         }
-
-        // Crear mapa de usuarios para acceso rápido
-        this.userMap = {};
-        if (users) {
-            users.forEach(user => {
-                this.userMap[user.id] = user;
-                console.log(`👤 Usuario ${user.id}: username = "${user.username}", full_name = "${user.full_name}"`);
-            });
-        }
-
-        console.log('✅ Usuarios cargados:', users);
-
-    } catch (error) {
-        console.warn('⚠️ Error cargando usuarios:', error);
     }
-}
+
+    // ✅ Cargar información de usuarios desde la tabla correcta
+    async loadUsersInfo(projectMembers) {
+        if (!projectMembers || projectMembers.length === 0) return;
+
+        try {
+            const userIds = projectMembers.map(member => member.user_id).filter(id => id);
+            
+            if (userIds.length === 0) return;
+
+            console.log('👤 IDs de usuarios a cargar:', userIds);
+
+            // Consultar información de usuarios desde la tabla 'profiles'
+            const { data: users, error } = await window.supabase
+                .from('profiles')
+                .select('id, username, full_name, avatar_url')
+                .in('id', userIds);
+
+            if (error) {
+                console.warn('⚠️ No se pudieron cargar los usuarios:', error);
+                return;
+            }
+
+            // Crear mapa de usuarios para acceso rápido
+            this.userMap = {};
+            if (users) {
+                users.forEach(user => {
+                    this.userMap[user.id] = user;
+                    console.log(`👤 Usuario ${user.id}: username = "${user.username}", full_name = "${user.full_name}"`);
+                });
+            }
+
+            console.log('✅ Usuarios cargados:', users);
+
+        } catch (error) {
+            console.warn('⚠️ Error cargando usuarios:', error);
+        }
+    }
 
     // Actualizar la interfaz con los datos del proyecto
     updateUI() {
@@ -458,93 +483,92 @@ async loadUsersInfo(projectMembers) {
         });
     }
 
- 
-// 🔥 CORREGIDO: Actualizar miembros - MOSTRAR TODOS LOS MIEMBROS
-updateMembers(members) {
-    const container = document.getElementById('project-members');
-    if (!container) return;
+    // 🔥 CORREGIDO: Actualizar miembros - MOSTRAR TODOS LOS MIEMBROS
+    updateMembers(members) {
+        const container = document.getElementById('project-members');
+        if (!container) return;
 
-    console.log('👥 Actualizando miembros:', members);
+        console.log('👥 Actualizando miembros:', members);
 
-    // Ocultar sección completa si no hay miembros
-    const section = container.closest('.team-members-section');
-    
-    if (!members || members.length === 0) {
-        if (section) section.style.display = 'none';
-        return;
-    }
-
-    // ✅ DECLARAR LA VARIABLE membersFound
-    let membersFound = false;
-    
-    // Mostrar sección y limpiar contenedor
-    if (section) section.style.display = '';
-    container.innerHTML = '';
-
-    members.forEach(member => {
-        if (member && member.user_id) {
-            membersFound = true;
-            
-            const user = this.userMap ? this.userMap[member.user_id] : null;
-            
-            console.log(`👤 Procesando miembro ${member.user_id}:`, user);
-            
-            const memberItem = document.createElement('div');
-            memberItem.className = 'team-member';
-            memberItem.style.cursor = 'pointer';
-            
-            // OBTENER DATOS DEL USUARIO
-            const avatarUrl = user?.avatar_url || '../assets/elements/default-avatar.png';
-            const username = user?.username || 'Usuario';
-            const fullName = user?.full_name || '';
-            const displayName = fullName || username;
-            
-            memberItem.innerHTML = `
-                <div class="member-avatar">
-                    <img src="${avatarUrl}" alt="${displayName}" 
-                         onerror="this.src='../assets/elements/default-avatar.png'">
-                </div>
-                <div class="member-info">
-                    <strong class="member-name">${displayName}</strong>
-                    ${username ? `<span class="member-username">@${username}</span>` : ''}
-                    <span class="member-role">${this.formatMemberRole(member.role)}</span>
-                    <span class="member-status ${member.is_active !== false ? 'active' : 'inactive'}">
-                        ${member.is_active !== false ? 'Activo' : 'Inactivo'}
-                    </span>
-                </div>
-            `;
-            
-            // 🔥 USAR USERNAME PARA EL ENLACE, NO FULL_NAME
-            const profileIdentifier = username || user?.id;
-            memberItem.addEventListener('click', () => {
-                this.navigateToProfile(profileIdentifier);
-            });
-            
-            container.appendChild(memberItem);
+        // Ocultar sección completa si no hay miembros
+        const section = container.closest('.team-members-section');
+        
+        if (!members || members.length === 0) {
+            if (section) section.style.display = 'none';
+            return;
         }
-    });
 
-    // Si no se encontraron miembros válidos, ocultar sección
-    if (!membersFound) {
-        if (section) section.style.display = 'none';
-        console.log('ℹ️ No se encontraron miembros válidos');
-    } else {
-        console.log(`✅ Se mostraron ${members.length} miembros con enlaces a perfiles`);
+        // ✅ DECLARAR LA VARIABLE membersFound
+        let membersFound = false;
+        
+        // Mostrar sección y limpiar contenedor
+        if (section) section.style.display = '';
+        container.innerHTML = '';
+
+        members.forEach(member => {
+            if (member && member.user_id) {
+                membersFound = true;
+                
+                const user = this.userMap ? this.userMap[member.user_id] : null;
+                
+                console.log(`👤 Procesando miembro ${member.user_id}:`, user);
+                
+                const memberItem = document.createElement('div');
+                memberItem.className = 'team-member';
+                memberItem.style.cursor = 'pointer';
+                
+                // OBTENER DATOS DEL USUARIO
+                const avatarUrl = user?.avatar_url || '../assets/elements/default-avatar.png';
+                const username = user?.username || 'Usuario';
+                const fullName = user?.full_name || '';
+                const displayName = fullName || username;
+                
+                memberItem.innerHTML = `
+                    <div class="member-avatar">
+                        <img src="${avatarUrl}" alt="${displayName}" 
+                             onerror="this.src='../assets/elements/default-avatar.png'">
+                    </div>
+                    <div class="member-info">
+                        <strong class="member-name">${displayName}</strong>
+                        ${username ? `<span class="member-username">@${username}</span>` : ''}
+                        <span class="member-role">${this.formatMemberRole(member.role)}</span>
+                        <span class="member-status ${member.is_active !== false ? 'active' : 'inactive'}">
+                            ${member.is_active !== false ? 'Activo' : 'Inactivo'}
+                        </span>
+                    </div>
+                `;
+                
+                // 🔥 USAR USERNAME PARA EL ENLACE, NO FULL_NAME
+                const profileIdentifier = username || user?.id;
+                memberItem.addEventListener('click', () => {
+                    this.navigateToProfile(profileIdentifier);
+                });
+                
+                container.appendChild(memberItem);
+            }
+        });
+
+        // Si no se encontraron miembros válidos, ocultar sección
+        if (!membersFound) {
+            if (section) section.style.display = 'none';
+            console.log('ℹ️ No se encontraron miembros válidos');
+        } else {
+            console.log(`✅ Se mostraron ${members.length} miembros con enlaces a perfiles`);
+        }
     }
-}
 
-//  Navegar al perfil del usuario
-navigateToProfile(userIdentifier) {
-    if (!userIdentifier) {
-        console.warn('No se puede navegar al perfil: identificador de usuario no disponible');
-        return;
+    // Navegar al perfil del usuario
+    navigateToProfile(userIdentifier) {
+        if (!userIdentifier) {
+            console.warn('No se puede navegar al perfil: identificador de usuario no disponible');
+            return;
+        }
+
+        // Construir la URL del perfil - usar username
+        const profileUrl = `/perfiles/${userIdentifier}`;
+        console.log('🔗 Navegando al perfil:', profileUrl);
+        window.location.href = profileUrl;
     }
-
-    // Construir la URL del perfil - usar username
-    const profileUrl = `/perfiles/${userIdentifier}`;
-    console.log('🔗 Navegando al perfil:', profileUrl);
-    window.location.href = profileUrl;
-}
 
     // Formatear rol del miembro
     formatMemberRole(role) {
@@ -749,6 +773,49 @@ navigateToProfile(userIdentifier) {
             const moveDown = Math.min(scrollY * 0.3, 200);
             ball.style.transform = `translateY(${moveDown}px)`;
         });
+    }
+}
+
+// ✅ NUEVA CLASE: ViewTracker para manejar el registro de vistas
+class ViewTracker {
+    constructor() {
+        this.sessionId = this.getSessionId();
+    }
+
+    getSessionId() {
+        // Usar sessionStorage para persistir durante la sesión del navegador
+        let sessionId = sessionStorage.getItem('project_view_session_id');
+        if (!sessionId) {
+            sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            sessionStorage.setItem('project_view_session_id', sessionId);
+        }
+        return sessionId;
+    }
+
+    async trackView(projectId) {
+        try {
+            if (!window.supabase) {
+                console.warn('Supabase no disponible para registrar vista');
+                return null;
+            }
+
+            const { data, error } = await window.supabase.rpc('register_project_view', {
+                p_project_id: projectId,
+                p_session_id: this.sessionId
+            });
+
+            if (error) {
+                console.warn('⚠️ Error registrando vista:', error);
+                return null;
+            }
+
+            console.log('📊 Vista registrada:', data);
+            return data;
+
+        } catch (error) {
+            console.warn('⚠️ Error en trackView:', error);
+            return null;
+        }
     }
 }
 
