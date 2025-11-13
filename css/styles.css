@@ -1351,56 +1351,562 @@ footer {
 .project-badge.completed { background: rgba(14, 165, 233, 0.8); }
 .project-badge.paused { background: rgba(139, 92, 246, 0.8); }
 
-/* 🔥 ESTILOS PARA SECCIÓN POPULARES */
+/* === 🎯 BANNER DE PROYECTOS POPULARES - MEJORADO Y ALINEADO === */
 
-/* Ícono de fuego con animación sutil */
-.category-header .fa-fire {
-  animation: gentlePulse 3s infinite;
+.popular-banner {
+  background: var(--fondo-tarjeta);
+  border: 1px solid var(--borde-tarjeta);
+  border-radius: 20px;
+  margin: 2rem 0;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
 }
 
-@keyframes gentlePulse {
-  0%, 100% { 
-    opacity: 1; 
-    transform: scale(1);
-  }
-  50% { 
-    opacity: 0.8; 
-    transform: scale(1.05);
-  }
+.popular-banner:hover {
+  border-color: var(--borde-tarjeta-hover);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  background: var(--fondo-tarjeta-hover);
+  transform: translateY(-2px);
 }
 
-/* Efecto sutil para tarjetas de populares (opcional) */
-.projects-grid .project-card {
+.banner-content {
+  max-width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+/* Header mejorado */
+.banner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--borde-tarjeta);
+}
+
+.banner-title {
+  color: var(--texto-primario);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.banner-title i {
+  background: var(--color-acento);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 1.3rem;
+}
+
+.banner-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.banner-nav-btn {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--borde-tarjeta);
+  color: var(--color-texto);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: "JetBrains Mono", monospace;
+  backdrop-filter: blur(6px);
+}
+
+.banner-nav-btn:hover {
+  background: var(--color-acento);
+  border-color: transparent;
+  color: white;
+  box-shadow: var(--sombra-acento);
+  transform: translateY(-2px);
+}
+
+.banner-counter {
+  color: var(--color-secundario);
+  font-size: 0.9rem;
+  min-width: 60px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+/* Layout de proyecto mejorado */
+.banner-project-card {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+/* Imagen mejorada - sin espacio extra */
+.banner-project-media {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--fondo-imagen);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  height: 220px; /* Altura fija */
+}
+
+.banner-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Se recorta para mantener proporción */
+  border-radius: 16px;
+  transition: transform 0.5s ease;
+  display: block;
+}
+
+.banner-project-card:hover .banner-cover {
+  transform: scale(1.08);
+}
+
+.banner-cover-placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--color-acento);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--texto-primario);
+  font-size: 3rem;
   transition: all 0.3s ease;
 }
 
-.projects-grid .project-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+.banner-project-card:hover .banner-cover-placeholder {
+  transform: scale(1.05);
 }
 
-/* Mejora visual para el header de populares */
-.category-section[data-category="populares"] .category-header {
-  background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(255, 107, 53, 0.05));
-  padding: 15px 20px;
-  border-radius: 12px;
-  margin-bottom: 25px;
-  border-left: 4px solid #ff6b35;
+/* Información del proyecto - TODO ALINEADO A LA IZQUIERDA */
+.banner-project-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  height: 220px; /* Misma altura que la imagen */
+  justify-content: space-between;
 }
 
-.category-section[data-category="populares"] .category-title {
-  color: #ff6b35;
+/* Header del proyecto alineado a la izquierda */
+.banner-project-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.banner-project-title {
+  color: var(--texto-primario);
+  font-size: 1.8rem;
   font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+  background: var(--color-acento);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: left;
+  width: 100%;
 }
 
-/* Responsive para móviles */
-@media screen and (max-width: 768px) {
-  .category-section[data-category="populares"] .category-header {
-    padding: 12px 15px;
-    margin-bottom: 20px;
+.banner-project-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--texto-destacado);
+  font-weight: 600;
+  white-space: nowrap;
+  background: rgba(106, 17, 203, 0.15);
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(106, 17, 203, 0.3);
+  font-size: 0.875rem;
+  align-self: flex-start;
+}
+
+/* Descripción alineada a la izquierda */
+.banner-project-description {
+  color: var(--texto-secundario);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 0;
+  text-align: left;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+/* Metadatos reorganizados - solo autor */
+.banner-project-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.5rem 0;
+}
+
+.banner-author {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.75rem 1.25rem;
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.3s ease;
+}
+
+.banner-author:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.banner-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.banner-avatar.placeholder {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-secundario);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  font-size: 0.9rem;
+}
+
+.banner-author-name {
+  color: var(--texto-primario);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Tecnologías alineadas a la izquierda */
+.banner-technologies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.banner-tech-tag {
+  background: rgba(106, 17, 203, 0.15);
+  color: var(--texto-destacado);
+  padding: 0.4rem 0.9rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid rgba(106, 17, 203, 0.3);
+  transition: all 0.3s ease;
+}
+
+.banner-tech-tag:hover {
+  background: rgba(106, 17, 203, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Acciones con botón a la derecha */
+.banner-actions {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end; /* Botón a la derecha */
+  align-items: center;
+}
+
+.btn-banner-view {
+  background: var(--color-acento);
+  color: var(--texto-primario);
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.btn-banner-view:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  text-decoration: none;
+  color: var(--texto-primario);
+}
+
+/* ✨ Efecto de brillo en el banner */
+.popular-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--color-acento);
+  transform: scaleX(0);
+  transition: transform 0.4s ease;
+  z-index: 1;
+}
+
+.popular-banner:hover::before {
+  transform: scaleX(1);
+}
+
+/* === 📱 RESPONSIVE MEJORADO === */
+
+/* Tabletas */
+@media screen and (max-width: 968px) {
+  .banner-project-card {
+    grid-template-columns: 280px 1fr;
+    gap: 2rem;
   }
   
-  .category-header .fa-fire {
-    font-size: 1.1em;
+  .banner-project-media {
+    height: 200px;
+  }
+  
+  .banner-project-info {
+    height: 200px;
+  }
+  
+  .banner-project-title {
+    font-size: 1.6rem;
+  }
+}
+
+/* Tabletas pequeñas */
+@media screen and (max-width: 768px) {
+  .banner-project-card {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .banner-project-media {
+    height: 200px;
+    width: 100%;
+  }
+  
+  .banner-project-info {
+    height: auto;
+    min-height: 200px;
+  }
+  
+  .banner-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .banner-title {
+    justify-content: flex-start;
+  }
+  
+  .banner-controls {
+    align-self: flex-end;
+  }
+  
+  .banner-project-header {
+    align-items: flex-start;
+  }
+  
+  .banner-project-stats {
+    align-self: flex-start;
+  }
+  
+  .banner-actions {
+    justify-content: flex-start; /* En móvil el botón va a la izquierda */
+    margin-top: 1rem;
+  }
+  
+  .popular-banner {
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+  }
+}
+
+/* Móviles */
+@media screen and (max-width: 480px) {
+  .banner-project-title {
+    font-size: 1.4rem;
+  }
+  
+  .banner-project-description {
+    font-size: 1rem;
+    -webkit-line-clamp: 4;
+  }
+  
+  .banner-project-stats {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+  
+  .banner-controls {
+    gap: 0.75rem;
+  }
+  
+  .banner-nav-btn {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .banner-counter {
+    font-size: 0.8rem;
+    min-width: 50px;
+    padding: 4px 8px;
+  }
+  
+  .banner-project-media {
+    height: 180px;
+  }
+  
+  .popular-banner {
+    margin: 1rem 0;
+    padding: 1.25rem;
+  }
+  
+  .btn-banner-view {
+    padding: 0.65rem 1.5rem;
+    font-size: 0.85rem;
+    width: 100%; /* En móvil ocupa todo el ancho */
+    justify-content: center;
+  }
+  
+  .banner-actions {
+    justify-content: center;
+  }
+}
+
+/* Móviles pequeños */
+@media screen and (max-width: 360px) {
+  .banner-project-title {
+    font-size: 1.2rem;
+  }
+  
+  .banner-project-description {
+    font-size: 0.95rem;
+  }
+  
+  .banner-project-media {
+    height: 160px;
+  }
+  
+  .banner-author {
+    padding: 0.5rem 1rem;
+  }
+  
+  .banner-avatar,
+  .banner-avatar.placeholder {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .banner-author-name {
+    font-size: 0.85rem;
+  }
+}
+
+/* Tabletas grandes */
+@media screen and (min-width: 1200px) {
+  .banner-project-card {
+    grid-template-columns: 340px 1fr;
+    gap: 3rem;
+  }
+  
+  .banner-project-media {
+    height: 240px;
+  }
+  
+  .banner-project-info {
+    height: 240px;
+  }
+}
+
+/* Landscape móviles */
+@media screen and (max-width: 968px) and (orientation: landscape) {
+  .banner-project-card {
+    grid-template-columns: 200px 1fr;
+    gap: 1.5rem;
+  }
+  
+  .banner-project-media {
+    height: 160px;
+  }
+  
+  .banner-project-info {
+    height: 160px;
+  }
+  
+  .banner-project-title {
+    font-size: 1.4rem;
+  }
+  
+  .banner-project-description {
+    -webkit-line-clamp: 2;
+    font-size: 0.95rem;
+  }
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .banner-cover,
+  .popular-banner,
+  .banner-nav-btn,
+  .btn-banner-view,
+  .banner-tech-tag,
+  .banner-author {
+    transition: none;
+    transform: none;
+  }
+  
+  .banner-project-card:hover .banner-cover,
+  .banner-project-card:hover .banner-cover-placeholder {
+    transform: none;
+  }
+}
+
+/* Soporte para alto contraste */
+@media (prefers-contrast: high) {
+  .popular-banner {
+    border: 2px solid var(--texto-primario);
+    background: var(--color-fondo);
+  }
+  
+  .banner-nav-btn {
+    border: 2px solid var(--texto-primario);
+  }
+  
+  .banner-tech-tag {
+    border: 2px solid var(--texto-primario);
+  }
+  
+  .banner-author {
+    border: 2px solid var(--texto-primario);
   }
 }

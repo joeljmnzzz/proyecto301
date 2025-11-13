@@ -1,4 +1,9 @@
-// main.js - VERSIÓN COMPLETA CON SECCIÓN POPULARES
+// main.js - VERSIÓN COMPLETA CON BANNER DE PROYECTOS POPULARES
+
+// Variables globales para el banner
+let popularProjects = [];
+let currentBannerIndex = 0;
+let bannerInterval = null;
 
 // Animación de escritura para el título
 function startTypingAnimation(texto) {
@@ -36,8 +41,6 @@ function startTypingAnimation(texto) {
 
 // 🚀 CARGAR PROYECTOS POR CATEGORÍAS - VERSIÓN DEFINITIVA
 document.addEventListener('DOMContentLoaded', async function() {
-  console.log('🚀 Iniciando carga de proyectos...');
-  
   try {
     // Esperar a que Supabase esté listo
     await waitForSupabase();
@@ -45,11 +48,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Esperar a que las traducciones estén cargadas
     await waitForTranslations();
     
-    // Cargar proyectos
+    // Cargar banner de proyectos populares
+    await loadPopularBanner();
+    
+    // Cargar proyectos normales
     await loadPublicProjects();
     setupEventListeners();
     
-    console.log('✅ Página principal cargada completamente');
   } catch (error) {
     console.error('❌ Error cargando página principal:', error);
     showError('Error al cargar la página: ' + error.message);
@@ -58,11 +63,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // 🔥 FUNCIÓN: Esperar inicialización de Supabase
 async function waitForSupabase() {
-  console.log('🔄 Esperando inicialización de Supabase...');
-  
   // Si Supabase ya está listo, continuar
   if (window.supabase && typeof window.supabase.from === 'function') {
-    console.log('✅ Supabase ya está inicializado');
     return true;
   }
   
@@ -76,7 +78,6 @@ async function waitForSupabase() {
       
       if (window.supabase && typeof window.supabase.from === 'function') {
         clearInterval(checkInterval);
-        console.log('✅ Supabase inicializado después de ' + attempts + ' intentos');
         resolve(true);
       }
       
@@ -90,10 +91,7 @@ async function waitForSupabase() {
 
 // 🔥 FUNCIÓN: Esperar traducciones
 async function waitForTranslations() {
-  console.log('🔄 Esperando traducciones...');
-  
   if (window.translations) {
-    console.log('✅ Traducciones ya cargadas');
     return true;
   }
   
@@ -101,11 +99,223 @@ async function waitForTranslations() {
     const checkInterval = setInterval(() => {
       if (window.translations) {
         clearInterval(checkInterval);
-        console.log('✅ Traducciones cargadas');
         resolve(true);
       }
     }, 100);
   });
+}
+
+// 🔥 NUEVA FUNCIÓN: Cargar banner de proyectos populares
+async function loadPopularBanner() {
+  try {
+    if (!window.supabase || typeof window.supabase.from !== 'function') {
+      console.error('❌ Supabase no está disponible para el banner');
+      return;
+    }
+
+    console.log('🔄 Cargando proyectos para el banner...');
+    
+    // Consulta para proyectos populares (máximo 5 para el banner)
+    const { data: projects, error } = await window.supabase
+      .from('projects')
+      .select('id, name, slug, title, subtitle, description, cover_image_url, status, category, technologies, visibility, created_at, created_by, cached_view_count')
+      .eq('visibility', 'public')
+      .gt('cached_view_count', 0)
+      .order('cached_view_count', { ascending: false })
+      .limit(5); // Solo 5 proyectos para el banner
+
+    if (error) {
+      console.error('❌ Error cargando proyectos para banner:', error);
+      return;
+    }
+
+    if (projects && projects.length > 0) {
+      // Cargar información de usuarios
+      const projectsWithUsers = await loadUsersForProjects(projects);
+      popularProjects = projectsWithUsers;
+      
+      // Mostrar el banner
+      displayPopularBanner();
+      
+      // Iniciar rotación automática cada 8 segundos
+      startBannerRotation();
+    } else {
+      console.log('ℹ️ No hay proyectos populares para mostrar en el banner');
+      hidePopularBanner();
+    }
+
+  } catch (error) {
+    console.error('❌ Error en loadPopularBanner:', error);
+    hidePopularBanner();
+  }
+}
+
+// 🔥 NUEVA FUNCIÓN: Mostrar banner de proyectos populares
+function displayPopularBanner() {
+  const banner = document.getElementById('popular-banner');
+  if (!banner || popularProjects.length === 0) {
+    hidePopularBanner();
+    return;
+  }
+
+  // Mostrar el banner
+  banner.classList.remove('hidden');
+  
+  // Mostrar el primer proyecto
+  showBannerProject(0);
+  
+  // Actualizar contadores
+  updateBannerCounters();
+}
+
+// 🔥 NUEVA FUNCIÓN: Mostrar proyecto específico en el banner
+function showBannerProject(index) {
+  const bannerContent = document.getElementById('banner-project-content');
+  if (!bannerContent || popularProjects.length === 0) return;
+
+  currentBannerIndex = index;
+  const project = popularProjects[index];
+
+  // Crear HTML del proyecto para el banner
+  const bannerHTML = `
+    <div class="banner-project-card">
+      <div class="banner-project-media">
+        ${project.cover_image_url ? `
+          <img src="${project.cover_image_url}" alt="${project.title || project.name}" class="banner-cover">
+        ` : `
+          <div class="banner-cover-placeholder">
+            <i class="fas fa-rocket"></i>
+          </div>
+        `}
+      </div>
+      
+      <div class="banner-project-info">
+        <div class="banner-project-header">
+          <h3 class="banner-project-title">${project.title || project.name}</h3>
+          <div class="banner-project-stats">
+            <span class="view-count">
+              <i class="fas fa-eye"></i>
+              ${project.cached_view_count || 0} vistas
+            </span>
+          </div>
+        </div>
+        
+        <p class="banner-project-description">
+          ${project.subtitle || project.description?.substring(0, 150) || 'Sin descripción disponible'}...
+        </p>
+        
+        <div class="banner-project-meta">
+          <div class="banner-author">
+            ${project.profiles?.avatar_url ? `
+              <img src="${project.profiles.avatar_url}" alt="${project.profiles.full_name}" class="banner-avatar">
+            ` : `
+              <div class="banner-avatar placeholder">
+                <i class="fas fa-user"></i>
+              </div>
+            `}
+            <span class="banner-author-name">
+              ${project.profiles?.first_name || project.profiles?.full_name || 'Usuario'}
+            </span>
+          </div>
+          
+          <div class="banner-project-category">
+            <i class="fas fa-tag"></i>
+            ${project.category || 'Sin categoría'}
+          </div>
+        </div>
+        
+        ${project.technologies && project.technologies.length > 0 ? `
+          <div class="banner-technologies">
+            ${project.technologies.slice(0, 4).map(tech => `
+              <span class="banner-tech-tag">${tech}</span>
+            `).join('')}
+          </div>
+        ` : ''}
+        
+        <div class="banner-actions">
+          <button class="btn-banner-view" data-project-slug="${project.slug}">
+            <i class="fas fa-eye"></i>
+            Ver Proyecto
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  bannerContent.innerHTML = bannerHTML;
+  
+  // Conectar evento del botón
+  const viewButton = bannerContent.querySelector('.btn-banner-view');
+  if (viewButton) {
+    viewButton.addEventListener('click', () => {
+      const slug = viewButton.getAttribute('data-project-slug');
+      if (slug) {
+        window.location.href = `/proyectos/${slug}`;
+      }
+    });
+  }
+  
+  // Actualizar contadores
+  updateBannerCounters();
+}
+
+// 🔥 NUEVA FUNCIÓN: Actualizar contadores del banner
+function updateBannerCounters() {
+  const currentElement = document.getElementById('banner-current');
+  const totalElement = document.getElementById('banner-total');
+  
+  if (currentElement) {
+    currentElement.textContent = currentBannerIndex + 1;
+  }
+  
+  if (totalElement) {
+    totalElement.textContent = popularProjects.length;
+  }
+}
+
+// 🔥 NUEVA FUNCIÓN: Iniciar rotación automática del banner
+function startBannerRotation() {
+  if (popularProjects.length <= 1) return;
+  
+  // Limpiar intervalo anterior si existe
+  if (bannerInterval) {
+    clearInterval(bannerInterval);
+  }
+  
+  // Rotar cada 8 segundos
+  bannerInterval = setInterval(() => {
+    nextBannerProject();
+  }, 8000);
+}
+
+// 🔥 NUEVA FUNCIÓN: Siguiente proyecto en el banner
+function nextBannerProject() {
+  if (popularProjects.length === 0) return;
+  
+  currentBannerIndex = (currentBannerIndex + 1) % popularProjects.length;
+  showBannerProject(currentBannerIndex);
+}
+
+// 🔥 NUEVA FUNCIÓN: Proyecto anterior en el banner
+function prevBannerProject() {
+  if (popularProjects.length === 0) return;
+  
+  currentBannerIndex = (currentBannerIndex - 1 + popularProjects.length) % popularProjects.length;
+  showBannerProject(currentBannerIndex);
+}
+
+// 🔥 NUEVA FUNCIÓN: Ocultar banner
+function hidePopularBanner() {
+  const banner = document.getElementById('popular-banner');
+  if (banner) {
+    banner.classList.add('hidden');
+  }
+  
+  // Limpiar intervalo
+  if (bannerInterval) {
+    clearInterval(bannerInterval);
+    bannerInterval = null;
+  }
 }
 
 // 🔥 FUNCIÓN PRINCIPAL: Cargar proyectos públicos (VERSIÓN CORREGIDA)
@@ -120,8 +330,6 @@ async function loadPublicProjects(searchTerm = '') {
       return;
     }
 
-    console.log('📊 Ejecutando consulta a Supabase...');
-    
     // 🔥 CONSULTA CORREGIDA - SIN RELACIONES PARA EVITAR ERRORES
     let query = window.supabase
       .from('projects')
@@ -131,8 +339,6 @@ async function loadPublicProjects(searchTerm = '') {
 
     // 🔥 CORRECCIÓN: Aplicar filtro de búsqueda de forma segura
     if (searchTerm && searchTerm.trim() !== '') {
-      console.log('🔍 Buscando:', searchTerm);
-      
       // 🔥 OPCIÓN 1: Solo buscar en título y descripción (más seguro)
       query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
     }
@@ -145,8 +351,6 @@ async function loadPublicProjects(searchTerm = '') {
       return;
     }
 
-    console.log(`✅ ${projects?.length || 0} proyectos cargados`);
-    
     // 🔥 CARGAR INFORMACIÓN DE USUARIOS POR SEPARADO
     const projectsWithUsers = await loadUsersForProjects(projects || []);
     
@@ -164,190 +368,6 @@ async function loadPublicProjects(searchTerm = '') {
   }
 }
 
-// 🔥 NUEVA FUNCIÓN: Cargar proyectos populares (SIN MOSTRAR VISTAS)
-async function loadPopularProjects(searchTerm = '') {
-  try {
-    showLoading(true);
-    
-    if (!window.supabase || typeof window.supabase.from !== 'function') {
-      console.error('❌ Supabase no está disponible');
-      showError('Error de conexión con la base de datos. Recarga la página.');
-      return;
-    }
-
-    console.log('📊 Cargando proyectos populares...');
-    
-    // 🔥 CONSULTA PARA PROYECTOS POPULARES - Ordenados por vistas pero SIN MOSTRARLAS
-    let query = window.supabase
-      .from('projects')
-      .select('id, name, slug, title, subtitle, description, cover_image_url, status, category, technologies, visibility, created_at, created_by')
-      .eq('visibility', 'public')
-      .order('cached_view_count', { ascending: false }) // ← Ordenar por vistas descendente
-      .limit(20); // Limitar a los 20 más populares
-
-    // Aplicar filtro de búsqueda si existe
-    if (searchTerm && searchTerm.trim() !== '') {
-      console.log('🔍 Buscando en populares:', searchTerm);
-      query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
-    }
-
-    const { data: projects, error } = await query;
-
-    if (error) {
-      console.error('❌ Error cargando proyectos populares:', error);
-      showError('Error al cargar proyectos populares: ' + error.message);
-      return;
-    }
-
-    console.log(`✅ ${projects?.length || 0} proyectos populares cargados`);
-    
-    // Cargar información de usuarios
-    const projectsWithUsers = await loadUsersForProjects(projects || []);
-    
-    // Mostrar proyectos populares
-    displayPopularProjects(projectsWithUsers, searchTerm);
-
-  } catch (error) {
-    console.error('❌ Error cargando proyectos populares:', error);
-    showError('Error inesperado: ' + error.message);
-  } finally {
-    showLoading(false);
-  }
-}
-
-// 🔥 NUEVA FUNCIÓN: Mostrar proyectos populares (MISMO DISEÑO QUE PROYECTOS NORMALES)
-function displayPopularProjects(projects, searchTerm = '') {
-  const container = document.getElementById('projects-container');
-  const emptyState = document.getElementById('empty-state');
-  
-  if (!container) {
-    console.error('❌ Contenedor de proyectos no encontrado');
-    return;
-  }
-  
-  // Verificar si hay proyectos
-  if (!projects || projects.length === 0) {
-    container.innerHTML = '';
-    emptyState.classList.remove('hidden');
-    
-    const message = searchTerm ? 
-      'No se encontraron proyectos populares para tu búsqueda' : 
-      'Aún no hay proyectos populares disponibles';
-    
-    const messageElement = emptyState.querySelector('p');
-    if (messageElement) {
-      messageElement.textContent = message;
-    }
-    
-    return;
-  }
-  
-  emptyState.classList.add('hidden');
-  
-  // Generar HTML para proyectos populares - MISMO DISEÑO QUE PROYECTOS NORMALES
-  const popularHTML = `
-    <div class="category-section" data-category="populares">
-      <div class="category-header">
-        <h2 class="category-title">
-          <i class="fas fa-fire" style="color: #ff6b35; margin-right: 8px;"></i>
-          Proyectos Populares
-        </h2>
-        <span class="project-count">${projects.length} proyecto${projects.length !== 1 ? 's' : ''} destacados</span>
-      </div>
-      
-      <div class="projects-grid">
-        ${projects.map(project => `
-          <div class="project-card" data-project-id="${project.id}">
-            <div class="project-media-container">
-              ${project.cover_image_url ? `
-                <div class="project-cover">
-                  <img src="${project.cover_image_url}" alt="${project.title || project.name}" loading="lazy">
-                  <div class="project-title-overlay">
-                    <h3 class="project-title">${project.title || project.name}</h3>
-                  </div>
-                  <div class="project-status ${project.status}">
-                    <i class="fas ${getStatusIcon(project.status)}"></i>
-                    <span>${getStatusText(project.status)}</span>
-                  </div>
-                </div>
-              ` : `
-                <div class="project-cover no-image">
-                  <div class="project-cover-placeholder">
-                    <i class="fas fa-rocket"></i>
-                  </div>
-                  <div class="project-title-overlay">
-                    <h3 class="project-title">${project.title || project.name}</h3>
-                  </div>
-                  <div class="project-status ${project.status}">
-                    <i class="fas ${getStatusIcon(project.status)}"></i>
-                    <span>${getStatusText(project.status)}</span>
-                  </div>
-                </div>
-              `}
-            </div>
-            
-            <div class="project-card-content">
-              <p class="project-subtitle">${project.subtitle || project.description?.substring(0, 120) || 'Sin descripción disponible'}...</p>
-              
-              <div class="project-author">
-                <div class="author-info">
-                  ${project.profiles?.avatar_url ? `
-                    <img src="${project.profiles.avatar_url}" alt="${project.profiles.full_name || project.profiles.username}" class="author-avatar">
-                  ` : `
-                    <div class="author-avatar placeholder">
-                      <i class="fas fa-user"></i>
-                    </div>
-                  `}
-                  <span class="author-name">${project.profiles?.first_name || project.profiles?.full_name || project.profiles?.username || 'Usuario'}</span>
-                </div>
-              </div>
-              
-              <div class="project-meta">
-                <div class="project-category">
-                  <i class="fas fa-tag"></i>
-                  <span>${project.category || 'Sin categoría'}</span>
-                </div>
-                <div class="project-visibility ${project.visibility}">
-                  <i class="fas ${getVisibilityIcon(project.visibility)}"></i>
-                  <span>${getVisibilityText(project.visibility)}</span>
-                </div>
-              </div>
-              
-              ${project.technologies && project.technologies.length > 0 ? `
-                <div class="project-technologies">
-                  ${project.technologies.slice(0, 3).map(tech => `
-                    <span class="tech-tag">${tech}</span>
-                  `).join('')}
-                  ${project.technologies.length > 3 ? `
-                    <span class="tech-tag-more">+${project.technologies.length - 3}</span>
-                  ` : ''}
-                </div>
-              ` : ''}
-              
-              <div class="project-actions">
-                <button class="btn-view-project" data-project-slug="${project.slug}">
-                  <i class="fas fa-eye"></i>
-                  <span>Ver Proyecto</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  `;
-  
-  container.innerHTML = popularHTML;
-  
-  // Conectar eventos de los botones
-  connectProjectActions();
-  
-  // Actualizar traducciones si es necesario
-  if (window.updateTranslations) {
-    setTimeout(() => window.updateTranslations(), 100);
-  }
-}
-
 // 🔥 FUNCIÓN CORREGIDA: Cargar información de usuarios para los proyectos
 async function loadUsersForProjects(projects) {
     if (!projects || projects.length === 0) return projects;
@@ -357,7 +377,6 @@ async function loadUsersForProjects(projects) {
         const userIds = [...new Set(projects.map(p => p.created_by).filter(Boolean))];
         
         if (userIds.length === 0) {
-            console.log('ℹ️ No hay user IDs para cargar');
             return projects.map(project => ({
                 ...project,
                 profiles: { 
@@ -368,13 +387,10 @@ async function loadUsersForProjects(projects) {
             }));
         }
 
-        console.log('👥 Cargando información de', userIds.length, 'usuarios...');
-        
         let users = [];
         
         // 🔥 ESTRATEGIA PRINCIPAL: Cargar desde la tabla profiles
         try {
-            console.log('🔄 Cargando desde tabla profiles...');
             const { data: profilesData, error: profilesError } = await window.supabase
                 .from('profiles')
                 .select('id, username, full_name, avatar_url')
@@ -382,14 +398,10 @@ async function loadUsersForProjects(projects) {
             
             if (!profilesError && profilesData && profilesData.length > 0) {
                 users = profilesData;
-                console.log('✅ Usuarios cargados desde profiles:', users.length);
             } else {
-                console.log('ℹ️ No se pudieron cargar desde profiles:', profilesError);
                 throw new Error('Fallback a auth.users');
             }
         } catch (profilesError) {
-            console.log('🔄 Fallback: Intentando cargar desde auth.users...');
-            
             // Estrategia de respaldo: auth.users
             try {
                 const { data: authUsers, error: authError } = await window.supabase
@@ -398,7 +410,6 @@ async function loadUsersForProjects(projects) {
                     .in('id', userIds);
                 
                 if (!authError && authUsers && authUsers.length > 0) {
-                    console.log('✅ Usuarios cargados desde auth.users:', authUsers.length);
                     users = authUsers.map(user => ({
                         id: user.id,
                         username: user.user_metadata?.username || user.user_metadata?.full_name || user.email?.split('@')[0] || 'usuario',
@@ -407,11 +418,9 @@ async function loadUsersForProjects(projects) {
                         email: user.email
                     }));
                 } else {
-                    console.log('ℹ️ No se pudieron cargar desde auth.users:', authError);
                     throw new Error('Usar datos por defecto');
                 }
             } catch (authError) {
-                console.log('🔄 Usando datos de usuario por defecto...');
                 // Crear datos de usuario por defecto
                 users = userIds.map(id => ({
                     id: id,
@@ -424,7 +433,6 @@ async function loadUsersForProjects(projects) {
 
         // Si no se cargaron usuarios, crear datos por defecto
         if (users.length === 0) {
-            console.log('ℹ️ Creando datos de usuario por defecto');
             users = userIds.map(id => ({
                 id: id,
                 username: 'usuario_' + id.substring(0, 8),
@@ -458,7 +466,6 @@ async function loadUsersForProjects(projects) {
             };
         });
 
-        console.log('✅ Proyectos combinados con usuarios:', projectsWithUsers.length);
         return projectsWithUsers;
 
     } catch (error) {
@@ -664,43 +671,46 @@ function displayProjectsByCategory(categories, searchTerm = '') {
   }
 }
 
-// 🔧 FUNCIÓN: Configurar event listeners (ACTUALIZADA CON POPULARES)
+// 🔧 FUNCIÓN: Configurar event listeners (ACTUALIZADA CON BANNER)
 function setupEventListeners() {
-    // Navegación entre secciones
-    const sectionButtons = document.querySelectorAll('.categorias button');
-    sectionButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            // Remover clase active de todos los botones
-            sectionButtons.forEach(btn => btn.classList.remove('active'));
-            // Agregar clase active al botón clickeado
-            e.target.classList.add('active');
-            
-            const section = e.target.getAttribute('data-section');
-            console.log('Cambiando a sección:', section);
-            
-            if (section === 'proyectos') {
-                loadPublicProjects();
-            } else if (section === 'populares') {
-                loadPopularProjects(); // ← NUEVO: Cargar populares
-            }
-        });
+  // Navegación del banner
+  const prevBtn = document.getElementById('prev-banner');
+  const nextBtn = document.getElementById('next-banner');
+  
+  if (prevBtn) {
+    prevBtn.addEventListener('click', prevBannerProject);
+  }
+  
+  if (nextBtn) {
+    nextBtn.addEventListener('click', nextBannerProject);
+  }
+  
+  // Navegación entre secciones (quitamos la sección populares)
+  const sectionButtons = document.querySelectorAll('.categorias button');
+  sectionButtons.forEach(button => {
+    button.addEventListener('click', (e) => {
+      // Remover clase active de todos los botones
+      sectionButtons.forEach(btn => btn.classList.remove('active'));
+      // Agregar clase active al botón clickeado
+      e.target.classList.add('active');
+      
+      const section = e.target.getAttribute('data-section');
+      
+      if (section === 'proyectos') {
+        loadPublicProjects();
+      }
+      // Aquí puedes agregar más secciones según sea necesario
     });
-    
-    // 🔍 Buscador (funciona para ambas secciones)
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.trim();
-            const activeSection = document.querySelector('.categorias button.active');
-            const section = activeSection ? activeSection.getAttribute('data-section') : 'proyectos';
-            
-            if (section === 'populares') {
-                loadPopularProjects(searchTerm);
-            } else {
-                loadPublicProjects(searchTerm);
-            }
-        });
-    }
+  });
+  
+  // 🔍 Buscador
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.trim();
+      loadPublicProjects(searchTerm);
+    });
+  }
 }
 
 // 🔥 FUNCIÓN: Conectar acciones de proyectos
@@ -793,6 +803,10 @@ function showError(message) {
 window.reloadProjects = function() {
   loadPublicProjects();
 };
+
+// Exportamos las funciones para el banner
+window.nextBannerProject = nextBannerProject;
+window.prevBannerProject = prevBannerProject;
 
 // Exportamos la función para que i18n.js la use
 window.startTypingAnimation = startTypingAnimation;

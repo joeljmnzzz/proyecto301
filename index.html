@@ -33,9 +33,37 @@
       <input type="text" placeholder="Buscar..." class="input-busqueda" data-key-placeholder="main.buscador.placeholder" id="search-input">
     </div>
 
+    <!-- 🎯 BANNER DE PROYECTOS POPULARES -->
+    <div id="popular-banner" class="popular-banner hidden">
+      <div class="banner-content">
+        <div class="banner-header">
+          <h2 class="banner-title">
+            <i class="fas fa-star" style="color: #ff6b35; margin-right: 8px;"></i>
+            Proyecto Destacado
+          </h2>
+          <div class="banner-controls">
+            <button id="prev-banner" class="banner-nav-btn">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="banner-counter">
+              <span id="banner-current">1</span> / <span id="banner-total">0</span>
+            </span>
+            <button id="next-banner" class="banner-nav-btn">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="banner-project">
+          <div id="banner-project-content">
+            <!-- El contenido del proyecto se cargará aquí dinámicamente -->
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 🧭 Menú de secciones -->
     <div class="categorias">
-      <button data-section="populares" data-key="main.categorias.populares">Populares</button>
       <button data-section="proyectos" data-key="main.categorias.proyectos" class="active">Proyectos</button>
       <button data-section="portafolios" data-key="main.categorias.portafolios">Portafolios</button>
       <button data-section="equipos" data-key="main.categorias.equipos">Equipos</button>
