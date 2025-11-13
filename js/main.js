@@ -1,4 +1,4 @@
-// main.js - VERSIÓN COMPLETA CON BANNER DE PROYECTOS POPULARES
+// main.js - VERSIÓN COMPLETA CON NAVEGACIÓN A PERFILES DE USUARIO
 
 // Variables globales para el banner
 let popularProjects = [];
@@ -105,6 +105,40 @@ async function waitForTranslations() {
   });
 }
 
+// 🔥 NUEVA FUNCIÓN: Navegar al perfil del usuario
+function navigateToProfile(userIdentifier) {
+    if (!userIdentifier) {
+        console.warn('No se puede navegar al perfil: identificador de usuario no disponible');
+        return;
+    }
+
+    // Construir la URL del perfil - usar username
+    const profileUrl = `/perfiles/${userIdentifier}`;
+    console.log('🔗 Navegando al perfil:', profileUrl);
+    window.location.href = profileUrl;
+}
+
+// 🔥 NUEVA FUNCIÓN: Controlar visibilidad del banner basado en búsqueda
+function toggleBannerVisibility(show) {
+  const banner = document.getElementById('popular-banner');
+  if (!banner) return;
+  
+  if (show) {
+    banner.classList.remove('hidden');
+    // Reanudar rotación si hay proyectos
+    if (popularProjects.length > 1 && !bannerInterval) {
+      startBannerRotation();
+    }
+  } else {
+    banner.classList.add('hidden');
+    // Detener rotación automática
+    if (bannerInterval) {
+      clearInterval(bannerInterval);
+      bannerInterval = null;
+    }
+  }
+}
+
 // 🔥 NUEVA FUNCIÓN: Cargar banner de proyectos populares
 async function loadPopularBanner() {
   try {
@@ -168,44 +202,38 @@ function displayPopularBanner() {
   updateBannerCounters();
 }
 
-// 🔥 NUEVA FUNCIÓN: Mostrar proyecto específico en el banner
+// 🔥 NUEVA FUNCIÓN: Mostrar proyecto específico en el banner (ACTUALIZADA CON PERFIL)
 function showBannerProject(index) {
+  const banner = document.getElementById('popular-banner');
   const bannerContent = document.getElementById('banner-project-content');
   if (!bannerContent || popularProjects.length === 0) return;
 
   currentBannerIndex = index;
   const project = popularProjects[index];
 
-  // Crear HTML del proyecto para el banner
+  // CORRECCIÓN: Aplicar la imagen como fondo del banner
+  if (project.cover_image_url) {
+    banner.classList.add('with-background');
+    banner.style.setProperty('--banner-image', `url('${project.cover_image_url}')`);
+  } else {
+    banner.classList.remove('with-background');
+    banner.style.removeProperty('--banner-image');
+  }
+
+  // CORRECCIÓN: HTML simplificado sin contenedor de imagen lateral
   const bannerHTML = `
-    <div class="banner-project-card">
-      <div class="banner-project-media">
-        ${project.cover_image_url ? `
-          <img src="${project.cover_image_url}" alt="${project.title || project.name}" class="banner-cover">
-        ` : `
-          <div class="banner-cover-placeholder">
-            <i class="fas fa-rocket"></i>
-          </div>
-        `}
+    <div class="banner-project-info">
+      <div class="banner-project-header">
+        <h3 class="banner-project-title">${project.title || project.name}</h3>
       </div>
       
-      <div class="banner-project-info">
-        <div class="banner-project-header">
-          <h3 class="banner-project-title">${project.title || project.name}</h3>
-          <div class="banner-project-stats">
-            <span class="view-count">
-              <i class="fas fa-eye"></i>
-              ${project.cached_view_count || 0} vistas
-            </span>
-          </div>
-        </div>
-        
-        <p class="banner-project-description">
-          ${project.subtitle || project.description?.substring(0, 150) || 'Sin descripción disponible'}...
-        </p>
-        
+      <p class="banner-project-description">
+        ${project.subtitle || project.description?.substring(0, 150) || 'Sin descripción disponible'}...
+      </p>
+      
+      <div class="banner-project-details">
         <div class="banner-project-meta">
-          <div class="banner-author">
+          <div class="banner-author clickable-author" data-username="${project.profiles?.username || ''}">
             ${project.profiles?.avatar_url ? `
               <img src="${project.profiles.avatar_url}" alt="${project.profiles.full_name}" class="banner-avatar">
             ` : `
@@ -217,11 +245,6 @@ function showBannerProject(index) {
               ${project.profiles?.first_name || project.profiles?.full_name || 'Usuario'}
             </span>
           </div>
-          
-          <div class="banner-project-category">
-            <i class="fas fa-tag"></i>
-            ${project.category || 'Sin categoría'}
-          </div>
         </div>
         
         ${project.technologies && project.technologies.length > 0 ? `
@@ -231,10 +254,16 @@ function showBannerProject(index) {
             `).join('')}
           </div>
         ` : ''}
-        
-        <div class="banner-actions">
-          <button class="btn-banner-view" data-project-slug="${project.slug}">
+      </div>
+      
+      <div class="banner-actions">
+        <div class="banner-actions-container">
+          <div class="view-count-badge">
             <i class="fas fa-eye"></i>
+            ${project.cached_view_count || 0} vistas
+          </div>
+          <button class="btn-banner-view" data-project-slug="${project.slug}">
+            <i class="fas fa-external-link-alt"></i>
             Ver Proyecto
           </button>
         </div>
@@ -244,7 +273,7 @@ function showBannerProject(index) {
 
   bannerContent.innerHTML = bannerHTML;
   
-  // Conectar evento del botón
+  // Conectar evento del botón de proyecto
   const viewButton = bannerContent.querySelector('.btn-banner-view');
   if (viewButton) {
     viewButton.addEventListener('click', () => {
@@ -253,6 +282,22 @@ function showBannerProject(index) {
         window.location.href = `/proyectos/${slug}`;
       }
     });
+  }
+  
+  // 🔥 NUEVO: Conectar evento del autor (perfil)
+  const authorElement = bannerContent.querySelector('.clickable-author');
+  if (authorElement) {
+    authorElement.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevenir eventos del padre
+      const username = authorElement.getAttribute('data-username');
+      if (username) {
+        navigateToProfile(username);
+      }
+    });
+    
+    // Agregar estilo de cursor pointer
+    authorElement.style.cursor = 'pointer';
+    authorElement.title = 'Ver perfil del usuario';
   }
   
   // Actualizar contadores
@@ -318,10 +363,19 @@ function hidePopularBanner() {
   }
 }
 
-// 🔥 FUNCIÓN PRINCIPAL: Cargar proyectos públicos (VERSIÓN CORREGIDA)
+// 🔥 FUNCIÓN PRINCIPAL: Cargar proyectos públicos (VERSIÓN CORREGIDA CON CONTROL DE BANNER)
 async function loadPublicProjects(searchTerm = '') {
   try {
     showLoading(true);
+    
+    // 🔥 NUEVO: Controlar visibilidad del banner basado en búsqueda
+    if (searchTerm && searchTerm.trim() !== '') {
+      // Ocultar banner durante búsqueda
+      toggleBannerVisibility(false);
+    } else {
+      // Mostrar banner cuando no hay búsqueda
+      toggleBannerVisibility(true);
+    }
     
     // Verificación robusta de Supabase
     if (!window.supabase || typeof window.supabase.from !== 'function') {
@@ -539,7 +593,7 @@ function getCategoryDisplayName(category) {
   return categoryNames[category] || category;
 }
 
-// 🔥 FUNCIÓN: Mostrar proyectos agrupados por categoría
+// 🔥 FUNCIÓN: Mostrar proyectos agrupados por categoría (ACTUALIZADA CON PERFILES)
 function displayProjectsByCategory(categories, searchTerm = '') {
   const container = document.getElementById('projects-container');
   const emptyState = document.getElementById('empty-state');
@@ -613,7 +667,7 @@ function displayProjectsByCategory(categories, searchTerm = '') {
               <p class="project-subtitle">${project.subtitle || project.description?.substring(0, 120) || 'Sin descripción disponible'}...</p>
               
               <div class="project-author">
-                <div class="author-info">
+                <div class="author-info clickable-author" data-username="${project.profiles?.username || ''}">
                   ${project.profiles?.avatar_url ? `
                     <img src="${project.profiles.avatar_url}" alt="${project.profiles.full_name || project.profiles.username}" class="author-avatar">
                   ` : `
@@ -703,18 +757,36 @@ function setupEventListeners() {
     });
   });
   
-  // 🔍 Buscador
+  // 🔍 Buscador - ACTUALIZADO para controlar el banner
   const searchInput = document.getElementById('search-input');
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
       const searchTerm = e.target.value.trim();
+      
+      // Control inmediato del banner
+      if (searchTerm) {
+        toggleBannerVisibility(false);
+      } else {
+        toggleBannerVisibility(true);
+      }
+      
       loadPublicProjects(searchTerm);
+    });
+
+    // Limpiar búsqueda con Escape
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        searchInput.value = '';
+        toggleBannerVisibility(true);
+        loadPublicProjects('');
+      }
     });
   }
 }
 
-// 🔥 FUNCIÓN: Conectar acciones de proyectos
+// 🔥 FUNCIÓN: Conectar acciones de proyectos (ACTUALIZADA CON PERFILES)
 function connectProjectActions() {
+    // Botones de ver proyecto
     const viewButtons = document.querySelectorAll('.btn-view-project');
     viewButtons.forEach(button => {
         button.addEventListener('click', (e) => {
@@ -722,6 +794,33 @@ function connectProjectActions() {
             if (slug) {
                 window.location.href = `/proyectos/${slug}`;
             }
+        });
+    });
+    
+    // 🔥 NUEVO: Elementos clickables de autor (perfil)
+    const authorElements = document.querySelectorAll('.clickable-author');
+    authorElements.forEach(authorElement => {
+        authorElement.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevenir eventos del padre
+            const username = authorElement.getAttribute('data-username');
+            if (username && username !== 'Usuario') {
+                navigateToProfile(username);
+            } else {
+                console.warn('Username no disponible para navegar al perfil');
+            }
+        });
+        
+        // Agregar estilo de cursor pointer y tooltip
+        authorElement.style.cursor = 'pointer';
+        authorElement.title = 'Ver perfil del usuario';
+        
+        // Efecto hover (opcional)
+        authorElement.addEventListener('mouseenter', () => {
+            authorElement.style.opacity = '0.8';
+        });
+        
+        authorElement.addEventListener('mouseleave', () => {
+            authorElement.style.opacity = '1';
         });
     });
 }
@@ -807,6 +906,10 @@ window.reloadProjects = function() {
 // Exportamos las funciones para el banner
 window.nextBannerProject = nextBannerProject;
 window.prevBannerProject = prevBannerProject;
+window.toggleBannerVisibility = toggleBannerVisibility;
+
+// 🔥 NUEVO: Exportar función de navegación a perfil
+window.navigateToProfile = navigateToProfile;
 
 // Exportamos la función para que i18n.js la use
 window.startTypingAnimation = startTypingAnimation;

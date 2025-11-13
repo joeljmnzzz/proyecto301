@@ -22,6 +22,10 @@
    <div class="ball"></div>
   <!-- 🌌 Contenido principal -->
   <main>
+
+    
+
+    
     <h1 id="titulo">
       <span id="texto" data-key="main.titulo"></span><span id="cursor">|</span>
     </h1>
@@ -33,35 +37,71 @@
       <input type="text" placeholder="Buscar..." class="input-busqueda" data-key-placeholder="main.buscador.placeholder" id="search-input">
     </div>
 
-    <!-- 🎯 BANNER DE PROYECTOS POPULARES -->
-    <div id="popular-banner" class="popular-banner hidden">
-      <div class="banner-content">
-        <div class="banner-header">
-          <h2 class="banner-title">
-            <i class="fas fa-star" style="color: #ff6b35; margin-right: 8px;"></i>
-            Proyecto Destacado
-          </h2>
-          <div class="banner-controls">
-            <button id="prev-banner" class="banner-nav-btn">
-              <i class="fas fa-chevron-left"></i>
-            </button>
-            <span class="banner-counter">
-              <span id="banner-current">1</span> / <span id="banner-total">0</span>
-            </span>
-            <button id="next-banner" class="banner-nav-btn">
-              <i class="fas fa-chevron-right"></i>
-            </button>
+<!-- 🎯 BANNER DE PROYECTOS POPULARES CON INFO SOBRE IMAGEN -->
+<div id="popular-banner" class="popular-banner hidden">
+  <div class="banner-content">
+    <div class="banner-header">
+      <h2 class="banner-title">
+        <i class="fas fa-star" style="color: #ff6b35; margin-right: 8px;"></i>
+        Proyecto Destacado
+      </h2>
+      <div class="banner-controls">
+        <button id="prev-banner" class="banner-nav-btn">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <span class="banner-counter">
+          <span id="banner-current">1</span> / <span id="banner-total">0</span>
+        </span>
+        <button id="next-banner" class="banner-nav-btn">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+    
+    <div class="banner-project-card">
+      <div id="banner-project-content">
+        <!-- El contenido del proyecto se cargará aquí dinámicamente -->
+        <div class="banner-project-info">
+          <div class="banner-project-header">
+            <h3 class="banner-project-title">Título del Proyecto</h3>
+            <div class="banner-project-stats">
+              <i class="fas fa-star"></i>
+              <span>4.8</span>
+              <i class="fas fa-eye"></i>
+              <span>1.2K</span>
+              <i class="fas fa-download"></i>
+              <span>456</span>
+            </div>
           </div>
-        </div>
-        
-        <div class="banner-project">
-          <div id="banner-project-content">
-            <!-- El contenido del proyecto se cargará aquí dinámicamente -->
+          <p class="banner-project-description">
+            Descripción del proyecto destacado que aparece sobre la imagen de fondo con un efecto overlay elegante.
+          </p>
+          <div class="banner-project-details">
+            <div class="banner-project-meta">
+              <div class="banner-author">
+                <div class="banner-avatar placeholder">
+                  <i class="fas fa-user"></i>
+                </div>
+                <span class="banner-author-name">Autor del Proyecto</span>
+              </div>
+            </div>
+            <div class="banner-technologies">
+              <span class="banner-tech-tag">JavaScript</span>
+              <span class="banner-tech-tag">React</span>
+              <span class="banner-tech-tag">CSS3</span>
+            </div>
+          </div>
+          <div class="banner-actions">
+            <a href="#" class="btn-banner-view">
+              <i class="fas fa-external-link-alt"></i>
+              Ver Proyecto
+            </a>
           </div>
         </div>
       </div>
     </div>
-
+  </div>
+</div>
     <!-- 🧭 Menú de secciones -->
     <div class="categorias">
       <button data-section="proyectos" data-key="main.categorias.proyectos" class="active">Proyectos</button>

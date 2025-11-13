@@ -1351,7 +1351,7 @@ footer {
 .project-badge.completed { background: rgba(14, 165, 233, 0.8); }
 .project-badge.paused { background: rgba(139, 92, 246, 0.8); }
 
-/* === 🎯 BANNER DE PROYECTOS POPULARES - MEJORADO Y ALINEADO === */
+/* === 🎯 BANNER DE PROYECTOS POPULARES - CON IMAGEN DE FONDO === */
 
 .popular-banner {
   background: var(--fondo-tarjeta);
@@ -1366,11 +1366,33 @@ footer {
   overflow: hidden;
 }
 
+/* Imagen como fondo del banner */
+.popular-banner.with-background {
+  background: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.7) 0%,
+      rgba(0, 0, 0, 0.5) 50%,
+      rgba(0, 0, 0, 0.3) 100%
+    ),
+    var(--banner-image) center/cover no-repeat;
+  color: white;
+}
+
 .popular-banner:hover {
   border-color: var(--borde-tarjeta-hover);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
   background: var(--fondo-tarjeta-hover);
   transform: translateY(-2px);
+}
+
+.popular-banner.with-background:hover {
+  background: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0.6) 50%,
+      rgba(0, 0, 0, 0.4) 100%
+    ),
+    var(--banner-image) center/cover no-repeat;
 }
 
 .banner-content {
@@ -1384,14 +1406,18 @@ footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--borde-tarjeta);
+}
+
+.popular-banner.with-background .banner-header {
+  border-bottom-color: rgba(255, 255, 255, 0.3);
 }
 
 .banner-title {
   color: var(--texto-primario);
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 600;
   margin: 0;
   display: flex;
@@ -1399,11 +1425,21 @@ footer {
   gap: 0.5rem;
 }
 
+.popular-banner.with-background .banner-title {
+  color: white;
+}
+
 .banner-title i {
   background: var(--color-acento);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-size: 1.3rem;
+}
+
+.popular-banner.with-background .banner-title i {
+  color: #ff6b35;
+  -webkit-text-fill-color: #ff6b35;
+  background: none;
 }
 
 .banner-controls {
@@ -1416,8 +1452,8 @@ footer {
   background: rgba(255, 255, 255, 0.07);
   border: 1px solid var(--borde-tarjeta);
   color: var(--color-texto);
-  width: 40px;
-  height: 40px;
+  width: 25px;
+  height: 25px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1426,6 +1462,12 @@ footer {
   transition: all 0.3s ease;
   font-family: "JetBrains Mono", monospace;
   backdrop-filter: blur(6px);
+}
+
+.popular-banner.with-background .banner-nav-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: white;
 }
 
 .banner-nav-btn:hover {
@@ -1446,61 +1488,29 @@ footer {
   border-radius: 20px;
 }
 
-/* Layout de proyecto mejorado */
+.popular-banner.with-background .banner-counter {
+  color: white;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Layout de proyecto mejorado - UNA SOLA COLUMNA */
 .banner-project-card {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 2.5rem;
-  align-items: start;
-}
-
-/* Imagen mejorada - sin espacio extra */
-.banner-project-media {
-  position: relative;
-  border-radius: 16px;
-  overflow: hidden;
-  background: var(--fondo-imagen);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  height: 220px; /* Altura fija */
-}
-
-.banner-cover {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Se recorta para mantener proporción */
-  border-radius: 16px;
-  transition: transform 0.5s ease;
   display: block;
 }
 
-.banner-project-card:hover .banner-cover {
-  transform: scale(1.08);
+/* Eliminar el contenedor de imagen ya que ahora es fondo */
+.banner-project-media {
+  display: none; /* Ocultamos el contenedor de imagen lateral */
 }
 
-.banner-cover-placeholder {
-  width: 100%;
-  height: 100%;
-  background: var(--color-acento);
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--texto-primario);
-  font-size: 3rem;
-  transition: all 0.3s ease;
-}
-
-.banner-project-card:hover .banner-cover-placeholder {
-  transform: scale(1.05);
-}
-
-/* Información del proyecto - TODO ALINEADO A LA IZQUIERDA */
+/* CORRECCIÓN PRINCIPAL: Eliminar altura fija y mejorar el layout */
 .banner-project-info {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  height: 220px; /* Misma altura que la imagen */
+  gap: 1rem;
+  min-height: 220px;
   justify-content: space-between;
+  position: relative;
 }
 
 /* Header del proyecto alineado a la izquierda */
@@ -1509,7 +1519,6 @@ footer {
   flex-direction: column;
   align-items: flex-start;
   gap: 0.75rem;
-  margin-bottom: 0.5rem;
 }
 
 .banner-project-title {
@@ -1525,19 +1534,12 @@ footer {
   width: 100%;
 }
 
-.banner-project-stats {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--texto-destacado);
-  font-weight: 600;
-  white-space: nowrap;
-  background: rgba(106, 17, 203, 0.15);
-  padding: 8px 12px;
-  border-radius: 20px;
-  border: 1px solid rgba(106, 17, 203, 0.3);
-  font-size: 0.875rem;
-  align-self: flex-start;
+.popular-banner.with-background .banner-project-title {
+  color: white;
+  background: linear-gradient(135deg, #ff6b35, #ff8e53);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 /* Descripción alineada a la izquierda */
@@ -1552,6 +1554,20 @@ footer {
   -webkit-box-orient: vertical;
   overflow: hidden;
   flex: 1;
+  min-height: 60px;
+}
+
+.popular-banner.with-background .banner-project-description {
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Contenedor para metadata y tecnologías */
+.banner-project-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin: 0.5rem 0;
 }
 
 /* Metadatos reorganizados - solo autor */
@@ -1559,7 +1575,6 @@ footer {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin: 0.5rem 0;
 }
 
 .banner-author {
@@ -1567,15 +1582,24 @@ footer {
   align-items: center;
   gap: 0.75rem;
   background: rgba(255, 255, 255, 0.08);
-  padding: 0.75rem 1.25rem;
+  padding: 0.3rem 1.25rem;
   border-radius: 25px;
   border: 1px solid rgba(255, 255, 255, 0.15);
   transition: all 0.3s ease;
 }
 
+.popular-banner.with-background .banner-author {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
 .banner-author:hover {
   background: rgba(255, 255, 255, 0.12);
   transform: translateY(-1px);
+}
+
+.popular-banner.with-background .banner-author:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .banner-avatar {
@@ -1599,10 +1623,20 @@ footer {
   font-size: 0.9rem;
 }
 
+.popular-banner.with-background .banner-avatar.placeholder {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
 .banner-author-name {
   color: var(--texto-primario);
   font-weight: 600;
   font-size: 0.9rem;
+}
+
+.popular-banner.with-background .banner-author-name {
+  color: white;
 }
 
 /* Tecnologías alineadas a la izquierda */
@@ -1610,7 +1644,6 @@ footer {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin: 0.5rem 0;
 }
 
 .banner-tech-tag {
@@ -1624,19 +1657,69 @@ footer {
   transition: all 0.3s ease;
 }
 
+.popular-banner.with-background .banner-tech-tag {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
 .banner-tech-tag:hover {
   background: rgba(106, 17, 203, 0.25);
   transform: translateY(-1px);
 }
 
-/* Acciones con botón a la derecha */
-.banner-actions {
-  margin-top: auto;
-  display: flex;
-  justify-content: flex-end; /* Botón a la derecha */
-  align-items: center;
+.popular-banner.with-background .banner-tech-tag:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
+/* CORRECCIÓN: Acciones con vistas integradas en la misma barra */
+.banner-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.popular-banner.with-background .banner-actions {
+  border-top-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Contenedor de acciones del banner */
+.banner-actions-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+}
+
+/* Badge de vistas integrado */
+.view-count-badge {
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.view-count-badge:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.view-count-badge i {
+  color: #ffffff;
+}
+
+/* Botón de ver proyecto */
 .btn-banner-view {
   background: var(--color-acento);
   color: var(--texto-primario);
@@ -1652,6 +1735,14 @@ footer {
   font-family: "JetBrains Mono", monospace;
   font-size: 0.9rem;
   text-decoration: none;
+  flex-shrink: 0;
+}
+
+.popular-banner.with-background .btn-banner-view {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .btn-banner-view:hover {
@@ -1659,6 +1750,11 @@ footer {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
   text-decoration: none;
   color: var(--texto-primario);
+}
+
+.popular-banner.with-background .btn-banner-view:hover {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
 }
 
 /* ✨ Efecto de brillo en el banner */
@@ -1679,21 +1775,16 @@ footer {
   transform: scaleX(1);
 }
 
+.popular-banner.with-background::before {
+  background: #ff6b35;
+}
+
 /* === 📱 RESPONSIVE MEJORADO === */
 
 /* Tabletas */
 @media screen and (max-width: 968px) {
-  .banner-project-card {
-    grid-template-columns: 280px 1fr;
-    gap: 2rem;
-  }
-  
-  .banner-project-media {
-    height: 200px;
-  }
-  
   .banner-project-info {
-    height: 200px;
+    min-height: auto;
   }
   
   .banner-project-title {
@@ -1703,19 +1794,9 @@ footer {
 
 /* Tabletas pequeñas */
 @media screen and (max-width: 768px) {
-  .banner-project-card {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-  
-  .banner-project-media {
-    height: 200px;
-    width: 100%;
-  }
-  
   .banner-project-info {
+    min-height: auto;
     height: auto;
-    min-height: 200px;
   }
   
   .banner-header {
@@ -1736,13 +1817,25 @@ footer {
     align-items: flex-start;
   }
   
-  .banner-project-stats {
+  .banner-actions-container {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .view-count-badge {
     align-self: flex-start;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+  
+  .btn-banner-view {
+    width: 100%;
+    justify-content: center;
   }
   
   .banner-actions {
-    justify-content: flex-start; /* En móvil el botón va a la izquierda */
-    margin-top: 1rem;
+    justify-content: flex-start;
+    margin-top: 1.5rem;
   }
   
   .popular-banner {
@@ -1760,11 +1853,7 @@ footer {
   .banner-project-description {
     font-size: 1rem;
     -webkit-line-clamp: 4;
-  }
-  
-  .banner-project-stats {
-    font-size: 0.8rem;
-    padding: 6px 10px;
+    min-height: 80px;
   }
   
   .banner-controls {
@@ -1782,10 +1871,6 @@ footer {
     padding: 4px 8px;
   }
   
-  .banner-project-media {
-    height: 180px;
-  }
-  
   .popular-banner {
     margin: 1rem 0;
     padding: 1.25rem;
@@ -1794,12 +1879,11 @@ footer {
   .btn-banner-view {
     padding: 0.65rem 1.5rem;
     font-size: 0.85rem;
-    width: 100%; /* En móvil ocupa todo el ancho */
-    justify-content: center;
   }
   
-  .banner-actions {
-    justify-content: center;
+  .view-count-badge {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
   }
 }
 
@@ -1811,10 +1895,7 @@ footer {
   
   .banner-project-description {
     font-size: 0.95rem;
-  }
-  
-  .banner-project-media {
-    height: 160px;
+    min-height: 76px;
   }
   
   .banner-author {
@@ -1830,63 +1911,22 @@ footer {
   .banner-author-name {
     font-size: 0.85rem;
   }
-}
-
-/* Tabletas grandes */
-@media screen and (min-width: 1200px) {
-  .banner-project-card {
-    grid-template-columns: 340px 1fr;
-    gap: 3rem;
-  }
   
-  .banner-project-media {
-    height: 240px;
-  }
-  
-  .banner-project-info {
-    height: 240px;
-  }
-}
-
-/* Landscape móviles */
-@media screen and (max-width: 968px) and (orientation: landscape) {
-  .banner-project-card {
-    grid-template-columns: 200px 1fr;
-    gap: 1.5rem;
-  }
-  
-  .banner-project-media {
-    height: 160px;
-  }
-  
-  .banner-project-info {
-    height: 160px;
-  }
-  
-  .banner-project-title {
-    font-size: 1.4rem;
-  }
-  
-  .banner-project-description {
-    -webkit-line-clamp: 2;
-    font-size: 0.95rem;
+  .view-count-badge {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
   }
 }
 
 /* Mejoras de accesibilidad */
 @media (prefers-reduced-motion: reduce) {
-  .banner-cover,
   .popular-banner,
   .banner-nav-btn,
   .btn-banner-view,
   .banner-tech-tag,
-  .banner-author {
+  .banner-author,
+  .view-count-badge {
     transition: none;
-    transform: none;
-  }
-  
-  .banner-project-card:hover .banner-cover,
-  .banner-project-card:hover .banner-cover-placeholder {
     transform: none;
   }
 }
@@ -1907,6 +1947,10 @@ footer {
   }
   
   .banner-author {
+    border: 2px solid var(--texto-primario);
+  }
+  
+  .view-count-badge {
     border: 2px solid var(--texto-primario);
   }
 }
