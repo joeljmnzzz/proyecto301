@@ -1351,3 +1351,56 @@ footer {
 .project-badge.completed { background: rgba(14, 165, 233, 0.8); }
 .project-badge.paused { background: rgba(139, 92, 246, 0.8); }
 
+/* 🔥 ESTILOS PARA SECCIÓN POPULARES */
+
+/* Ícono de fuego con animación sutil */
+.category-header .fa-fire {
+  animation: gentlePulse 3s infinite;
+}
+
+@keyframes gentlePulse {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.8; 
+    transform: scale(1.05);
+  }
+}
+
+/* Efecto sutil para tarjetas de populares (opcional) */
+.projects-grid .project-card {
+  transition: all 0.3s ease;
+}
+
+.projects-grid .project-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Mejora visual para el header de populares */
+.category-section[data-category="populares"] .category-header {
+  background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(255, 107, 53, 0.05));
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  border-left: 4px solid #ff6b35;
+}
+
+.category-section[data-category="populares"] .category-title {
+  color: #ff6b35;
+  font-weight: 700;
+}
+
+/* Responsive para móviles */
+@media screen and (max-width: 768px) {
+  .category-section[data-category="populares"] .category-header {
+    padding: 12px 15px;
+    margin-bottom: 20px;
+  }
+  
+  .category-header .fa-fire {
+    font-size: 1.1em;
+  }
+}

@@ -1,4 +1,4 @@
-// main.js - VERSIÓN COMPLETA CORREGIDA
+// main.js - VERSIÓN COMPLETA CON SECCIÓN POPULARES
 
 // Animación de escritura para el título
 function startTypingAnimation(texto) {
@@ -135,10 +135,6 @@ async function loadPublicProjects(searchTerm = '') {
       
       // 🔥 OPCIÓN 1: Solo buscar en título y descripción (más seguro)
       query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
-      
-      // 🔥 OPCIÓN 2: Si quieres buscar en tecnologías también, usa esta sintaxis:
-      // query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
-      //          .contains('technologies', [searchTerm.toLowerCase()]);
     }
 
     const { data: projects, error } = await query;
@@ -168,6 +164,190 @@ async function loadPublicProjects(searchTerm = '') {
   }
 }
 
+// 🔥 NUEVA FUNCIÓN: Cargar proyectos populares (SIN MOSTRAR VISTAS)
+async function loadPopularProjects(searchTerm = '') {
+  try {
+    showLoading(true);
+    
+    if (!window.supabase || typeof window.supabase.from !== 'function') {
+      console.error('❌ Supabase no está disponible');
+      showError('Error de conexión con la base de datos. Recarga la página.');
+      return;
+    }
+
+    console.log('📊 Cargando proyectos populares...');
+    
+    // 🔥 CONSULTA PARA PROYECTOS POPULARES - Ordenados por vistas pero SIN MOSTRARLAS
+    let query = window.supabase
+      .from('projects')
+      .select('id, name, slug, title, subtitle, description, cover_image_url, status, category, technologies, visibility, created_at, created_by')
+      .eq('visibility', 'public')
+      .order('cached_view_count', { ascending: false }) // ← Ordenar por vistas descendente
+      .limit(20); // Limitar a los 20 más populares
+
+    // Aplicar filtro de búsqueda si existe
+    if (searchTerm && searchTerm.trim() !== '') {
+      console.log('🔍 Buscando en populares:', searchTerm);
+      query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+    }
+
+    const { data: projects, error } = await query;
+
+    if (error) {
+      console.error('❌ Error cargando proyectos populares:', error);
+      showError('Error al cargar proyectos populares: ' + error.message);
+      return;
+    }
+
+    console.log(`✅ ${projects?.length || 0} proyectos populares cargados`);
+    
+    // Cargar información de usuarios
+    const projectsWithUsers = await loadUsersForProjects(projects || []);
+    
+    // Mostrar proyectos populares
+    displayPopularProjects(projectsWithUsers, searchTerm);
+
+  } catch (error) {
+    console.error('❌ Error cargando proyectos populares:', error);
+    showError('Error inesperado: ' + error.message);
+  } finally {
+    showLoading(false);
+  }
+}
+
+// 🔥 NUEVA FUNCIÓN: Mostrar proyectos populares (MISMO DISEÑO QUE PROYECTOS NORMALES)
+function displayPopularProjects(projects, searchTerm = '') {
+  const container = document.getElementById('projects-container');
+  const emptyState = document.getElementById('empty-state');
+  
+  if (!container) {
+    console.error('❌ Contenedor de proyectos no encontrado');
+    return;
+  }
+  
+  // Verificar si hay proyectos
+  if (!projects || projects.length === 0) {
+    container.innerHTML = '';
+    emptyState.classList.remove('hidden');
+    
+    const message = searchTerm ? 
+      'No se encontraron proyectos populares para tu búsqueda' : 
+      'Aún no hay proyectos populares disponibles';
+    
+    const messageElement = emptyState.querySelector('p');
+    if (messageElement) {
+      messageElement.textContent = message;
+    }
+    
+    return;
+  }
+  
+  emptyState.classList.add('hidden');
+  
+  // Generar HTML para proyectos populares - MISMO DISEÑO QUE PROYECTOS NORMALES
+  const popularHTML = `
+    <div class="category-section" data-category="populares">
+      <div class="category-header">
+        <h2 class="category-title">
+          <i class="fas fa-fire" style="color: #ff6b35; margin-right: 8px;"></i>
+          Proyectos Populares
+        </h2>
+        <span class="project-count">${projects.length} proyecto${projects.length !== 1 ? 's' : ''} destacados</span>
+      </div>
+      
+      <div class="projects-grid">
+        ${projects.map(project => `
+          <div class="project-card" data-project-id="${project.id}">
+            <div class="project-media-container">
+              ${project.cover_image_url ? `
+                <div class="project-cover">
+                  <img src="${project.cover_image_url}" alt="${project.title || project.name}" loading="lazy">
+                  <div class="project-title-overlay">
+                    <h3 class="project-title">${project.title || project.name}</h3>
+                  </div>
+                  <div class="project-status ${project.status}">
+                    <i class="fas ${getStatusIcon(project.status)}"></i>
+                    <span>${getStatusText(project.status)}</span>
+                  </div>
+                </div>
+              ` : `
+                <div class="project-cover no-image">
+                  <div class="project-cover-placeholder">
+                    <i class="fas fa-rocket"></i>
+                  </div>
+                  <div class="project-title-overlay">
+                    <h3 class="project-title">${project.title || project.name}</h3>
+                  </div>
+                  <div class="project-status ${project.status}">
+                    <i class="fas ${getStatusIcon(project.status)}"></i>
+                    <span>${getStatusText(project.status)}</span>
+                  </div>
+                </div>
+              `}
+            </div>
+            
+            <div class="project-card-content">
+              <p class="project-subtitle">${project.subtitle || project.description?.substring(0, 120) || 'Sin descripción disponible'}...</p>
+              
+              <div class="project-author">
+                <div class="author-info">
+                  ${project.profiles?.avatar_url ? `
+                    <img src="${project.profiles.avatar_url}" alt="${project.profiles.full_name || project.profiles.username}" class="author-avatar">
+                  ` : `
+                    <div class="author-avatar placeholder">
+                      <i class="fas fa-user"></i>
+                    </div>
+                  `}
+                  <span class="author-name">${project.profiles?.first_name || project.profiles?.full_name || project.profiles?.username || 'Usuario'}</span>
+                </div>
+              </div>
+              
+              <div class="project-meta">
+                <div class="project-category">
+                  <i class="fas fa-tag"></i>
+                  <span>${project.category || 'Sin categoría'}</span>
+                </div>
+                <div class="project-visibility ${project.visibility}">
+                  <i class="fas ${getVisibilityIcon(project.visibility)}"></i>
+                  <span>${getVisibilityText(project.visibility)}</span>
+                </div>
+              </div>
+              
+              ${project.technologies && project.technologies.length > 0 ? `
+                <div class="project-technologies">
+                  ${project.technologies.slice(0, 3).map(tech => `
+                    <span class="tech-tag">${tech}</span>
+                  `).join('')}
+                  ${project.technologies.length > 3 ? `
+                    <span class="tech-tag-more">+${project.technologies.length - 3}</span>
+                  ` : ''}
+                </div>
+              ` : ''}
+              
+              <div class="project-actions">
+                <button class="btn-view-project" data-project-slug="${project.slug}">
+                  <i class="fas fa-eye"></i>
+                  <span>Ver Proyecto</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  
+  container.innerHTML = popularHTML;
+  
+  // Conectar eventos de los botones
+  connectProjectActions();
+  
+  // Actualizar traducciones si es necesario
+  if (window.updateTranslations) {
+    setTimeout(() => window.updateTranslations(), 100);
+  }
+}
+
 // 🔥 FUNCIÓN CORREGIDA: Cargar información de usuarios para los proyectos
 async function loadUsersForProjects(projects) {
     if (!projects || projects.length === 0) return projects;
@@ -183,13 +363,12 @@ async function loadUsersForProjects(projects) {
                 profiles: { 
                     username: 'Usuario', 
                     full_name: 'Usuario',
-                    first_name: 'Usuario' // 🔥 AGREGADO: primer nombre por defecto
+                    first_name: 'Usuario'
                 }
             }));
         }
 
         console.log('👥 Cargando información de', userIds.length, 'usuarios...');
-        console.log('📋 User IDs:', userIds);
         
         let users = [];
         
@@ -254,17 +433,13 @@ async function loadUsersForProjects(projects) {
             }));
         }
 
-        console.log('👤 Usuarios finales cargados:', users);
-
         // Crear mapa de usuarios por ID
         const usersMap = {};
         users.forEach(user => {
-            // 🔥 EXTRACCIÓN DEL PRIMER NOMBRE
             const firstName = extractFirstName(user.full_name);
-            
             usersMap[user.id] = {
                 ...user,
-                first_name: firstName // 🔥 AGREGADO: primer nombre extraído
+                first_name: firstName
             };
         });
 
@@ -273,16 +448,9 @@ async function loadUsersForProjects(projects) {
             const userInfo = usersMap[project.created_by] || {
                 username: 'usuario_' + (project.created_by ? project.created_by.substring(0, 8) : 'anon'),
                 full_name: 'Usuario',
-                first_name: 'Usuario', // 🔥 AGREGADO: primer nombre por defecto
+                first_name: 'Usuario',
                 avatar_url: null
             };
-            
-            console.log(`📝 Proyecto ${project.title}:`, {
-                projectId: project.id,
-                createdBy: project.created_by,
-                userInfo: userInfo,
-                firstName: userInfo.first_name // 🔥 AGREGADO: log del primer nombre
-            });
             
             return {
                 ...project,
@@ -301,7 +469,7 @@ async function loadUsersForProjects(projects) {
             profiles: { 
                 username: 'usuario_' + (project.created_by ? project.created_by.substring(0, 8) : 'anon'),
                 full_name: 'Usuario',
-                first_name: 'Usuario', // 🔥 AGREGADO: primer nombre por defecto
+                first_name: 'Usuario',
                 avatar_url: null 
             }
         }));
@@ -314,17 +482,12 @@ function extractFirstName(fullName) {
         return 'Usuario';
     }
     
-    // Eliminar espacios en blanco al inicio y final
     const trimmedName = fullName.trim();
-    
     if (trimmedName === '') {
         return 'Usuario';
     }
     
-    // Dividir por espacios y tomar la primera palabra
     const firstName = trimmedName.split(' ')[0];
-    
-    // Si el primer nombre está vacío, retornar 'Usuario'
     return firstName || 'Usuario';
 }
 
@@ -386,7 +549,6 @@ function displayProjectsByCategory(categories, searchTerm = '') {
     container.innerHTML = '';
     emptyState.classList.remove('hidden');
     
-    // Actualizar mensaje según búsqueda
     const message = searchTerm ? 
       'No se encontraron proyectos para tu búsqueda' : 
       'Aún no hay proyectos públicos disponibles';
@@ -502,7 +664,7 @@ function displayProjectsByCategory(categories, searchTerm = '') {
   }
 }
 
-// 🔧 FUNCIÓN: Configurar event listeners
+// 🔧 FUNCIÓN: Configurar event listeners (ACTUALIZADA CON POPULARES)
 function setupEventListeners() {
     // Navegación entre secciones
     const sectionButtons = document.querySelectorAll('.categorias button');
@@ -518,9 +680,27 @@ function setupEventListeners() {
             
             if (section === 'proyectos') {
                 loadPublicProjects();
+            } else if (section === 'populares') {
+                loadPopularProjects(); // ← NUEVO: Cargar populares
             }
         });
     });
+    
+    // 🔍 Buscador (funciona para ambas secciones)
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.trim();
+            const activeSection = document.querySelector('.categorias button.active');
+            const section = activeSection ? activeSection.getAttribute('data-section') : 'proyectos';
+            
+            if (section === 'populares') {
+                loadPopularProjects(searchTerm);
+            } else {
+                loadPublicProjects(searchTerm);
+            }
+        });
+    }
 }
 
 // 🔥 FUNCIÓN: Conectar acciones de proyectos
@@ -530,7 +710,6 @@ function connectProjectActions() {
         button.addEventListener('click', (e) => {
             const slug = e.currentTarget.getAttribute('data-project-slug');
             if (slug) {
-                // 🔥 NAVEGAR A LA URL CORRECTA PARA NETLIFY
                 window.location.href = `/proyectos/${slug}`;
             }
         });
@@ -603,7 +782,6 @@ function showError(message) {
       messageElement.textContent = message;
     }
     
-    // Actualizar el icono para error
     const iconElement = emptyState.querySelector('i');
     if (iconElement) {
       iconElement.className = 'fas fa-exclamation-triangle';
