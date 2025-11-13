@@ -150,8 +150,7 @@ async function getUserBasicInfo(userId) {
     }
 }
 
-// ✅ FUNCIÓN OPTIMIZADA: Proyectos básicos
-// ✅ FUNCIÓN OPTIMIZADA: Proyectos básicos CON VISTAS
+
 async function getUserProjectsBasic(userId) {
     try {
         const { data: projects, error } = await window.supabase
@@ -160,8 +159,8 @@ async function getUserProjectsBasic(userId) {
                 id, name, slug, title, subtitle, 
                 cover_image_url, status, category, technologies,
                 visibility, created_at, 
-                cached_view_count, cached_unique_views  -- ✅ Añadir contadores de vistas
-            `)
+                cached_view_count, cached_unique_views
+            `)  
             .eq('created_by', userId)
             .order('created_at', { ascending: false })
             .limit(20);
@@ -345,23 +344,25 @@ function calculateEngagementRate(project) {
     return Math.min(Math.round(engagement), 100);
 }
 
-// ✅ OBTENER ESTADÍSTICAS DETALLADAS (NO CRÍTICO)
+/
 async function getProjectDetailedStats(projectId) {
     try {
         const { data, error } = await window.supabase.rpc('get_project_view_stats', {
             p_project_id: projectId
         });
 
-        if (error) throw error;
+        if (error) {
+            console.warn('⚠️ Error obteniendo estadísticas:', error);
+            return null;
+        }
         return data;
     } catch (error) {
-        console.warn('⚠️ Error obteniendo estadísticas:', error);
+        console.warn('⚠️ Error en getProjectDetailedStats:', error);
         return null;
     }
 }
 
-// ✅ CONECTAR ACCIONES DE PROYECTOS
-// ✅ CONECTAR ACCIONES DE PROYECTOS (ACTUALIZADO)
+
 function connectProjectActions() {
     // Botones de ver proyecto
     document.querySelectorAll('.btn-view-project').forEach(button => {
