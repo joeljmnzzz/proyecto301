@@ -344,7 +344,7 @@ function calculateEngagementRate(project) {
     return Math.min(Math.round(engagement), 100);
 }
 
-/
+
 async function getProjectDetailedStats(projectId) {
     try {
         const { data, error } = await window.supabase.rpc('get_project_view_stats', {
