@@ -49,19 +49,81 @@ async function loadCriticalData() {
 }
 
 // ✅ DATOS NO CRÍTICOS: Cargar en segundo plano
+// ✅ DATOS NO CRÍTICOS: Cargar en segundo plano
 function loadNonCriticalData() {
-    
     Promise.allSettled([
         loadAdditionalMetrics(),
         loadCreateProjectModalAsync(),
-        loadUserDetailedProfile()
+        loadUserDetailedProfile(),
+        loadProjectsDetailedStats() // ✅ Nuevo: estadísticas detalladas
     ]).then(results => {
-        
-        // Actualizar UI si es necesario
         updateNonCriticalUI();
     }).catch(error => {
         console.warn('⚠️ Algunos datos no críticos fallaron:', error);
     });
+}
+
+// ✅ CARGAR ESTADÍSTICAS DETALLADAS DE PROYECTOS
+async function loadProjectsDetailedStats() {
+    try {
+        const { data: { user } } = await window.supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: projects } = await window.supabase
+            .from('projects')
+            .select('id')
+            .eq('created_by', user.id)
+            .limit(10);
+
+        if (!projects) return;
+
+        // Cargar estadísticas para cada proyecto
+        const statsPromises = projects.map(project => 
+            getProjectDetailedStats(project.id)
+        );
+
+        const statsResults = await Promise.allSettled(statsPromises);
+        
+        // Actualizar UI con estadísticas detalladas
+        updateProjectsWithDetailedStats(statsResults);
+        
+    } catch (error) {
+        console.warn('⚠️ Error cargando estadísticas:', error);
+    }
+}
+
+// ✅ ACTUALIZAR UI CON ESTADÍSTICAS DETALLADAS
+function updateProjectsWithDetailedStats(statsResults) {
+    statsResults.forEach((result, index) => {
+        if (result.status === 'fulfilled' && result.value) {
+            const stats = result.value;
+            updateProjectCardStats(stats);
+        }
+    });
+}
+
+function updateProjectCardStats(stats) {
+    // Buscar y actualizar la tarjeta del proyecto con stats detalladas
+    const projectCard = document.querySelector(`[data-project-id="${stats.project_id}"]`);
+    if (projectCard) {
+        const statsElement = projectCard.querySelector('.project-view-metrics');
+        if (statsElement) {
+            statsElement.innerHTML = `
+                <div class="view-metric">
+                    <span class="metric-value">${stats.total_views || 0}</span>
+                    <span class="metric-label">Vistas totales</span>
+                </div>
+                <div class="view-metric">
+                    <span class="metric-value">${stats.unique_views || 0}</span>
+                    <span class="metric-label">Visitantes únicos</span>
+                </div>
+                <div class="view-metric">
+                    <span class="metric-value">${stats.views_today || 0}</span>
+                    <span class="metric-label">Vistas hoy</span>
+                </div>
+            `;
+        }
+    }
 }
 
 // ✅ FUNCIÓN OPTIMIZADA: Información básica del usuario
@@ -89,6 +151,7 @@ async function getUserBasicInfo(userId) {
 }
 
 // ✅ FUNCIÓN OPTIMIZADA: Proyectos básicos
+// ✅ FUNCIÓN OPTIMIZADA: Proyectos básicos CON VISTAS
 async function getUserProjectsBasic(userId) {
     try {
         const { data: projects, error } = await window.supabase
@@ -96,11 +159,12 @@ async function getUserProjectsBasic(userId) {
             .select(`
                 id, name, slug, title, subtitle, 
                 cover_image_url, status, category, technologies,
-                visibility, created_at
+                visibility, created_at, 
+                cached_view_count, cached_unique_views  -- ✅ Añadir contadores de vistas
             `)
             .eq('created_by', userId)
             .order('created_at', { ascending: false })
-            .limit(20); // ✅ Limitar para mayor velocidad
+            .limit(20);
 
         if (error) {
             console.error('❌ Error cargando proyectos:', error);
@@ -113,7 +177,6 @@ async function getUserProjectsBasic(userId) {
         return [];
     }
 }
-
 // ✅ RENDERIZADO CRÍTICO: Mostrar UI inmediatamente
 function renderCriticalUI(userInfo, projects) {
     
@@ -172,6 +235,7 @@ function renderProjectsSection(projects) {
 }
 
 // ✅ GENERAR HTML DE PROYECTOS (OPTIMIZADO)
+// ✅ GENERAR HTML DE PROYECTOS (OPTIMIZADO CON VISTAS)
 function generateProjectsHTML(projects) {
     return projects.map(project => `
         <div class="project-card" data-project-id="${project.id}">
@@ -201,6 +265,12 @@ function generateProjectsHTML(projects) {
                         </div>
                     </div>
                 `}
+                
+                <!-- ✅ CONTADOR DE VISTAS EN LA PORTADA -->
+                <div class="project-views-overlay">
+                    <i class="fas fa-eye"></i>
+                    <span>${project.cached_view_count || 0}</span>
+                </div>
             </div>
             
             <div class="project-card-content">
@@ -214,6 +284,22 @@ function generateProjectsHTML(projects) {
                     <div class="project-visibility ${project.visibility}">
                         <i class="fas ${getVisibilityIcon(project.visibility)}"></i>
                         <span>${getVisibilityText(project.visibility)}</span>
+                    </div>
+                </div>
+                
+                <!-- ✅ MÉTRICAS DE VISTAS DETALLADAS -->
+                <div class="project-view-metrics">
+                    <div class="view-metric">
+                        <span class="metric-value">${project.cached_view_count || 0}</span>
+                        <span class="metric-label">Vistas totales</span>
+                    </div>
+                    <div class="view-metric">
+                        <span class="metric-value">${project.cached_unique_views || 0}</span>
+                        <span class="metric-label">Visitantes únicos</span>
+                    </div>
+                    <div class="view-metric">
+                        <span class="metric-value">${calculateEngagementRate(project)}%</span>
+                        <span class="metric-label">Tasa de engagement</span>
                     </div>
                 </div>
                 
@@ -237,13 +323,45 @@ function generateProjectsHTML(projects) {
                         <i class="fas fa-edit"></i>
                         <span data-key="dashboard.projects.edit">Editar</span>
                     </button>
+                    <button class="btn-analytics-project" data-project-id="${project.id}">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Analíticas</span>
+                    </button>
                 </div>
             </div>
         </div>
     `).join('');
 }
 
+// ✅ FUNCIONES AUXILIARES PARA VISTAS
+function calculateEngagementRate(project) {
+    const totalViews = project.cached_view_count || 0;
+    const uniqueViews = project.cached_unique_views || 0;
+    
+    if (totalViews === 0 || uniqueViews === 0) return 0;
+    
+    // Fórmula simple: ratio de vistas únicas vs totales
+    const engagement = (uniqueViews / totalViews) * 100;
+    return Math.min(Math.round(engagement), 100);
+}
+
+// ✅ OBTENER ESTADÍSTICAS DETALLADAS (NO CRÍTICO)
+async function getProjectDetailedStats(projectId) {
+    try {
+        const { data, error } = await window.supabase.rpc('get_project_view_stats', {
+            p_project_id: projectId
+        });
+
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.warn('⚠️ Error obteniendo estadísticas:', error);
+        return null;
+    }
+}
+
 // ✅ CONECTAR ACCIONES DE PROYECTOS
+// ✅ CONECTAR ACCIONES DE PROYECTOS (ACTUALIZADO)
 function connectProjectActions() {
     // Botones de ver proyecto
     document.querySelectorAll('.btn-view-project').forEach(button => {
@@ -261,6 +379,68 @@ function connectProjectActions() {
             const projectId = e.currentTarget.getAttribute('data-project-id');
             handleEditProject(projectId);
         });
+    });
+
+    // ✅ NUEVO: Botones de analíticas
+    document.querySelectorAll('.btn-analytics-project').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const projectId = e.currentTarget.getAttribute('data-project-id');
+            showProjectAnalytics(projectId);
+        });
+    });
+}
+
+// ✅ MOSTRAR ANALÍTICAS DEL PROYECTO
+async function showProjectAnalytics(projectId) {
+    try {
+        const stats = await getProjectDetailedStats(projectId);
+        if (stats) {
+            openAnalyticsModal(stats);
+        } else {
+            showNotification('No hay datos de analíticas disponibles', 'info');
+        }
+    } catch (error) {
+        console.error('Error mostrando analíticas:', error);
+        showNotification('Error al cargar analíticas', 'error');
+    }
+}
+
+function openAnalyticsModal(stats) {
+    // Crear modal simple para mostrar estadísticas
+    const modalHTML = `
+        <div class="analytics-modal">
+            <div class="modal-content">
+                <h3>📊 Analíticas del Proyecto</h3>
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <div class="analytics-value">${stats.total_views || 0}</div>
+                        <div class="analytics-label">Vistas Totales</div>
+                    </div>
+                    <div class="analytics-card">
+                        <div class="analytics-value">${stats.unique_views || 0}</div>
+                        <div class="analytics-label">Visitantes Únicos</div>
+                    </div>
+                    <div class="analytics-card">
+                        <div class="analytics-value">${stats.views_today || 0}</div>
+                        <div class="analytics-label">Vistas Hoy</div>
+                    </div>
+                    <div class="analytics-card">
+                        <div class="analytics-value">${stats.views_this_week || 0}</div>
+                        <div class="analytics-label">Esta Semana</div>
+                    </div>
+                </div>
+                <button class="btn-close-analytics">Cerrar</button>
+            </div>
+        </div>
+    `;
+    
+    const modalContainer = document.createElement('div');
+    modalContainer.innerHTML = modalHTML;
+    document.body.appendChild(modalContainer);
+    
+    // Conectar evento de cierre
+    modalContainer.querySelector('.btn-close-analytics').addEventListener('click', () => {
+        modalContainer.remove();
     });
 }
 
@@ -283,7 +463,7 @@ function getDisplayName(profile) {
 function getFallbackUserInfo() {
     return {
         displayName: 'Usuario',
-        profession: 'Desarrollador Full-Stack',
+        profession: 'Sin profesión especificada',
         memberSince: new Date().getFullYear()
     };
 }
