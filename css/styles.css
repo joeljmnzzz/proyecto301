@@ -1351,7 +1351,7 @@ footer {
 .project-badge.completed { background: rgba(14, 165, 233, 0.8); }
 .project-badge.paused { background: rgba(139, 92, 246, 0.8); }
 
-/* === 🎯 BANNER DE PROYECTOS POPULARES - CON IMAGEN DE FONDO === */
+/* === 🎯 BANNER DE PROYECTOS POPULARES - CON NAVEGACIÓN LATERAL MEJORADA === */
 
 .popular-banner {
   background: var(--fondo-tarjeta);
@@ -1363,97 +1363,138 @@ footer {
   backdrop-filter: blur(10px);
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  min-height: 320px;
 }
 
-/* Imagen como fondo del banner */
+/* Imagen como fondo con layout dividido */
 .popular-banner.with-background {
   background: linear-gradient(
       to right,
-      rgba(0, 0, 0, 0.7) 0%,
-      rgba(0, 0, 0, 0.5) 50%,
-      rgba(0, 0, 0, 0.3) 100%
+      var(--fondo-tarjeta) 0%,
+      var(--fondo-tarjeta) 65%,
+      transparent 65%
     ),
-    var(--banner-image) center/cover no-repeat;
-  color: white;
-}
-
-.popular-banner:hover {
-  border-color: var(--borde-tarjeta-hover);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-  background: var(--fondo-tarjeta-hover);
-  transform: translateY(-2px);
-}
-
-.popular-banner.with-background:hover {
-  background: linear-gradient(
-      to right,
-      rgba(0, 0, 0, 0.8) 0%,
-      rgba(0, 0, 0, 0.6) 50%,
+    linear-gradient(
+      to left,
+      transparent 35%,
       rgba(0, 0, 0, 0.4) 100%
     ),
-    var(--banner-image) center/cover no-repeat;
+    var(--banner-image) right center/35% auto no-repeat;
+  color: white;
+  display: flex;
+  align-items: center;
+}
+
+/* Contenedor principal */
+.banner-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 .banner-content {
-  max-width: 100%;
+  width: 100%;
+  height: 100%;
   position: relative;
   z-index: 2;
-}
-
-/* Header mejorado */
-.banner-header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+}
+
+/* 🔥 BOTONES DE NAVEGACIÓN LATERALES - MEJORADO PARA EVITAR CORTES */
+.banner-nav-side {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 50%;
+  display: flex;
   align-items: center;
-  margin-bottom: 0.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--borde-tarjeta);
-}
-
-.popular-banner.with-background .banner-header {
-  border-bottom-color: rgba(255, 255, 255, 0.3);
-}
-
-.banner-title {
-  color: var(--texto-primario);
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 1.2rem;
-  font-weight: 600;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-.popular-banner.with-background .banner-title {
+/* Botón anterior - izquierda CON MARGEN DE SEGURIDAD */
+.banner-nav-side.prev {
+  left: -75px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
 }
 
-.banner-title i {
+/* Botón siguiente - derecha CON MARGEN DE SEGURIDAD */
+.banner-nav-side.next {
+  right: -75px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+/* Estados hover de los botones laterales */
+.banner-nav-side:hover {
   background: var(--color-acento);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-size: 1.3rem;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 6px 25px rgba(106, 17, 203, 0.4);
+  border-color: transparent;
 }
 
-.popular-banner.with-background .banner-title i {
-  color: #ff6b35;
-  -webkit-text-fill-color: #ff6b35;
-  background: none;
+.banner-nav-side:active {
+  transform: translateY(-50%) scale(0.95);
 }
 
-.banner-controls {
+/* Header con badge - MEJORADO PARA EVITAR SUPERPOSICIÓN */
+.banner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0rem;
+  position: relative;
+  min-height: 40px;
+  gap: 1rem;
+}
+
+/* Etiqueta "Proyecto Destacado" en header - CON MÁRGENES DE SEGURIDAD */
+.banner-featured-badge {
+  background: linear-gradient(135deg, #ff6b35, #ff8e53);
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 25px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
   display: flex;
   align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 5;
+  flex-shrink: 0;
+  max-width: calc(100% - 100px);
+}
+
+/* Controles para móviles - OCULTOS POR DEFECTO */
+.banner-controls {
+  display: none;
+  align-items: center;
   gap: 1rem;
+  flex-shrink: 0;
 }
 
 .banner-nav-btn {
   background: rgba(255, 255, 255, 0.07);
   border: 1px solid var(--borde-tarjeta);
   color: var(--color-texto);
-  width: 25px;
-  height: 25px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1478,103 +1519,98 @@ footer {
   transform: translateY(-2px);
 }
 
+/* Contador - OCULTO */
 .banner-counter {
-  color: var(--color-secundario);
-  font-size: 0.9rem;
-  min-width: 60px;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 6px 12px;
-  border-radius: 20px;
+  display: none;
 }
 
-.popular-banner.with-background .banner-counter {
-  color: white;
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* Layout de proyecto mejorado - UNA SOLA COLUMNA */
+/* Contenedor principal del proyecto */
 .banner-project-card {
-  display: block;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 200px;
 }
 
-/* Eliminar el contenedor de imagen ya que ahora es fondo */
-.banner-project-media {
-  display: none; /* Ocultamos el contenedor de imagen lateral */
-}
-
-/* CORRECCIÓN PRINCIPAL: Eliminar altura fija y mejorar el layout */
+/* ESTILOS PARA EL CONTENIDO DINÁMICO (template) */
 .banner-project-info {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  min-height: 220px;
+  height: 100%;
   justify-content: space-between;
-  position: relative;
 }
 
-/* Header del proyecto alineado a la izquierda */
 .banner-project-header {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  text-align: left;
+  margin-bottom: 1rem;
 }
 
 .banner-project-title {
   color: var(--texto-primario);
-  font-size: 1.8rem;
-  font-weight: 700;
+  font-size: 2.2rem;
+  font-weight: 800;
   margin: 0;
-  line-height: 1.2;
+  line-height: 1.1;
   background: var(--color-acento);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-align: left;
   width: 100%;
+  letter-spacing: -0.5px;
 }
 
 .popular-banner.with-background .banner-project-title {
   color: white;
-  background: linear-gradient(135deg, #ff6b35, #ff8e53);
+  background: linear-gradient(135deg, #ffffff, #e0e0e0);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
-/* Descripción alineada a la izquierda */
-.banner-project-description {
+.banner-project-subtitle {
   color: var(--texto-secundario);
-  font-size: 1.1rem;
-  line-height: 1.6;
+  font-size: 1.3rem;
+  font-weight: 500;
+  line-height: 1.4;
   margin: 0;
   text-align: left;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  flex: 1;
-  min-height: 60px;
+  opacity: 0.9;
 }
 
-.popular-banner.with-background .banner-project-description {
+.popular-banner.with-background .banner-project-subtitle {
   color: rgba(255, 255, 255, 0.9);
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
-/* Contenedor para metadata y tecnologías */
-.banner-project-details {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  margin: 0.5rem 0;
+.banner-project-description {
+  color: var(--texto-secundario);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0 0 1rem 0;
+  text-align: left;
+  opacity: 0.8;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* Metadatos reorganizados - solo autor */
+.popular-banner.with-background .banner-project-description {
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .banner-project-meta {
   display: flex;
   align-items: center;
   gap: 1rem;
+  margin: 0.5rem 0;
 }
 
 .banner-author {
@@ -1582,7 +1618,7 @@ footer {
   align-items: center;
   gap: 0.75rem;
   background: rgba(255, 255, 255, 0.08);
-  padding: 0.3rem 1.25rem;
+  padding: 0.5rem 1.25rem;
   border-radius: 25px;
   border: 1px solid rgba(255, 255, 255, 0.15);
   transition: all 0.3s ease;
@@ -1639,92 +1675,52 @@ footer {
   color: white;
 }
 
-/* Tecnologías alineadas a la izquierda */
-.banner-technologies {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.banner-tech-tag {
-  background: rgba(106, 17, 203, 0.15);
-  color: var(--texto-destacado);
-  padding: 0.4rem 0.9rem;
-  border-radius: 15px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  border: 1px solid rgba(106, 17, 203, 0.3);
-  transition: all 0.3s ease;
-}
-
-.popular-banner.with-background .banner-tech-tag {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
-.banner-tech-tag:hover {
-  background: rgba(106, 17, 203, 0.25);
-  transform: translateY(-1px);
-}
-
-.popular-banner.with-background .banner-tech-tag:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-/* CORRECCIÓN: Acciones con vistas integradas en la misma barra */
 .banner-actions {
-  margin-top: 1rem;
+  margin-top: auto;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   align-items: center;
-  padding-top: 0.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 1rem;
 }
 
-.popular-banner.with-background .banner-actions {
-  border-top-color: rgba(255, 255, 255, 0.2);
-}
-
-/* Contenedor de acciones del banner */
 .banner-actions-container {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  width: 100%;
+  gap: 1.5rem;
+  flex-wrap: wrap;
 }
 
-/* Badge de vistas integrado */
 .view-count-badge {
-  color: white;
-  padding: 0.6rem 1.2rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--texto-primario);
+  padding: 0.7rem 1.5rem;
   border-radius: 12px;
   font-size: 0.9rem;
   font-weight: 600;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-
+  border: 1px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
-  flex-shrink: 0;
+  backdrop-filter: blur(10px);
+}
+
+.popular-banner.with-background .view-count-badge {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .view-count-badge:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.2);
   transform: translateY(-1px);
 }
 
-.view-count-badge i {
-  color: #ffffff;
-}
-
-/* Botón de ver proyecto */
 .btn-banner-view {
   background: var(--color-acento);
-  color: var(--texto-primario);
+  color: white;
   border: none;
-  padding: 0.75rem 2rem;
+  padding: 0.8rem 2.5rem;
   border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -1733,9 +1729,9 @@ footer {
   align-items: center;
   gap: 0.5rem;
   font-family: "JetBrains Mono", monospace;
-  font-size: 0.9rem;
+  font-size: 1rem;
   text-decoration: none;
-  flex-shrink: 0;
+  box-shadow: 0 4px 15px rgba(106, 17, 203, 0.3);
 }
 
 .popular-banner.with-background .btn-banner-view {
@@ -1743,21 +1739,43 @@ footer {
   backdrop-filter: blur(10px);
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
 }
 
 .btn-banner-view:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 25px rgba(106, 17, 203, 0.4);
   text-decoration: none;
-  color: var(--texto-primario);
+  color: white;
 }
 
 .popular-banner.with-background .btn-banner-view:hover {
   background: rgba(255, 255, 255, 0.3);
-  color: white;
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
 }
 
-/* ✨ Efecto de brillo en el banner */
+/* Etiqueta de estado en esquina inferior izquierda */
+.banner-status-badge {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  color: white;
+  padding: 0.5rem 1.2rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ✨ Efectos de brillo */
 .popular-banner::before {
   content: '';
   position: absolute;
@@ -1779,151 +1797,352 @@ footer {
   background: #ff6b35;
 }
 
-/* === 📱 RESPONSIVE MEJORADO === */
+/* === 📱 RESPONSIVE MEJORADO - FLECHAS SE ADAPTAN MEJOR === */
 
-/* Tabletas */
-@media screen and (max-width: 968px) {
-  .banner-project-info {
-    min-height: auto;
+/* Pantallas medianas donde las flechas podrían tener overflow */
+@media screen and (max-width: 1200px) {
+  .banner-nav-side {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
   }
   
-  .banner-project-title {
-    font-size: 1.6rem;
+  .banner-nav-side.prev {
+    left: -20px;
+  }
+  
+  .banner-nav-side.next {
+    right: -20px;
   }
 }
 
-/* Tabletas pequeñas */
+/* Tabletas */
+@media screen and (max-width: 968px) {
+  .popular-banner.with-background {
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.7) 0%,
+        rgba(0, 0, 0, 0.5) 50%,
+        rgba(0, 0, 0, 0.3) 100%
+      ),
+      var(--banner-image) center/cover no-repeat;
+  }
+  
+  .banner-project-title {
+    font-size: 1.8rem;
+  }
+  
+  .banner-project-subtitle {
+    font-size: 1.1rem;
+  }
+  
+  /* Flechas más cerca del borde en tabletas */
+  .banner-nav-side {
+    width: 42px;
+    height: 42px;
+    font-size: 1rem;
+  }
+  
+  .banner-nav-side.prev {
+    left: -15px;
+  }
+  
+  .banner-nav-side.next {
+    right: -15px;
+  }
+}
+
+/* Tabletas pequeñas - TRANSICIÓN A DISEÑO RESPONSIVE */
+@media screen and (max-width: 850px) {
+  .banner-nav-side {
+    width: 40px;
+    height: 40px;
+    font-size: 0.9rem;
+  }
+  
+  .banner-nav-side.prev {
+    left: -12px;
+  }
+  
+  .banner-nav-side.next {
+    right: -12px;
+  }
+}
+
+/* Tabletas pequeñas y móviles - FLECHAS DENTRO DEL BANNER CON ESPACIO PARA BADGE */
 @media screen and (max-width: 768px) {
-  .banner-project-info {
-    min-height: auto;
-    height: auto;
+  .popular-banner.with-background {
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.8) 0%,
+        rgba(0, 0, 0, 0.6) 50%,
+        rgba(0, 0, 0, 0.4) 100%
+      ),
+      var(--banner-image) center/cover no-repeat;
+    min-height: 350px;
+  }
+  
+  .banner-header {
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    position: relative;
+    padding-top: 3rem; /* Espacio para las flechas */
+  }
+  
+  .banner-project-title {
+    font-size: 1.5rem;
+    line-height: 1.2;
+    margin-bottom: 0.25rem;
+  }
+  
+  .banner-project-subtitle {
+    font-size: 1rem;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+  }
+  
+  .banner-project-description {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+    -webkit-line-clamp: 2;
+  }
+  
+  .banner-project-meta {
+    margin: 0.25rem 0;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .banner-author {
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+  }
+  
+  .banner-avatar,
+  .banner-avatar.placeholder {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .banner-actions-container {
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+  
+  .view-count-badge {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+  
+  .btn-banner-view {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.85rem;
+  }
+  
+  .banner-status-badge {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    margin: 0.5rem 0 0 0;
+    align-self: flex-start;
+    font-size: 0.7rem;
+    padding: 0.4rem 0.8rem;
+  }
+  
+  /* 🔥 FLECHAS SE MUEVEN DENTRO DEL BANNER EN ESQUINAS SUPERIORES CON ESPACIO */
+  .banner-nav-side {
+    top: 1.5rem;
+    transform: none;
+    width: 38px;
+    height: 38px;
+    font-size: 0.9rem;
+  }
+  
+  .banner-nav-side.prev {
+    left: 1rem;
+    top: 1.5rem;
+  }
+  
+  .banner-nav-side.next {
+    right: 1rem;
+    top: 1.5rem;
+  }
+  
+/* Featured badge con margen para no superponerse con flechas */
+.banner-featured-badge {
+  margin-left: 0;
+  margin-right: 0;
+  max-width: calc(100% - 6rem);
+  text-align: center;
+  /* Centrado con flexbox */
+  align-self: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+  
+  .banner-nav-side:hover {
+    transform: scale(1.1) !important;
+  }
+  
+  .banner-nav-side:active {
+    transform: scale(0.95) !important;
+  }
+  
+  /* Ocultar controles móviles por defecto en esta resolución */
+  .banner-controls {
+    display: none;
+  }
+}
+
+/* Móviles - MOSTRAR CONTROLES MÓVILES */
+@media screen and (max-width: 640px) {
+  /* Ocultar flechas laterales y mostrar controles móviles */
+  .banner-nav-side {
+    display: none;
+  }
+  
+  .banner-controls {
+    display: flex;
+  }
+  
+  .popular-banner {
+    margin: 1rem 0;
+    padding: 1.5rem 1rem;
+    min-height: 300px;
+    border-radius: 16px;
+  }
+  
+  .popular-banner.with-background {
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.8) 0%,
+        rgba(0, 0, 0, 0.6) 50%,
+        rgba(0, 0, 0, 0.4) 100%
+      ),
+      var(--banner-image) center/cover no-repeat;
+    min-height: 280px;
+  }
+  
+  .banner-header {
+    padding-top: 0; /* Reset del padding para móviles */
+  }
+  
+  .banner-featured-badge {
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 100%;
+  }
+  
+  .banner-project-title {
+    font-size: 1.3rem;
+  }
+  
+  .banner-project-subtitle {
+    font-size: 0.9rem;
+  }
+  
+  .banner-project-description {
+    font-size: 0.85rem;
+    -webkit-line-clamp: 2;
+    margin-bottom: 0.5rem;
+  }
+  
+  .banner-controls {
+    gap: 0.5rem;
+  }
+  
+  .banner-nav-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+  }
+  
+  .banner-featured-badge {
+    font-size: 0.65rem;
+    padding: 0.3rem 0.8rem;
+  }
+  
+  .banner-actions-container {
+    gap: 0.75rem;
+  }
+  
+  .view-count-badge {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+  }
+  
+  .btn-banner-view {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.8rem;
+  }
+  
+  .banner-author {
+    padding: 0.3rem 0.8rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Móviles pequeños */
+@media screen and (max-width: 360px) {
+  .popular-banner {
+    padding: 1rem 0.8rem;
+    min-height: 260px;
+  }
+  
+  .popular-banner.with-background {
+    min-height: 240px;
+  }
+  
+  .banner-project-title {
+    font-size: 1.1rem;
+  }
+  
+  .banner-project-subtitle {
+    font-size: 0.8rem;
+  }
+  
+  .banner-project-description {
+    font-size: 0.8rem;
+    -webkit-line-clamp: 2;
   }
   
   .banner-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 0.5rem;
   }
   
-  .banner-title {
-    justify-content: flex-start;
+  .banner-featured-badge {
+    align-self: flex-start;
   }
   
   .banner-controls {
     align-self: flex-end;
   }
   
-  .banner-project-header {
-    align-items: flex-start;
-  }
-  
   .banner-actions-container {
     flex-direction: column;
-    gap: 0.75rem;
-  }
-  
-  .view-count-badge {
-    align-self: flex-start;
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
+    align-items: stretch;
+    gap: 0.5rem;
   }
   
   .btn-banner-view {
     width: 100%;
     justify-content: center;
   }
-  
-  .banner-actions {
-    justify-content: flex-start;
-    margin-top: 1.5rem;
-  }
-  
-  .popular-banner {
-    margin: 1.5rem 0;
-    padding: 1.5rem;
-  }
-}
-
-/* Móviles */
-@media screen and (max-width: 480px) {
-  .banner-project-title {
-    font-size: 1.4rem;
-  }
-  
-  .banner-project-description {
-    font-size: 1rem;
-    -webkit-line-clamp: 4;
-    min-height: 80px;
-  }
-  
-  .banner-controls {
-    gap: 0.75rem;
-  }
-  
-  .banner-nav-btn {
-    width: 36px;
-    height: 36px;
-  }
-  
-  .banner-counter {
-    font-size: 0.8rem;
-    min-width: 50px;
-    padding: 4px 8px;
-  }
-  
-  .popular-banner {
-    margin: 1rem 0;
-    padding: 1.25rem;
-  }
-  
-  .btn-banner-view {
-    padding: 0.65rem 1.5rem;
-    font-size: 0.85rem;
-  }
-  
-  .view-count-badge {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.8rem;
-  }
-}
-
-/* Móviles pequeños */
-@media screen and (max-width: 360px) {
-  .banner-project-title {
-    font-size: 1.2rem;
-  }
-  
-  .banner-project-description {
-    font-size: 0.95rem;
-    min-height: 76px;
-  }
-  
-  .banner-author {
-    padding: 0.5rem 1rem;
-  }
-  
-  .banner-avatar,
-  .banner-avatar.placeholder {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .banner-author-name {
-    font-size: 0.85rem;
-  }
-  
-  .view-count-badge {
-    padding: 0.3rem 0.6rem;
-    font-size: 0.75rem;
-  }
 }
 
 /* Mejoras de accesibilidad */
 @media (prefers-reduced-motion: reduce) {
   .popular-banner,
+  .banner-nav-side,
   .banner-nav-btn,
   .btn-banner-view,
-  .banner-tech-tag,
   .banner-author,
   .view-count-badge {
     transition: none;
@@ -1938,11 +2157,8 @@ footer {
     background: var(--color-fondo);
   }
   
+  .banner-nav-side,
   .banner-nav-btn {
-    border: 2px solid var(--texto-primario);
-  }
-  
-  .banner-tech-tag {
     border: 2px solid var(--texto-primario);
   }
   
@@ -1951,6 +2167,11 @@ footer {
   }
   
   .view-count-badge {
+    border: 2px solid var(--texto-primario);
+  }
+  
+  .banner-status-badge,
+  .banner-featured-badge {
     border: 2px solid var(--texto-primario);
   }
 }

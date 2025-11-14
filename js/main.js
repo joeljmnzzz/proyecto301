@@ -1,4 +1,4 @@
-// main.js - VERSIÓN COMPLETA CON NAVEGACIÓN A PERFILES DE USUARIO
+// main.js - VERSIÓN ACTUALIZADA CON NUEVA ESTRUCTURA DE BANNER
 
 // Variables globales para el banner
 let popularProjects = [];
@@ -39,7 +39,7 @@ function startTypingAnimation(texto) {
   escribir();
 }
 
-// 🚀 CARGAR PROYECTOS POR CATEGORÍAS - VERSIÓN DEFINITIVA
+// 🚀 CARGAR PROYECTOS POR CATEGORÍAS
 document.addEventListener('DOMContentLoaded', async function() {
   try {
     // Esperar a que Supabase esté listo
@@ -63,15 +63,13 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // 🔥 FUNCIÓN: Esperar inicialización de Supabase
 async function waitForSupabase() {
-  // Si Supabase ya está listo, continuar
   if (window.supabase && typeof window.supabase.from === 'function') {
     return true;
   }
   
-  // Esperar máximo 8 segundos
   return new Promise((resolve, reject) => {
     let attempts = 0;
-    const maxAttempts = 80; // 8 segundos (80 * 100ms)
+    const maxAttempts = 80;
     
     const checkInterval = setInterval(() => {
       attempts++;
@@ -105,33 +103,30 @@ async function waitForTranslations() {
   });
 }
 
-// 🔥 NUEVA FUNCIÓN: Navegar al perfil del usuario
+// 🔥 FUNCIÓN: Navegar al perfil del usuario
 function navigateToProfile(userIdentifier) {
     if (!userIdentifier) {
         console.warn('No se puede navegar al perfil: identificador de usuario no disponible');
         return;
     }
 
-    // Construir la URL del perfil - usar username
     const profileUrl = `/perfiles/${userIdentifier}`;
     console.log('🔗 Navegando al perfil:', profileUrl);
     window.location.href = profileUrl;
 }
 
-// 🔥 NUEVA FUNCIÓN: Controlar visibilidad del banner basado en búsqueda
+// 🔥 FUNCIÓN: Controlar visibilidad del banner basado en búsqueda
 function toggleBannerVisibility(show) {
   const banner = document.getElementById('popular-banner');
   if (!banner) return;
   
   if (show) {
     banner.classList.remove('hidden');
-    // Reanudar rotación si hay proyectos
     if (popularProjects.length > 1 && !bannerInterval) {
       startBannerRotation();
     }
   } else {
     banner.classList.add('hidden');
-    // Detener rotación automática
     if (bannerInterval) {
       clearInterval(bannerInterval);
       bannerInterval = null;
@@ -139,7 +134,7 @@ function toggleBannerVisibility(show) {
   }
 }
 
-// 🔥 NUEVA FUNCIÓN: Cargar banner de proyectos populares
+// 🔥 FUNCIÓN: Cargar banner de proyectos populares
 async function loadPopularBanner() {
   try {
     if (!window.supabase || typeof window.supabase.from !== 'function') {
@@ -149,14 +144,13 @@ async function loadPopularBanner() {
 
     console.log('🔄 Cargando proyectos para el banner...');
     
-    // Consulta para proyectos populares (máximo 5 para el banner)
     const { data: projects, error } = await window.supabase
       .from('projects')
       .select('id, name, slug, title, subtitle, description, cover_image_url, status, category, technologies, visibility, created_at, created_by, cached_view_count')
       .eq('visibility', 'public')
       .gt('cached_view_count', 0)
       .order('cached_view_count', { ascending: false })
-      .limit(5); // Solo 5 proyectos para el banner
+      .limit(5);
 
     if (error) {
       console.error('❌ Error cargando proyectos para banner:', error);
@@ -164,14 +158,9 @@ async function loadPopularBanner() {
     }
 
     if (projects && projects.length > 0) {
-      // Cargar información de usuarios
       const projectsWithUsers = await loadUsersForProjects(projects);
       popularProjects = projectsWithUsers;
-      
-      // Mostrar el banner
       displayPopularBanner();
-      
-      // Iniciar rotación automática cada 8 segundos
       startBannerRotation();
     } else {
       console.log('ℹ️ No hay proyectos populares para mostrar en el banner');
@@ -184,7 +173,7 @@ async function loadPopularBanner() {
   }
 }
 
-// 🔥 NUEVA FUNCIÓN: Mostrar banner de proyectos populares
+// 🔥 FUNCIÓN: Mostrar banner de proyectos populares
 function displayPopularBanner() {
   const banner = document.getElementById('popular-banner');
   if (!banner || popularProjects.length === 0) {
@@ -192,17 +181,12 @@ function displayPopularBanner() {
     return;
   }
 
-  // Mostrar el banner
   banner.classList.remove('hidden');
-  
-  // Mostrar el primer proyecto
   showBannerProject(0);
-  
-  // Actualizar contadores
   updateBannerCounters();
 }
 
-// 🔥 NUEVA FUNCIÓN: Mostrar proyecto específico en el banner (ACTUALIZADA CON PERFIL)
+// 🔥 FUNCIÓN ACTUALIZADA: Mostrar proyecto específico en el banner
 function showBannerProject(index) {
   const banner = document.getElementById('popular-banner');
   const bannerContent = document.getElementById('banner-project-content');
@@ -211,7 +195,7 @@ function showBannerProject(index) {
   currentBannerIndex = index;
   const project = popularProjects[index];
 
-  // CORRECCIÓN: Aplicar la imagen como fondo del banner
+  // Manejar fondo de imagen
   if (project.cover_image_url) {
     banner.classList.add('with-background');
     banner.style.setProperty('--banner-image', `url('${project.cover_image_url}')`);
@@ -220,91 +204,106 @@ function showBannerProject(index) {
     banner.style.removeProperty('--banner-image');
   }
 
-  // CORRECCIÓN: HTML simplificado sin contenedor de imagen lateral
-  const bannerHTML = `
-    <div class="banner-project-info">
-      <div class="banner-project-header">
-        <h3 class="banner-project-title">${project.title || project.name}</h3>
-      </div>
-      
-      <p class="banner-project-description">
-        ${project.subtitle || project.description?.substring(0, 150) || 'Sin descripción disponible'}...
-      </p>
-      
-      <div class="banner-project-details">
-        <div class="banner-project-meta">
-          <div class="banner-author clickable-author" data-username="${project.profiles?.username || ''}">
-            ${project.profiles?.avatar_url ? `
-              <img src="${project.profiles.avatar_url}" alt="${project.profiles.full_name}" class="banner-avatar">
-            ` : `
-              <div class="banner-avatar placeholder">
-                <i class="fas fa-user"></i>
-              </div>
-            `}
-            <span class="banner-author-name">
-              ${project.profiles?.first_name || project.profiles?.full_name || 'Usuario'}
-            </span>
-          </div>
-        </div>
-        
-        ${project.technologies && project.technologies.length > 0 ? `
-          <div class="banner-technologies">
-            ${project.technologies.slice(0, 4).map(tech => `
-              <span class="banner-tech-tag">${tech}</span>
-            `).join('')}
-          </div>
-        ` : ''}
-      </div>
-      
-      <div class="banner-actions">
-        <div class="banner-actions-container">
-          <div class="view-count-badge">
-            <i class="fas fa-eye"></i>
-            ${project.cached_view_count || 0} vistas
-          </div>
-          <button class="btn-banner-view" data-project-slug="${project.slug}">
-            <i class="fas fa-external-link-alt"></i>
-            Ver Proyecto
-          </button>
-        </div>
-      </div>
-    </div>
-  `;
+  // Usar template
+  const template = document.getElementById('banner-template');
+  if (!template) {
+    console.error('❌ Template del banner no encontrado');
+    return;
+  }
 
-  bannerContent.innerHTML = bannerHTML;
+  const clone = template.content.cloneNode(true);
   
-  // Conectar evento del botón de proyecto
-  const viewButton = bannerContent.querySelector('.btn-banner-view');
+  // Llenar el template con datos del proyecto
+  const titleElement = clone.querySelector('.banner-project-title');
+  const subtitleElement = clone.querySelector('.banner-project-subtitle');
+  const descriptionElement = clone.querySelector('.banner-project-description');
+  const authorNameElement = clone.querySelector('.banner-author-name');
+  const viewCountElement = clone.querySelector('.view-count');
+  const viewButton = clone.querySelector('.btn-banner-view');
+  const statusBadge = document.querySelector('.banner-status-badge .status-text');
+
+  if (titleElement) {
+    titleElement.textContent = project.title || project.name;
+  }
+
+  if (subtitleElement) {
+    subtitleElement.textContent = project.subtitle || 'Proyecto innovador';
+  }
+
+  if (descriptionElement) {
+    descriptionElement.textContent = 
+      project.description?.substring(0, 120) || 
+      'Descripción del proyecto destacado...';
+  }
+
+  if (authorNameElement) {
+    authorNameElement.textContent = project.profiles?.first_name || 'Usuario';
+  }
+
+  if (viewCountElement) {
+    viewCountElement.textContent = project.cached_view_count || 0;
+  }
+
   if (viewButton) {
-    viewButton.addEventListener('click', () => {
+    viewButton.setAttribute('data-project-slug', project.slug);
+    viewButton.addEventListener('click', (e) => {
+      e.stopPropagation(); // Evitar que el clic se propague al contenedor
       const slug = viewButton.getAttribute('data-project-slug');
       if (slug) {
         window.location.href = `/proyectos/${slug}`;
       }
     });
   }
-  
-  // 🔥 NUEVO: Conectar evento del autor (perfil)
-  const authorElement = bannerContent.querySelector('.clickable-author');
-  if (authorElement) {
-    authorElement.addEventListener('click', (e) => {
-      e.stopPropagation(); // Prevenir eventos del padre
-      const username = authorElement.getAttribute('data-username');
-      if (username) {
-        navigateToProfile(username);
-      }
-    });
-    
-    // Agregar estilo de cursor pointer
-    authorElement.style.cursor = 'pointer';
-    authorElement.title = 'Ver perfil del usuario';
+
+  // Actualizar etiqueta de estado
+  if (statusBadge) {
+    statusBadge.textContent = getStatusText(project.status);
   }
+
+  // Limpiar y agregar nuevo contenido
+  bannerContent.innerHTML = '';
+  bannerContent.appendChild(clone);
+  
+  // 🔥 NUEVO: Hacer todo el banner clickeable (excepto los controles de navegación)
+  setupBannerClickHandler(bannerContent, project.slug);
   
   // Actualizar contadores
   updateBannerCounters();
 }
 
-// 🔥 NUEVA FUNCIÓN: Actualizar contadores del banner
+// 🔥 NUEVA FUNCIÓN: Configurar clic en el contenedor del banner
+function setupBannerClickHandler(bannerContent, projectSlug) {
+  if (!bannerContent || !projectSlug) return;
+  
+  // Hacer el contenedor principal clickeable
+  bannerContent.style.cursor = 'pointer';
+  
+  // Agregar event listener para el clic
+  bannerContent.addEventListener('click', (e) => {
+    // Verificar que el clic no sea en elementos que deben tener su propio comportamiento
+    const isNavigationElement = e.target.closest('.banner-nav-side') || 
+                               e.target.closest('.banner-nav-btn') ||
+                               e.target.closest('.btn-banner-view') ||
+                               e.target.closest('.banner-author') ||
+                               e.target.closest('.banner-controls');
+    
+    if (!isNavigationElement) {
+      // Navegar a los detalles del proyecto
+      window.location.href = `/proyectos/${projectSlug}`;
+    }
+  });
+  
+  // Feedback visual al hover
+  bannerContent.addEventListener('mouseenter', () => {
+    bannerContent.style.opacity = '0.95';
+  });
+  
+  bannerContent.addEventListener('mouseleave', () => {
+    bannerContent.style.opacity = '1';
+  });
+}
+
+// 🔥 FUNCIÓN: Actualizar contadores del banner
 function updateBannerCounters() {
   const currentElement = document.getElementById('banner-current');
   const totalElement = document.getElementById('banner-total');
@@ -318,22 +317,20 @@ function updateBannerCounters() {
   }
 }
 
-// 🔥 NUEVA FUNCIÓN: Iniciar rotación automática del banner
+// 🔥 FUNCIÓN: Iniciar rotación automática del banner
 function startBannerRotation() {
   if (popularProjects.length <= 1) return;
   
-  // Limpiar intervalo anterior si existe
   if (bannerInterval) {
     clearInterval(bannerInterval);
   }
   
-  // Rotar cada 8 segundos
   bannerInterval = setInterval(() => {
     nextBannerProject();
   }, 8000);
 }
 
-// 🔥 NUEVA FUNCIÓN: Siguiente proyecto en el banner
+// 🔥 FUNCIÓN: Siguiente proyecto en el banner
 function nextBannerProject() {
   if (popularProjects.length === 0) return;
   
@@ -341,7 +338,7 @@ function nextBannerProject() {
   showBannerProject(currentBannerIndex);
 }
 
-// 🔥 NUEVA FUNCIÓN: Proyecto anterior en el banner
+// 🔥 FUNCIÓN: Proyecto anterior en el banner
 function prevBannerProject() {
   if (popularProjects.length === 0) return;
   
@@ -349,51 +346,110 @@ function prevBannerProject() {
   showBannerProject(currentBannerIndex);
 }
 
-// 🔥 NUEVA FUNCIÓN: Ocultar banner
+// 🔥 FUNCIÓN: Ocultar banner
 function hidePopularBanner() {
   const banner = document.getElementById('popular-banner');
   if (banner) {
     banner.classList.add('hidden');
   }
   
-  // Limpiar intervalo
   if (bannerInterval) {
     clearInterval(bannerInterval);
     bannerInterval = null;
   }
 }
 
-// 🔥 FUNCIÓN PRINCIPAL: Cargar proyectos públicos (VERSIÓN CORREGIDA CON CONTROL DE BANNER)
+// 🔧 FUNCIÓN: Configurar event listeners (ACTUALIZADA CON BOTONES LATERALES)
+function setupEventListeners() {
+  // Botones de navegación laterales
+  const prevSideBtn = document.querySelector('.banner-nav-side.prev');
+  const nextSideBtn = document.querySelector('.banner-nav-side.next');
+  
+  if (prevSideBtn) {
+    prevSideBtn.addEventListener('click', prevBannerProject);
+  }
+  
+  if (nextSideBtn) {
+    nextSideBtn.addEventListener('click', nextBannerProject);
+  }
+  
+  // Botones originales (para móviles)
+  const prevBtn = document.querySelector('.banner-nav-btn:first-child');
+  const nextBtn = document.querySelector('.banner-nav-btn:last-child');
+  
+  if (prevBtn) {
+    prevBtn.addEventListener('click', prevBannerProject);
+  }
+  
+  if (nextBtn) {
+    nextBtn.addEventListener('click', nextBannerProject);
+  }
+  
+  // Navegación entre secciones
+  const sectionButtons = document.querySelectorAll('.categorias button');
+  sectionButtons.forEach(button => {
+    button.addEventListener('click', (e) => {
+      sectionButtons.forEach(btn => btn.classList.remove('active'));
+      e.target.classList.add('active');
+      
+      const section = e.target.getAttribute('data-section');
+      
+      if (section === 'proyectos') {
+        loadPublicProjects();
+      }
+    });
+  });
+  
+  // 🔍 Buscador
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.trim();
+      
+      if (searchTerm) {
+        toggleBannerVisibility(false);
+      } else {
+        toggleBannerVisibility(true);
+      }
+      
+      loadPublicProjects(searchTerm);
+    });
+
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        searchInput.value = '';
+        toggleBannerVisibility(true);
+        loadPublicProjects('');
+      }
+    });
+  }
+}
+
+// 🔥 FUNCIÓN PRINCIPAL: Cargar proyectos públicos
 async function loadPublicProjects(searchTerm = '') {
   try {
     showLoading(true);
     
-    // 🔥 NUEVO: Controlar visibilidad del banner basado en búsqueda
+    // Controlar visibilidad del banner basado en búsqueda
     if (searchTerm && searchTerm.trim() !== '') {
-      // Ocultar banner durante búsqueda
       toggleBannerVisibility(false);
     } else {
-      // Mostrar banner cuando no hay búsqueda
       toggleBannerVisibility(true);
     }
     
-    // Verificación robusta de Supabase
     if (!window.supabase || typeof window.supabase.from !== 'function') {
       console.error('❌ Supabase no está disponible');
       showError('Error de conexión con la base de datos. Recarga la página.');
       return;
     }
 
-    // 🔥 CONSULTA CORREGIDA - SIN RELACIONES PARA EVITAR ERRORES
     let query = window.supabase
       .from('projects')
       .select('id, name, slug, title, subtitle, description, cover_image_url, status, category, technologies, visibility, created_at, created_by')
       .eq('visibility', 'public')
       .order('created_at', { ascending: false });
 
-    // 🔥 CORRECCIÓN: Aplicar filtro de búsqueda de forma segura
     if (searchTerm && searchTerm.trim() !== '') {
-      // 🔥 OPCIÓN 1: Solo buscar en título y descripción (más seguro)
       query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
     }
 
@@ -405,13 +461,8 @@ async function loadPublicProjects(searchTerm = '') {
       return;
     }
 
-    // 🔥 CARGAR INFORMACIÓN DE USUARIOS POR SEPARADO
     const projectsWithUsers = await loadUsersForProjects(projects || []);
-    
-    // Agrupar proyectos por categoría
     const projectsByCategory = groupProjectsByCategory(projectsWithUsers);
-    
-    // Mostrar proyectos en la interfaz
     displayProjectsByCategory(projectsByCategory, searchTerm);
 
   } catch (error) {
@@ -422,12 +473,11 @@ async function loadPublicProjects(searchTerm = '') {
   }
 }
 
-// 🔥 FUNCIÓN CORREGIDA: Cargar información de usuarios para los proyectos
+// 🔥 FUNCIÓN: Cargar información de usuarios para los proyectos
 async function loadUsersForProjects(projects) {
     if (!projects || projects.length === 0) return projects;
 
     try {
-        // Obtener IDs únicos de usuarios
         const userIds = [...new Set(projects.map(p => p.created_by).filter(Boolean))];
         
         if (userIds.length === 0) {
@@ -443,7 +493,6 @@ async function loadUsersForProjects(projects) {
 
         let users = [];
         
-        // 🔥 ESTRATEGIA PRINCIPAL: Cargar desde la tabla profiles
         try {
             const { data: profilesData, error: profilesError } = await window.supabase
                 .from('profiles')
@@ -456,7 +505,6 @@ async function loadUsersForProjects(projects) {
                 throw new Error('Fallback a auth.users');
             }
         } catch (profilesError) {
-            // Estrategia de respaldo: auth.users
             try {
                 const { data: authUsers, error: authError } = await window.supabase
                     .from('auth.users')
@@ -475,7 +523,6 @@ async function loadUsersForProjects(projects) {
                     throw new Error('Usar datos por defecto');
                 }
             } catch (authError) {
-                // Crear datos de usuario por defecto
                 users = userIds.map(id => ({
                     id: id,
                     username: 'usuario_' + id.substring(0, 8),
@@ -485,7 +532,6 @@ async function loadUsersForProjects(projects) {
             }
         }
 
-        // Si no se cargaron usuarios, crear datos por defecto
         if (users.length === 0) {
             users = userIds.map(id => ({
                 id: id,
@@ -495,7 +541,6 @@ async function loadUsersForProjects(projects) {
             }));
         }
 
-        // Crear mapa de usuarios por ID
         const usersMap = {};
         users.forEach(user => {
             const firstName = extractFirstName(user.full_name);
@@ -505,7 +550,6 @@ async function loadUsersForProjects(projects) {
             };
         });
 
-        // Combinar proyectos con información de usuarios
         const projectsWithUsers = projects.map(project => {
             const userInfo = usersMap[project.created_by] || {
                 username: 'usuario_' + (project.created_by ? project.created_by.substring(0, 8) : 'anon'),
@@ -524,7 +568,6 @@ async function loadUsersForProjects(projects) {
 
     } catch (error) {
         console.error('❌ Error combinando datos:', error);
-        // Retornar proyectos con datos de usuario por defecto
         return projects.map(project => ({
             ...project,
             profiles: { 
@@ -537,7 +580,7 @@ async function loadUsersForProjects(projects) {
     }
 }
 
-// 🔥 NUEVA FUNCIÓN: Extraer primer nombre de full_name
+// 🔥 FUNCIÓN: Extraer primer nombre de full_name
 function extractFirstName(fullName) {
     if (!fullName || typeof fullName !== 'string') {
         return 'Usuario';
@@ -570,7 +613,6 @@ function groupProjectsByCategory(projects) {
     categories[category].projects.push(project);
   });
   
-  // Ordenar categorías por número de proyectos (descendente)
   return Object.values(categories).sort((a, b) => b.projects.length - a.projects.length);
 }
 
@@ -593,7 +635,7 @@ function getCategoryDisplayName(category) {
   return categoryNames[category] || category;
 }
 
-// 🔥 FUNCIÓN: Mostrar proyectos agrupados por categoría (ACTUALIZADA CON PERFILES)
+// 🔥 FUNCIÓN: Mostrar proyectos agrupados por categoría
 function displayProjectsByCategory(categories, searchTerm = '') {
   const container = document.getElementById('projects-container');
   const emptyState = document.getElementById('empty-state');
@@ -603,7 +645,6 @@ function displayProjectsByCategory(categories, searchTerm = '') {
     return;
   }
   
-  // Verificar si hay proyectos
   const totalProjects = categories.reduce((total, category) => total + category.projects.length, 0);
   
   if (totalProjects === 0) {
@@ -624,7 +665,6 @@ function displayProjectsByCategory(categories, searchTerm = '') {
   
   emptyState.classList.add('hidden');
   
-  // Generar HTML para cada categoría
   const categoriesHTML = categories.map(category => `
     <div class="category-section" data-category="${category.name}">
       <div class="category-header">
@@ -715,78 +755,15 @@ function displayProjectsByCategory(categories, searchTerm = '') {
   `).join('');
   
   container.innerHTML = categoriesHTML;
-  
-  // Conectar eventos de los botones
   connectProjectActions();
   
-  // Actualizar traducciones si es necesario
   if (window.updateTranslations) {
     setTimeout(() => window.updateTranslations(), 100);
   }
 }
 
-// 🔧 FUNCIÓN: Configurar event listeners (ACTUALIZADA CON BANNER)
-function setupEventListeners() {
-  // Navegación del banner
-  const prevBtn = document.getElementById('prev-banner');
-  const nextBtn = document.getElementById('next-banner');
-  
-  if (prevBtn) {
-    prevBtn.addEventListener('click', prevBannerProject);
-  }
-  
-  if (nextBtn) {
-    nextBtn.addEventListener('click', nextBannerProject);
-  }
-  
-  // Navegación entre secciones (quitamos la sección populares)
-  const sectionButtons = document.querySelectorAll('.categorias button');
-  sectionButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
-      // Remover clase active de todos los botones
-      sectionButtons.forEach(btn => btn.classList.remove('active'));
-      // Agregar clase active al botón clickeado
-      e.target.classList.add('active');
-      
-      const section = e.target.getAttribute('data-section');
-      
-      if (section === 'proyectos') {
-        loadPublicProjects();
-      }
-      // Aquí puedes agregar más secciones según sea necesario
-    });
-  });
-  
-  // 🔍 Buscador - ACTUALIZADO para controlar el banner
-  const searchInput = document.getElementById('search-input');
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-      const searchTerm = e.target.value.trim();
-      
-      // Control inmediato del banner
-      if (searchTerm) {
-        toggleBannerVisibility(false);
-      } else {
-        toggleBannerVisibility(true);
-      }
-      
-      loadPublicProjects(searchTerm);
-    });
-
-    // Limpiar búsqueda con Escape
-    searchInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        searchInput.value = '';
-        toggleBannerVisibility(true);
-        loadPublicProjects('');
-      }
-    });
-  }
-}
-
-// 🔥 FUNCIÓN: Conectar acciones de proyectos (ACTUALIZADA CON PERFILES)
+// 🔥 FUNCIÓN: Conectar acciones de proyectos
 function connectProjectActions() {
-    // Botones de ver proyecto
     const viewButtons = document.querySelectorAll('.btn-view-project');
     viewButtons.forEach(button => {
         button.addEventListener('click', (e) => {
@@ -797,11 +774,10 @@ function connectProjectActions() {
         });
     });
     
-    // 🔥 NUEVO: Elementos clickables de autor (perfil)
     const authorElements = document.querySelectorAll('.clickable-author');
     authorElements.forEach(authorElement => {
         authorElement.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevenir eventos del padre
+            e.stopPropagation();
             const username = authorElement.getAttribute('data-username');
             if (username && username !== 'Usuario') {
                 navigateToProfile(username);
@@ -810,11 +786,9 @@ function connectProjectActions() {
             }
         });
         
-        // Agregar estilo de cursor pointer y tooltip
         authorElement.style.cursor = 'pointer';
         authorElement.title = 'Ver perfil del usuario';
         
-        // Efecto hover (opcional)
         authorElement.addEventListener('mouseenter', () => {
             authorElement.style.opacity = '0.8';
         });
@@ -907,11 +881,7 @@ window.reloadProjects = function() {
 window.nextBannerProject = nextBannerProject;
 window.prevBannerProject = prevBannerProject;
 window.toggleBannerVisibility = toggleBannerVisibility;
-
-// 🔥 NUEVO: Exportar función de navegación a perfil
 window.navigateToProfile = navigateToProfile;
-
-// Exportamos la función para que i18n.js la use
 window.startTypingAnimation = startTypingAnimation;
 
 // Manejar errores no capturados
@@ -922,7 +892,6 @@ window.addEventListener('error', function(e) {
   }
 });
 
-// Manejar promesas no capturadas
 window.addEventListener('unhandledrejection', function(e) {
   console.error('❌ Promesa no manejada:', e.reason);
   e.preventDefault();
