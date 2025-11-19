@@ -1,4 +1,4 @@
-// production-tasks.js
+
 // Manejo de tareas para Proyecto301 - VERSIÓN MEJORADA
 
 // Variables globales

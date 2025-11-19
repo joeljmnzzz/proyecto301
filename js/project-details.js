@@ -139,7 +139,7 @@ class ProjectDetailsLoader {
         sessionStorage.setItem('currentProjectSlug', projectSlug);
         
         // Redirigir a la página de producción
-        const productionUrl = `/produccion/proyecto.html?project_id=${projectId}&slug=${projectSlug}`;
+        const productionUrl = `/html/production-project.html?project_id=${projectId}&slug=${projectSlug}`;
         console.log('🚀 Redirigiendo a:', productionUrl);
         window.location.href = productionUrl;
     }
