@@ -96,48 +96,142 @@
       </div> <!-- Fin del dashboard-content-section -->
     </div> <!-- Fin del dashboard-container -->
 
-    <!-- Modal para crear nueva tarea -->
-    <div id="task-modal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>Crear Nueva Tarea</h3>
-          <button class="close-modal">&times;</button>
-        </div>
-        <form id="task-form" class="modal-body">
-          <div class="form-group">
-            <label for="task-title">Título</label>
-            <input type="text" id="task-title" name="title" required>
-          </div>
-          <div class="form-group">
-            <label for="task-description">Descripción</label>
-            <textarea id="task-description" name="description" rows="3"></textarea>
-          </div>
-          <div class="form-group">
-            <label for="task-assignee">Asignar a</label>
-            <select id="task-assignee" name="assigned_to">
-              <option value="">Seleccionar miembro</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="task-priority">Prioridad</label>
-            <select id="task-priority" name="priority" required>
-              <option value="low">Baja</option>
-              <option value="medium" selected>Media</option>
-              <option value="high">Alta</option>
-              <option value="urgent">Urgente</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="task-due-date">Fecha límite</label>
-            <input type="datetime-local" id="task-due-date" name="due_date">
-          </div>
-          <div class="form-actions">
-            <button type="button" class="btn-cancel">Cancelar</button>
-            <button type="submit" class="btn-primary">Crear Tarea</button>
-          </div>
-        </form>
-      </div>
+<!-- Modal para crear nueva tarea - VERSIÓN MEJORADA -->
+<div id="task-modal" class="modal">
+  <div class="modal-content large-modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-plus-circle"></i> Crear Nueva Tarea</h3>
+      <button class="close-modal">&times;</button>
     </div>
+    <form id="task-form" class="modal-body">
+      <!-- Título -->
+      <div class="form-group">
+        <label for="task-title" class="required">Título</label>
+        <input type="text" id="task-title" name="title" required 
+               maxlength="200" placeholder="¿Qué necesita hacerse?">
+        <div class="char-counter">
+          <span id="title-char-count">0</span>/200
+        </div>
+      </div>
+
+      <!-- Descripción -->
+      <div class="form-group">
+        <label for="task-description">Descripción</label>
+        <textarea id="task-description" name="description" rows="4" 
+                  placeholder="Describe los detalles de la tarea..." 
+                  maxlength="1000"></textarea>
+        <div class="char-counter">
+          <span id="description-char-count">0</span>/1000
+        </div>
+      </div>
+
+      <div class="form-row">
+        <!-- Asignación Múltiple -->
+        <div class="form-group">
+          <label for="task-assignees">Asignar a</label>
+          <select id="task-assignees" name="assignees" multiple class="multiple-select">
+            <option value="">Seleccionar miembros...</option>
+          </select>
+          <div class="selected-assignees" id="selected-assignees">
+            <!-- Los asignados seleccionados aparecerán aquí -->
+          </div>
+        </div>
+
+        <!-- Prioridad -->
+        <div class="form-group">
+          <label for="task-priority" class="required">Prioridad</label>
+          <select id="task-priority" name="priority" required>
+            <option value="low">🟢 Baja</option>
+            <option value="medium" selected>🟡 Media</option>
+            <option value="high">🟠 Alta</option>
+            <option value="urgent">🔴 Urgente</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <!-- Fecha Límite -->
+        <div class="form-group">
+          <label for="task-due-date">Fecha Límite</label>
+          <input type="datetime-local" id="task-due-date" name="due_date">
+          <div class="date-hint" id="date-hint"></div>
+        </div>
+
+        <!-- Estimación de Esfuerzo -->
+        <div class="form-group">
+          <label for="task-estimated-hours">Estimación (horas)</label>
+          <input type="number" id="task-estimated-hours" name="estimated_hours" 
+                 min="1" max="500" placeholder="Ej: 8">
+        </div>
+      </div>
+
+      <!-- Etiquetas -->
+      <div class="form-group">
+        <label for="task-tags">Etiquetas</label>
+        <div class="tags-input-container">
+          <select id="task-tags" name="tags" multiple class="multiple-select">
+            <option value="">Seleccionar etiquetas...</option>
+          </select>
+          <button type="button" class="btn-add-tag" id="btn-add-tag" title="Crear nueva etiqueta">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+        <div class="selected-tags" id="selected-tags">
+          <!-- Las etiquetas seleccionadas aparecerán aquí -->
+        </div>
+      </div>
+
+      <!-- Validación y Estado -->
+      <div class="form-validation" id="form-validation">
+        <!-- Mensajes de validación aparecerán aquí -->
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-cancel">Cancelar</button>
+        <button type="submit" class="btn-primary" id="submit-task-btn">
+          <i class="fas fa-plus"></i> Crear Tarea
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal para crear nueva etiqueta -->
+<div id="tag-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><i class="fas fa-tag"></i> Crear Nueva Etiqueta</h3>
+      <button class="close-modal">&times;</button>
+    </div>
+    <form id="tag-form" class="modal-body">
+      <div class="form-group">
+        <label for="tag-name" class="required">Nombre de la etiqueta</label>
+        <input type="text" id="tag-name" name="name" required maxlength="50" 
+               placeholder="Ej: Frontend, Bug, Urgente...">
+      </div>
+      <div class="form-group">
+        <label for="tag-color">Color</label>
+        <div class="color-picker">
+          <input type="color" id="tag-color" name="color" value="#6B7280">
+          <div class="color-presets">
+            <div class="color-preset" data-color="#EF4444" style="background-color: #EF4444;"></div>
+            <div class="color-preset" data-color="#F59E0B" style="background-color: #F59E0B;"></div>
+            <div class="color-preset" data-color="#10B981" style="background-color: #10B981;"></div>
+            <div class="color-preset" data-color="#3B82F6" style="background-color: #3B82F6;"></div>
+            <div class="color-preset" data-color="#8B5CF6" style="background-color: #8B5CF6;"></div>
+            <div class="color-preset" data-color="#6B7280" style="background-color: #6B7280;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-cancel">Cancelar</button>
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-tag"></i> Crear Etiqueta
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 
     <!-- Div 3: Chat General Fijo -->
     <section class="chat-column">
@@ -188,5 +282,6 @@
   <script src="/js/i18n.js" defer></script>
   <script src="/js/load-navbar.js" defer></script>
   <script src="/js/production-project.js" defer></script>
+  <script src="/js/task-management.js" defer></script>
 </body>
 </html>

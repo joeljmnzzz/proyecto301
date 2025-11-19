@@ -1,4 +1,4 @@
-// production-project.js - VERSIÓN CORREGIDA CON CONSULTAS SEPARADAS
+// production-project.js - VERSIÓN ACTUALIZADA CON NUEVO SISTEMA DE TAREAS
 
 // Variables globales
 let currentProjectId = null;
@@ -33,6 +33,9 @@ async function initializeDashboard() {
         // Cargar datos del proyecto
         await loadProjectData();
         
+        // INICIALIZAR EL GESTOR DE TAREAS
+        await taskManager.initialize(currentProjectId);
+        
         // Cargar datos iniciales
         await Promise.all([
             loadProjectMembers(),
@@ -50,285 +53,7 @@ async function initializeDashboard() {
     }
 }
 
-// Verificar acceso al proyecto
-async function verifyProjectAccess(projectId) {
-    try {
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        
-        if (authError || !user) {
-            console.log('🔐 Usuario no autenticado');
-            return false;
-        }
-
-        // Verificar si el usuario es miembro del proyecto
-        const { data: membership, error } = await supabase
-            .from('project_members')
-            .select('id')
-            .eq('project_id', projectId)
-            .eq('user_id', user.id)
-            .eq('is_active', true)
-            .single();
-
-        if (error) {
-            console.log('❌ Usuario no tiene acceso al proyecto:', error.message);
-            return false;
-        }
-
-        console.log('✅ Usuario tiene acceso al proyecto');
-        return true;
-
-    } catch (error) {
-        console.error('Error verificando acceso:', error);
-        return false;
-    }
-}
-
-// Cargar datos del proyecto
-async function loadProjectData() {
-    try {
-        const { data: project, error } = await supabase
-            .from('projects')
-            .select('*')
-            .eq('id', currentProjectId)
-            .single();
-
-        if (error) throw error;
-
-        currentProjectData = project;
-        console.log('✅ Datos del proyecto cargados:', project);
-
-    } catch (error) {
-        console.error('Error cargando datos del proyecto:', error);
-        throw error;
-    }
-}
-
-// Actualizar UI con datos del proyecto
-function updateProjectUI() {
-    if (!currentProjectData) return;
-
-    // Actualizar título de la página
-    document.title = `${currentProjectData.title} - Producción | Proyecto 301`;
-
-    // Actualizar navegación activa basada en la URL
-    updateActiveNavigation();
-}
-
-// Actualizar navegación activa
-function updateActiveNavigation() {
-    const navItems = document.querySelectorAll('.nav-item');
-    const currentPath = window.location.pathname;
-    
-    navItems.forEach(item => {
-        item.classList.remove('active');
-    });
-
-    // Determinar qué pestaña está activa basada en la URL o parámetros
-    const urlParams = new URLSearchParams(window.location.search);
-    const activeTab = urlParams.get('tab') || 'tasks';
-    
-    const activeNavItem = document.getElementById(`nav-${activeTab}`);
-    if (activeNavItem) {
-        activeNavItem.classList.add('active');
-    }
-}
-
-// Configurar event listeners
-function setupEventListeners() {
-    // Botón para agregar tarea
-    const addTaskBtn = document.getElementById('btn-add-task');
-    if (addTaskBtn) {
-        addTaskBtn.addEventListener('click', openTaskModal);
-    }
-    
-    // Modal de tarea
-    const closeModalBtn = document.querySelector('.close-modal');
-    const cancelBtn = document.querySelector('.btn-cancel');
-    const taskForm = document.getElementById('task-form');
-    
-    if (closeModalBtn) closeModalBtn.addEventListener('click', closeTaskModal);
-    if (cancelBtn) cancelBtn.addEventListener('click', closeTaskModal);
-    if (taskForm) taskForm.addEventListener('submit', handleTaskSubmit);
-    
-    // Chat
-    const sendMessageBtn = document.getElementById('btn-send-message');
-    const messageInput = document.getElementById('message-input');
-    
-    if (sendMessageBtn) sendMessageBtn.addEventListener('click', sendMessage);
-    if (messageInput) {
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-    }
-
-    // Cerrar modal al hacer click fuera
-    const modal = document.getElementById('task-modal');
-    if (modal) {
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                closeTaskModal();
-            }
-        });
-    }
-
-    // Navegación entre pestañas
-    setupNavigationListeners();
-}
-
-// Configurar listeners de navegación
-function setupNavigationListeners() {
-    const navItems = document.querySelectorAll('.nav-item');
-    
-    navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            // Remover activo de todos los items
-            navItems.forEach(i => i.classList.remove('active'));
-            
-            // Agregar activo al item clickeado
-            item.classList.add('active');
-            
-            // Obtener el tipo de navegación del ID
-            const navType = item.id.replace('nav-', '');
-            
-            // Manejar la navegación
-            handleNavigation(navType);
-        });
-    });
-}
-
-// Manejar navegación entre pestañas
-function handleNavigation(navType) {
-    console.log('Navegando a:', navType);
-    
-    // Actualizar URL sin recargar la página
-    const newUrl = `${window.location.pathname}?project_id=${currentProjectId}&tab=${navType}`;
-    window.history.pushState({}, '', newUrl);
-    
-    // Mostrar/ocultar secciones según la navegación
-    switch (navType) {
-        case 'project':
-            showProjectOverview();
-            break;
-        case 'tasks':
-            showTasksSection();
-            break;
-        case 'cloud':
-            showCloudSection();
-            break;
-        case 'requests':
-            showRequestsSection();
-            break;
-        case 'notifications':
-            showNotificationsSection();
-            break;
-        default:
-            showTasksSection();
-    }
-}
-
-// FUNCIONES DE NAVEGACIÓN
-function showProjectOverview() {
-    // Ocultar todas las secciones
-    hideAllSections();
-    
-    // Mostrar sección de proyecto
-    const projectSection = document.getElementById('project-overview-section');
-    if (projectSection) {
-        projectSection.style.display = 'block';
-    }
-    
-    // Cargar datos de overview del proyecto
-    loadProjectOverview();
-}
-
-function showTasksSection() {
-    hideAllSections();
-    
-    const tasksSection = document.getElementById('tasks-section');
-    if (tasksSection) {
-        tasksSection.style.display = 'block';
-    }
-    
-    // Recargar tareas si es necesario
-    loadTasks();
-}
-
-function showCloudSection() {
-    hideAllSections();
-    
-    const cloudSection = document.getElementById('cloud-section');
-    if (cloudSection) {
-        cloudSection.style.display = 'block';
-    }
-    
-    loadCloudFiles();
-}
-
-function showRequestsSection() {
-    hideAllSections();
-    
-    const requestsSection = document.getElementById('requests-section');
-    if (requestsSection) {
-        requestsSection.style.display = 'block';
-    }
-    
-    loadJoinRequests();
-}
-
-function showNotificationsSection() {
-    hideAllSections();
-    
-    const notificationsSection = document.getElementById('notifications-section');
-    if (notificationsSection) {
-        notificationsSection.style.display = 'block';
-    }
-    
-    loadNotifications();
-}
-
-function hideAllSections() {
-    const sections = [
-        'project-overview-section',
-        'tasks-section', 
-        'cloud-section',
-        'requests-section',
-        'notifications-section'
-    ];
-    
-    sections.forEach(sectionId => {
-        const section = document.getElementById(sectionId);
-        if (section) {
-            section.style.display = 'none';
-        }
-    });
-}
-
-// Obtener el ID del proyecto actual
-function getCurrentProjectId() {
-    // 1. Intentar obtener de la URL
-    const urlParams = new URLSearchParams(window.location.search);
-    let projectId = urlParams.get('project_id');
-    
-    // 2. Si no está en la URL, intentar obtener de sessionStorage
-    if (!projectId) {
-        projectId = sessionStorage.getItem('currentProjectId');
-    }
-    
-    // 3. Si aún no hay proyecto, mostrar error
-    if (!projectId) {
-        console.error('❌ No se pudo obtener el ID del proyecto');
-        return null;
-    }
-    
-    console.log('✅ Project ID obtenido:', projectId);
-    return projectId;
-}
-
-// CARGAR MIEMBROS DEL PROYECTO - VERSIÓN CORREGIDA
+// CARGAR MIEMBROS DEL PROYECTO - VERSIÓN ACTUALIZADA
 async function loadProjectMembers() {
     try {
         // PRIMERO: Obtener los user_ids de los miembros
@@ -347,8 +72,7 @@ async function loadProjectMembers() {
 
         if (!members || members.length === 0) {
             projectMembers = [];
-            updateMembersDropdown();
-            updateActiveUsers();
+            updateMembersUI();
             console.log('ℹ️ No hay miembros en este proyecto');
             return;
         }
@@ -382,8 +106,7 @@ async function loadProjectMembers() {
         });
 
         console.log('✅ Miembros combinados:', projectMembers);
-        updateMembersDropdown();
-        updateActiveUsers();
+        updateMembersUI();
         
     } catch (error) {
         console.error('Error loading project members:', error);
@@ -391,19 +114,13 @@ async function loadProjectMembers() {
     }
 }
 
-// Actualizar dropdown de asignación
-function updateMembersDropdown() {
-    const assigneeSelect = document.getElementById('task-assignee');
-    if (!assigneeSelect) return;
+// Actualizar UI de miembros (dropdown y avatares)
+function updateMembersUI() {
+    // Actualizar dropdown en el gestor de tareas
+    taskManager.updateMembersDropdown(projectMembers);
     
-    assigneeSelect.innerHTML = '<option value="">Seleccionar miembro</option>';
-    
-    projectMembers.forEach(member => {
-        const option = document.createElement('option');
-        option.value = member.user_id;
-        option.textContent = member.profiles.full_name || member.profiles.username;
-        assigneeSelect.appendChild(option);
-    });
+    // Actualizar usuarios activos en el chat
+    updateActiveUsers();
 }
 
 // Actualizar usuarios activos en el chat
@@ -433,7 +150,200 @@ function updateActiveUsers() {
     });
 }
 
-// CARGAR TAREAS - VERSIÓN CORREGIDA
+// Configurar event listeners - VERSIÓN ACTUALIZADA
+function setupEventListeners() {
+    // Botón para agregar tarea
+    const addTaskBtn = document.getElementById('btn-add-task');
+    if (addTaskBtn) {
+        addTaskBtn.addEventListener('click', openTaskModal);
+    }
+    
+    // Modal de tarea
+    const closeModalBtn = document.querySelector('.close-modal');
+    const cancelBtn = document.querySelector('.btn-cancel');
+    const taskForm = document.getElementById('task-form');
+    
+    if (closeModalBtn) closeModalBtn.addEventListener('click', closeTaskModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeTaskModal);
+    if (taskForm) taskForm.addEventListener('submit', handleTaskSubmit);
+    
+    // Modales de etiquetas
+    const tagModal = document.getElementById('tag-modal');
+    const closeTagModalBtn = tagModal?.querySelector('.close-modal');
+    const cancelTagBtn = tagModal?.querySelector('.btn-cancel');
+    
+    if (closeTagModalBtn) closeTagModalBtn.addEventListener('click', () => taskManager.closeTagModal());
+    if (cancelTagBtn) cancelTagBtn.addEventListener('click', () => taskManager.closeTagModal());
+    if (tagModal) {
+        tagModal.addEventListener('click', function(e) {
+            if (e.target === tagModal) {
+                taskManager.closeTagModal();
+            }
+        });
+    }
+
+    // Chat
+    const sendMessageBtn = document.getElementById('btn-send-message');
+    const messageInput = document.getElementById('message-input');
+    
+    if (sendMessageBtn) sendMessageBtn.addEventListener('click', sendMessage);
+    if (messageInput) {
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    }
+
+    // Cerrar modal al hacer click fuera
+    const modal = document.getElementById('task-modal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeTaskModal();
+            }
+        });
+    }
+
+    // Navegación entre pestañas
+    setupNavigationListeners();
+}
+
+// Modal functions - VERSIÓN ACTUALIZADA
+function openTaskModal() {
+    const modal = document.getElementById('task-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.getElementById('task-title').focus();
+        // Limpiar el formulario al abrir
+        taskManager.resetForm();
+    }
+}
+
+function closeTaskModal() {
+    const modal = document.getElementById('task-modal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.getElementById('task-form').reset();
+        taskManager.resetForm();
+    }
+}
+
+// Manejar envío de formulario de tarea - VERSIÓN COMPLETAMENTE ACTUALIZADA
+async function handleTaskSubmit(e) {
+    e.preventDefault();
+    
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    try {
+        // Mostrar estado de carga
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
+        submitBtn.disabled = true;
+        submitBtn.classList.add('btn-loading');
+        
+        const formData = new FormData(e.target);
+        
+        // Validar formulario usando el TaskManager
+        const validationErrors = taskManager.validateTaskForm(formData);
+        if (validationErrors.length > 0) {
+            taskManager.showValidationError(validationErrors[0]);
+            return;
+        }
+
+        // Obtener datos del formulario
+        const taskData = await taskManager.getTaskFormData(formData);
+        
+        // Crear la tarea con todas las relaciones
+        const task = await createTaskWithRelations(taskData);
+        
+        if (task) {
+            await loadTasks(); // Recargar tareas
+            closeTaskModal();
+            showSuccess('Tarea creada exitosamente');
+            
+            // Agregar al timeline
+            await addToTimeline(
+                currentProjectId, 
+                'task_created', 
+                `Nueva tarea creada: ${taskData.title}`, 
+                taskData.created_by, 
+                { 
+                    task_id: task.id, 
+                    task_title: taskData.title,
+                    assignees_count: taskData.assignees.length,
+                    tags_count: taskData.tags.length
+                }
+            );
+        }
+        
+    } catch (error) {
+        console.error('Error creating task:', error);
+        showError('Error al crear la tarea: ' + error.message);
+    } finally {
+        // Restaurar botón
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('btn-loading');
+    }
+}
+
+// Crear tarea con relaciones - NUEVA FUNCIÓN
+async function createTaskWithRelations(taskData) {
+    const { assignees, tags, ...taskMainData } = taskData;
+    
+    try {
+        // 1. Crear la tarea principal
+        const { data: task, error: taskError } = await supabase
+            .from('tasks')
+            .insert([taskMainData])
+            .select()
+            .single();
+
+        if (taskError) throw taskError;
+
+        console.log('✅ Tarea principal creada:', task);
+
+        // 2. Crear asignaciones múltiples si existen
+        if (assignees && assignees.length > 0) {
+            const assigneesData = assignees.map(userId => ({
+                task_id: task.id,
+                user_id: userId,
+                assigned_by: taskMainData.created_by
+            }));
+
+            const { error: assigneesError } = await supabase
+                .from('task_assignees')
+                .insert(assigneesData);
+
+            if (assigneesError) throw assigneesError;
+            console.log('✅ Asignaciones creadas:', assigneesData);
+        }
+
+        // 3. Agregar etiquetas si existen
+        if (tags && tags.length > 0) {
+            const tagsData = tags.map(tagId => ({
+                task_id: task.id,
+                tag_id: tagId
+            }));
+
+            const { error: tagsError } = await supabase
+                .from('task_tags')
+                .insert(tagsData);
+
+            if (tagsError) throw tagsError;
+            console.log('✅ Etiquetas agregadas:', tagsData);
+        }
+
+        return task;
+
+    } catch (error) {
+        console.error('Error creando tarea con relaciones:', error);
+        throw error;
+    }
+}
+
+// CARGAR TAREAS - VERSIÓN COMPLETAMENTE ACTUALIZADA
 async function loadTasks() {
     const tasksContainer = document.getElementById('tasks-container');
     if (!tasksContainer) return;
@@ -458,53 +368,85 @@ async function loadTasks() {
             return;
         }
 
-        // SEGUNDO: Obtener información de usuarios asignados
-        const assignedUserIds = tasks.map(task => task.assigned_to).filter(id => id);
-        const createdUserIds = tasks.map(task => task.created_by).filter(id => id);
-        const allUserIds = [...new Set([...assignedUserIds, ...createdUserIds])];
-
-        let userProfiles = {};
-        if (allUserIds.length > 0) {
-            const { data: profiles, error: profilesError } = await supabase
-                .from('profiles')
-                .select('id, username, full_name, avatar_url')
-                .in('id', allUserIds);
-
-            if (!profilesError && profiles) {
-                profiles.forEach(profile => {
-                    userProfiles[profile.id] = profile;
-                });
-                console.log('👤 Perfiles de tareas cargados:', userProfiles);
-            }
-        }
-
-        // TERCERO: Obtener contador de archivos adjuntos
+        // SEGUNDO: Obtener información relacionada en paralelo
         const taskIds = tasks.map(task => task.id);
-        let attachmentsCount = {};
         
-        if (taskIds.length > 0) {
-            const { data: attachments, error: attachmentsError } = await supabase
+        const [
+            { data: assignees, error: assigneesError },
+            { data: taskTags, error: tagsError },
+            { data: attachments, error: attachmentsError },
+            { data: userProfiles, error: profilesError }
+        ] = await Promise.all([
+            // Asignados
+            supabase
+                .from('task_assignees')
+                .select('task_id, user_id')
+                .in('task_id', taskIds),
+            
+            // Etiquetas
+            supabase
+                .from('task_tags')
+                .select('task_id, tags(id, name, color)')
+                .in('task_id', taskIds),
+            
+            // Archivos adjuntos
+            supabase
                 .from('task_attachments')
                 .select('task_id')
-                .in('task_id', taskIds);
+                .in('task_id', taskIds),
+            
+            // Perfiles de usuarios (para creadores y asignados)
+            supabase
+                .from('profiles')
+                .select('id, username, full_name, avatar_url')
+                .in('id', [...new Set([
+                    ...tasks.map(t => t.created_by),
+                    ...tasks.map(t => t.assigned_to).filter(id => id)
+                ])])
+        ]);
 
-            if (!attachmentsError && attachments) {
-                attachments.forEach(attachment => {
-                    attachmentsCount[attachment.task_id] = (attachmentsCount[attachment.task_id] || 0) + 1;
+        // Manejar errores de consultas relacionadas
+        if (assigneesError) console.error('Error cargando asignados:', assigneesError);
+        if (tagsError) console.error('Error cargando etiquetas:', tagsError);
+        if (attachmentsError) console.error('Error cargando adjuntos:', attachmentsError);
+        if (profilesError) console.error('Error cargando perfiles:', profilesError);
+
+        // TERCERO: Combinar toda la información
+        const tasksWithDetails = tasks.map(task => {
+            // Asignados múltiples
+            const taskAssignees = (assignees || [])
+                .filter(a => a.task_id === task.id)
+                .map(a => {
+                    const profile = (userProfiles || []).find(p => p.id === a.user_id);
+                    return profile || { id: a.user_id, username: 'Usuario', full_name: 'Usuario', avatar_url: null };
                 });
-                console.log('📎 Archivos adjuntos contados:', attachmentsCount);
-            }
-        }
 
-        // COMBINAR: Crear el objeto final de tareas
-        const tasksWithDetails = tasks.map(task => ({
-            ...task,
-            assigned_to: task.assigned_to ? userProfiles[task.assigned_to] : null,
-            created_by: task.created_by ? userProfiles[task.created_by] : null,
-            attachments: attachmentsCount[task.id] ? [{ count: attachmentsCount[task.id] }] : []
-        }));
+            // Etiquetas
+            const taskTagsData = (taskTags || [])
+                .filter(tt => tt.task_id === task.id)
+                .map(tt => tt.tags)
+                .filter(tag => tag); // Filtrar tags nulos
 
-        console.log('✅ Tareas combinadas:', tasksWithDetails);
+            // Archivos adjuntos
+            const taskAttachments = (attachments || [])
+                .filter(att => att.task_id === task.id);
+
+            // Creador
+            const creator = (userProfiles || []).find(p => p.id === task.created_by) || 
+                           { username: 'Usuario', full_name: 'Usuario', avatar_url: null };
+
+            return {
+                ...task,
+                assignees: taskAssignees,
+                tags: taskTagsData,
+                attachments: taskAttachments,
+                created_by: creator,
+                // Mantener compatibilidad con versión anterior
+                assigned_to: taskAssignees.length > 0 ? taskAssignees[0] : null
+            };
+        });
+
+        console.log('✅ Tareas combinadas con detalles:', tasksWithDetails);
         renderTasks(tasksWithDetails);
         
     } catch (error) {
@@ -519,7 +461,7 @@ async function loadTasks() {
     }
 }
 
-// Renderizar tareas en el HTML
+// Renderizar tareas en el HTML - VERSIÓN ACTUALIZADA
 function renderTasks(tasks) {
     const tasksContainer = document.getElementById('tasks-container');
     if (!tasksContainer) return;
@@ -544,25 +486,45 @@ function renderTasks(tasks) {
             
             ${task.description ? `<p class="task-description">${escapeHtml(task.description)}</p>` : ''}
             
+            <!-- Etiquetas -->
+            ${task.tags && task.tags.length > 0 ? `
+                <div class="task-tags">
+                    ${task.tags.map(tag => `
+                        <span class="task-tag" style="background-color: ${tag.color}">${tag.name}</span>
+                    `).join('')}
+                </div>
+            ` : ''}
+            
             <div class="task-meta">
-                <div class="task-assignee">
-                    ${task.assigned_to ? `
-                        <div class="assignee-info">
-                            <div class="assignee-avatar">
-                                ${task.assigned_to.avatar_url ? 
-                                    `<img src="${task.assigned_to.avatar_url}" alt="${task.assigned_to.full_name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : 
-                                    `<i class="fas fa-user"></i>`
-                                }
-                            </div>
-                            <span class="assignee-name">${task.assigned_to.full_name || task.assigned_to.username}</span>
+                <!-- Asignados múltiples -->
+                <div class="task-assignees">
+                    ${task.assignees && task.assignees.length > 0 ? `
+                        <div class="assignees-list">
+                            ${task.assignees.slice(0, 3).map(assignee => `
+                                <div class="assignee-avatar" title="${assignee.full_name || assignee.username}">
+                                    ${assignee.avatar_url ? 
+                                        `<img src="${assignee.avatar_url}" alt="${assignee.full_name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : 
+                                        `<i class="fas fa-user"></i>`
+                                    }
+                                </div>
+                            `).join('')}
+                            ${task.assignees.length > 3 ? `
+                                <div class="more-assignees">+${task.assignees.length - 3}</div>
+                            ` : ''}
                         </div>
                     ` : '<span class="no-assignee">Sin asignar</span>'}
                 </div>
                 
                 <div class="task-dates">
+                    ${task.estimated_hours ? `
+                        <div class="task-estimation">
+                            <i class="far fa-clock"></i>
+                            ${task.estimated_hours}h
+                        </div>
+                    ` : ''}
                     ${task.due_date ? `
                         <div class="task-due-date ${isOverdue(task.due_date, task.status) ? 'overdue' : ''}">
-                            <i class="far fa-clock"></i>
+                            <i class="far fa-calendar"></i>
                             ${formatDate(task.due_date)}
                         </div>
                     ` : ''}
@@ -575,7 +537,7 @@ function renderTasks(tasks) {
                 ${task.attachments && task.attachments.length > 0 ? `
                     <div class="task-attachments-indicator">
                         <i class="fas fa-paperclip"></i>
-                        <span>${task.attachments[0].count}</span>
+                        <span>${task.attachments.length}</span>
                     </div>
                 ` : ''}
                 
@@ -587,260 +549,8 @@ function renderTasks(tasks) {
     `).join('');
 }
 
-// Funciones auxiliares
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-function getPriorityLabel(priority) {
-    const labels = {
-        low: 'Baja',
-        medium: 'Media',
-        high: 'Alta',
-        urgent: 'Urgente'
-    };
-    return labels[priority] || priority;
-}
-
-function getStatusLabel(status) {
-    const labels = {
-        pending: 'Pendiente',
-        in_progress: 'En Progreso',
-        completed: 'Completada',
-        blocked: 'Bloqueada'
-    };
-    return labels[status] || status;
-}
-
-function formatDate(dateString) {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
-}
-
-function isOverdue(dueDate, status) {
-    if (status === 'completed') return false;
-    return new Date(dueDate) < new Date();
-}
-
-// Modal functions
-function openTaskModal() {
-    const modal = document.getElementById('task-modal');
-    if (modal) {
-        modal.style.display = 'flex';
-        document.getElementById('task-title').focus();
-    }
-}
-
-function closeTaskModal() {
-    const modal = document.getElementById('task-modal');
-    if (modal) {
-        modal.style.display = 'none';
-        document.getElementById('task-form').reset();
-    }
-}
-
-// Manejar envío de formulario de tarea
-async function handleTaskSubmit(e) {
-    e.preventDefault();
-    
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn.textContent;
-    
-    try {
-        // Mostrar estado de carga
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
-        submitBtn.disabled = true;
-        
-        const formData = new FormData(e.target);
-        const currentUser = (await supabase.auth.getUser()).data.user;
-        
-        if (!currentUser) {
-            throw new Error('Usuario no autenticado');
-        }
-        
-        const taskData = {
-            project_id: currentProjectId,
-            title: formData.get('title').trim(),
-            description: formData.get('description').trim(),
-            assigned_to: formData.get('assigned_to') || null,
-            priority: formData.get('priority'),
-            due_date: formData.get('due_date') || null,
-            created_by: currentUser.id,
-            status: 'pending'
-        };
-
-        const task = await createTask(taskData);
-        if (task) {
-            await loadTasks(); // Recargar tareas
-            closeTaskModal();
-            showSuccess('Tarea creada exitosamente');
-        }
-        
-    } catch (error) {
-        console.error('Error creating task:', error);
-        showError('Error al crear la tarea: ' + error.message);
-    } finally {
-        // Restaurar botón
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-    }
-}
-
-// Crear nueva tarea
-async function createTask(taskData) {
-    const { data, error } = await supabase
-        .from('tasks')
-        .insert([taskData])
-        .select()
-        .single();
-
-    if (error) throw error;
-
-    // Agregar al timeline de actividad
-    await addToTimeline(
-        taskData.project_id, 
-        'task_created', 
-        `Nueva tarea creada: ${taskData.title}`, 
-        taskData.created_by, 
-        { task_id: data.id, task_title: taskData.title }
-    );
-
-    return data;
-}
-
-// Agregar evento al timeline
-async function addToTimeline(projectId, actionType, description, performedBy, metadata = {}) {
-    try {
-        const { error } = await supabase
-            .from('project_timeline')
-            .insert([{
-                project_id: projectId,
-                action_type: actionType,
-                description: description,
-                performed_by: performedBy,
-                metadata: metadata
-            }]);
-
-        if (error) throw error;
-        
-    } catch (error) {
-        console.error('Error adding to timeline:', error);
-    }
-}
-
-// Mostrar opciones de tarea
-function showTaskOptions(taskId) {
-    // Implementar menú de opciones para tarea (editar, eliminar, etc.)
-    console.log('Mostrar opciones para tarea:', taskId);
-}
-
-// FUNCIONES PARA OTRAS SECCIONES
-async function loadProjectOverview() {
-    console.log('Cargando overview del proyecto...');
-    // Implementar carga de datos generales del proyecto
-}
-
-async function loadCloudFiles() {
-    console.log('Cargando archivos de la nube...');
-    // Implementar carga de archivos
-}
-
-async function loadJoinRequests() {
-    console.log('Cargando solicitudes de unión...');
-    // Implementar carga de solicitudes
-}
-
-async function loadNotifications() {
-    console.log('Cargando notificaciones...');
-    // Implementar carga de notificaciones
-}
-
-// Cargar mensajes del chat
-async function loadChatMessages() {
-    console.log('Cargando mensajes del chat...');
-    // Implementar carga de mensajes del chat
-}
-
-// Cargar actividad reciente
-async function loadRecentActivity() {
-    console.log('Cargando actividad reciente...');
-    // Implementar carga de actividad
-}
-
-// Enviar mensaje
-async function sendMessage() {
-    const messageInput = document.getElementById('message-input');
-    const message = messageInput.value.trim();
-    
-    if (!message) return;
-    
-    try {
-        const currentUser = (await supabase.auth.getUser()).data.user;
-        if (!currentUser) {
-            showError('Debes iniciar sesión para enviar mensajes');
-            return;
-        }
-        
-        const { error } = await supabase
-            .from('chat_messages')
-            .insert([{
-                project_id: currentProjectId,
-                sender_id: currentUser.id,
-                message: message
-            }]);
-            
-        if (error) throw error;
-        
-        // Limpiar input y recargar mensajes
-        messageInput.value = '';
-        await loadChatMessages();
-        
-    } catch (error) {
-        console.error('Error enviando mensaje:', error);
-        showError('Error al enviar el mensaje');
-    }
-}
-
-// Funciones de utilidad para mostrar mensajes
-function showError(message) {
-    // Implementar toast de error
-    console.error('Error:', message);
-    // Ejemplo simple de alerta
-    alert(`❌ ${message}`);
-}
-
-function showSuccess(message) {
-    // Implementar toast de éxito
-    console.log('Éxito:', message);
-    // Ejemplo simple de alerta
-    alert(`✅ ${message}`);
-}
-
 // Exportar funciones para uso global
 window.openTaskModal = openTaskModal;
 window.closeTaskModal = closeTaskModal;
 window.loadTasks = loadTasks;
 window.showTaskOptions = showTaskOptions;
-
-// ANIMACIÓN DEL NAV BAR (bola)
-function initBallScroll() {
-    const ball = document.querySelector('.ball');
-    if (!ball) return;
-
-    window.addEventListener('scroll', () => {
-        const scrollY = window.scrollY;
-        const moveDown = Math.min(scrollY * 0.3, 200);
-        ball.style.transform = `translateY(${moveDown}px)`;
-    });
-}
-
-// Inicializar animación cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', initBallScroll);
