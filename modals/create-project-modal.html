@@ -1,4 +1,4 @@
-<!-- Modal para crear nuevo proyecto - VERSIÓN COMPLETAMENTE CORREGIDA -->
+<!-- Modal para crear nuevo proyecto - VERSIÓN CORREGIDA -->
 <div id="createProjectModal" class="modal-overlay">
   <div class="modal-content">
     
@@ -112,6 +112,7 @@
             <small class="field-hint">La URL que identificará tu proyecto</small>
           </div>
 
+          <!-- CORRECCIÓN: Categoría principal con más opciones -->
           <div class="form-group">
             <label for="projectCategory">Categoría Principal</label>
             <select id="projectCategory">
@@ -124,6 +125,22 @@
               <option value="game-dev">Desarrollo de Juegos</option>
               <option value="research">Investigación</option>
               <option value="open-source">Open Source</option>
+              <option value="data-science">Ciencia de Datos</option>
+              <option value="cybersecurity">Ciberseguridad</option>
+              <option value="cloud-computing">Computación en la Nube</option>
+              <option value="robotics">Robótica</option>
+              <option value="ar-vr">Realidad Aumentada/Virtual</option>
+              <option value="fintech">Fintech</option>
+              <option value="edtech">Edtech</option>
+              <option value="healthtech">Healthtech</option>
+              <option value="ecommerce">E-commerce</option>
+              <option value="marketing-tech">Marketing Tech</option>
+              <option value="productivity">Productividad</option>
+              <option value="social-network">Red Social</option>
+              <option value="iot">Internet de las Cosas</option>
+              <option value="automation">Automatización</option>
+              <option value="dev-tools">Herramientas de Desarrollo</option>
+              <option value="other">Otro</option>
             </select>
           </div>
 
@@ -160,118 +177,146 @@
         </div>
       </div>
 
-  <!-- Paso 3: Equipo y Colaboración - VERSIÓN CORREGIDA -->
-<div class="form-step" data-step="3">
-  <div class="step-header">
-    <h3>Construye tu Equipo</h3>
-    <p>Invita colaboradores y define los roles necesarios.</p>
-  </div>
+      <!-- Paso 3: Equipo y Colaboración - VERSIÓN CORREGIDA -->
+      <div class="form-step" data-step="3">
+        <div class="step-header">
+          <h3>Construye tu Equipo</h3>
+          <p>Invita colaboradores y define los roles necesarios.</p>
+        </div>
 
-  <div class="team-form">
-    <!-- 🔥 BUSCADOR DE USUARIOS CORREGIDO -->
-    <div class="form-group">
-      <label for="userSearchInput">Agregar miembros al equipo</label>
-      <div class="user-search-container">
-        <div class="search-input-wrapper">
-          <input 
-            type="text" 
-            id="userSearchInput" 
-            class="user-search-input" 
-            placeholder="Buscar usuarios por @username..."
-            autocomplete="off"
-          >
-          <div class="search-icon">
-            <i class="fas fa-search"></i>
+        <div class="team-form">
+          <!-- Buscador de usuarios -->
+          <div class="form-group">
+            <label for="userSearchInput">Agregar miembros al equipo</label>
+            <div class="user-search-container">
+              <div class="search-input-wrapper">
+                <input 
+                  type="text" 
+                  id="userSearchInput" 
+                  class="user-search-input" 
+                  placeholder="Buscar usuarios por @username..."
+                  autocomplete="off"
+                >
+                <div class="search-icon">
+                  <i class="fas fa-search"></i>
+                </div>
+              </div>
+              <div class="search-results" id="userSearchResults" style="display: none;"></div>
+            </div>
+            <small class="field-hint">Escribe @ seguido del nombre de usuario para buscar en la base de datos</small>
+          </div>
+
+          <!-- Miembros agregados -->
+          <div class="form-group">
+            <label>Miembros del equipo</label>
+            <div class="selected-members" id="selectedMembers">
+              <div class="member-card owner">
+                <div class="member-avatar">
+                  <i class="fas fa-crown"></i>
+                </div>
+                <div class="member-info">
+                  <span class="member-name">Tú (Creador)</span>
+                  <span class="member-role">Fundador/Owner</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CORRECCIÓN: Opción para buscar colaboradores -->
+          <div class="form-group">
+            <label>¿Buscas colaboradores?</label>
+            <div class="collaboration-toggle">
+              <label class="toggle-option">
+                <input type="radio" name="looking-collaborators" value="yes">
+                <span>Sí</span>
+              </label>
+              <label class="toggle-option">
+                <input type="radio" name="looking-collaborators" value="no" checked>
+                <span>No</span>
+              </label>
+            </div>
+            <small class="field-hint">Indica si estás buscando personas para unirse a tu proyecto</small>
+          </div>
+
+          <!-- Sección condicional para roles buscados -->
+          <div class="collaboration-section" id="collaborationSection" style="display: none;">
+            <div class="form-group">
+              <label>Roles que estás buscando</label>
+              <div class="roles-needed">
+                <div class="role-tags"></div>
+                <select class="role-select" id="roleSelect">
+                  <option value="">Selecciona un rol...</option>
+                  <option value="frontend">Frontend Developer</option>
+                  <option value="backend">Backend Developer</option>
+                  <option value="fullstack">Full Stack Developer</option>
+                  <option value="ui-ux">UI/UX Designer</option>
+                  <option value="devops">DevOps Engineer</option>
+                  <option value="data-scientist">Data Scientist</option>
+                  <option value="product-manager">Product Manager</option>
+                  <option value="qa">QA Tester</option>
+                  <option value="mobile">Mobile Developer</option>
+                  <option value="ai-engineer">AI Engineer</option>
+                  <option value="blockchain-dev">Blockchain Developer</option>
+                  <option value="security">Security Specialist</option>
+                  <option value="data-engineer">Data Engineer</option>
+                  <option value="cloud-architect">Cloud Architect</option>
+                  <option value="technical-writer">Technical Writer</option>
+                  <option value="marketing">Marketing Specialist</option>
+                  <option value="business-dev">Business Development</option>
+                  <option value="other-role">Otro</option>
+                </select>
+              </div>
+              <small class="field-hint">Especifica los roles que necesitas</small>
+            </div>
+
+            <div class="collaboration-settings">
+              <div class="form-group">
+                <label>Modo de Colaboración</label>
+                <div class="collaboration-options">
+                  <label class="option-card">
+                    <input type="radio" name="collaboration-mode" value="remote" checked>
+                    <i class="fas fa-laptop"></i>
+                    <span>Remoto</span>
+                  </label>
+                  <label class="option-card">
+                    <input type="radio" name="collaboration-mode" value="hybrid">
+                    <i class="fas fa-balance-scale"></i>
+                    <span>Híbrido</span>
+                  </label>
+                  <label class="option-card">
+                    <input type="radio" name="collaboration-mode" value="in-person">
+                    <i class="fas fa-building"></i>
+                    <span>Presencial</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Compromiso Temporal</label>
+                <div class="commitment-options">
+                  <label class="option-card">
+                    <input type="radio" name="time-commitment" value="part-time" checked>
+                    <i class="fas fa-clock"></i>
+                    <span>Part-time</span>
+                  </label>
+                  <label class="option-card">
+                    <input type="radio" name="time-commitment" value="full-time">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Full-time</span>
+                  </label>
+                  <label class="option-card">
+                    <input type="radio" name="time-commitment" value="freelance">
+                    <i class="fas fa-calendar"></i>
+                    <span>Freelance</span>
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="search-results" id="userSearchResults" style="display: none;"></div>
-      </div>
-      <small class="field-hint">Escribe @ seguido del nombre de usuario para buscar en la base de datos</small>
-    </div>
-
-    <!-- 🔥 MIEMBROS AGREGADOS CORREGIDO -->
-    <div class="form-group">
-      <label>Miembros del equipo</label>
-      <div class="selected-members" id="selectedMembers">
-        <div class="member-card owner">
-          <div class="member-avatar">
-            <i class="fas fa-crown"></i>
-          </div>
-          <div class="member-info">
-            <span class="member-name">Tú (Creador)</span>
-            <span class="member-role">Fundador/Owner</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Roles buscados -->
-    <div class="form-group">
-      <label>Roles que estás buscando</label>
-      <div class="roles-needed">
-        <div class="role-tags"></div>
-        <select class="role-select" id="roleSelect">
-          <option value="">Selecciona un rol...</option>
-          <option value="frontend">Frontend Developer</option>
-          <option value="backend">Backend Developer</option>
-          <option value="fullstack">Full Stack Developer</option>
-          <option value="ui-ux">UI/UX Designer</option>
-          <option value="devops">DevOps Engineer</option>
-          <option value="data-scientist">Data Scientist</option>
-          <option value="product-manager">Product Manager</option>
-          <option value="qa">QA Tester</option>
-        </select>
-      </div>
-      <small class="field-hint">Especifica los roles que necesitas</small>
-    </div>
-
-    <div class="collaboration-settings">
-      <div class="form-group">
-        <label>Modo de Colaboración</label>
-        <div class="collaboration-options">
-          <label class="option-card">
-            <input type="radio" name="collaboration-mode" value="remote" checked>
-            <i class="fas fa-laptop"></i>
-            <span>Remoto</span>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="collaboration-mode" value="hybrid">
-            <i class="fas fa-balance-scale"></i>
-            <span>Híbrido</span>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="collaboration-mode" value="in-person">
-            <i class="fas fa-building"></i>
-            <span>Presencial</span>
-          </label>
-        </div>
       </div>
 
-      <div class="form-group">
-        <label>Compromiso Temporal</label>
-        <div class="commitment-options">
-          <label class="option-card">
-            <input type="radio" name="time-commitment" value="part-time" checked>
-            <i class="fas fa-clock"></i>
-            <span>Part-time</span>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="time-commitment" value="full-time">
-            <i class="fas fa-briefcase"></i>
-            <span>Full-time</span>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="time-commitment" value="freelance">
-            <i class="fas fa-calendar"></i>
-            <span>Freelance</span>
-          </label>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-      <!-- Paso 4: Stack Tecnológico -->
+      <!-- Paso 4: Stack Tecnológico - VERSIÓN CORREGIDA -->
       <div class="form-step" data-step="4">
         <div class="step-header">
           <h3>Stack Tecnológico</h3>
@@ -279,8 +324,23 @@
         </div>
 
         <div class="technology-form">
-          <!-- Tecnologías actuales -->
+          <!-- CORRECCIÓN: Opción para indicar si no se usan tecnologías -->
           <div class="form-group">
+            <label>¿Usas tecnologías actualmente?</label>
+            <div class="tech-toggle">
+              <label class="toggle-option">
+                <input type="radio" name="using-technologies" value="yes" checked>
+                <span>Sí</span>
+              </label>
+              <label class="toggle-option">
+                <input type="radio" name="using-technologies" value="no">
+                <span>No uso tecnologías aún</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Tecnologías actuales (se muestra solo si se selecciona "Sí") -->
+          <div class="form-group" id="currentTechSection">
             <label>Tecnologías que usas actualmente</label>
             <div class="tech-input-container">
               <div class="selected-technologies"></div>
@@ -298,6 +358,27 @@
               <input type="text" id="desiredTechInput" class="desired-tech-input" placeholder="Tecnologías que quieres aprender...">
             </div>
             <small class="field-hint">Tecnologías que te interesa aprender o implementar</small>
+          </div>
+
+          <!-- CORRECCIÓN: Galería de imágenes/videos -->
+          <div class="form-group">
+            <label>Galería del Proyecto</label>
+            <div class="gallery-upload">
+              <div class="gallery-preview" id="galleryPreview">
+                <div class="gallery-placeholder">
+                  <i class="fas fa-images"></i>
+                  <p>Agrega imágenes o videos de tu proyecto</p>
+                  <small>Arrastra archivos o haz clic para subir</small>
+                </div>
+              </div>
+              <div class="gallery-controls">
+                <button type="button" class="btn-upload-gallery">
+                  <i class="fas fa-plus"></i> Agregar archivos
+                </button>
+                <input type="file" id="galleryUpload" multiple accept="image/*,video/*" style="display: none;">
+              </div>
+            </div>
+            <small class="field-hint">Muestra imágenes o videos que ilustren tu proyecto</small>
           </div>
 
           <!-- Nivel de expertise -->
@@ -460,32 +541,30 @@
           </div>
         </div>
       </div>
-
     </div>
 
-<div class="modal-footer">
-  <div class="navigation-buttons">
-    <!-- Botón Anterior - oculto inicialmente -->
-    <button class="btn btn-secondary btn-hidden" id="prevStep">
-      <i class="fas fa-arrow-left"></i> Anterior
-    </button>
-    
-    <!-- Indicador de pasos -->
-    <div class="step-indicators">
-      <span class="current-step">Paso 1 de 5</span>
+    <div class="modal-footer">
+      <div class="navigation-buttons">
+        <!-- Botón Anterior - oculto inicialmente -->
+        <button class="btn btn-secondary btn-hidden" id="prevStep">
+          <i class="fas fa-arrow-left"></i> Anterior
+        </button>
+        
+        <!-- Indicador de pasos -->
+        <div class="step-indicators">
+          <span class="current-step">Paso 1 de 5</span>
+        </div>
+        
+        <!-- Botón Siguiente - visible inicialmente -->
+        <button class="btn btn-primary btn-visible" id="nextStep">
+          Siguiente <i class="fas fa-arrow-right"></i>
+        </button>
+        
+        <!-- Botón Crear Proyecto - oculto inicialmente -->
+        <button class="btn btn-success btn-hidden" id="createProject">
+          <i class="fas fa-rocket"></i> Crear Proyecto
+        </button>
+      </div>
     </div>
-    
-    <!-- Botón Siguiente - visible inicialmente -->
-    <button class="btn btn-primary btn-visible" id="nextStep">
-      Siguiente <i class="fas fa-arrow-right"></i>
-    </button>
-    
-    <!-- Botón Crear Proyecto - oculto inicialmente -->
-    <button class="btn btn-success btn-hidden" id="createProject">
-      <i class="fas fa-rocket"></i> Crear Proyecto
-    </button>
-  </div>
-</div>
-
   </div>
 </div>

@@ -1,4 +1,4 @@
-// create-project-modal.js - VERSIÓN COMPLETA CON BUSCADOR DE USUARIOS
+// create-project-modal.js - VERSIÓN CORREGIDA PARA EL HTML ACTUALIZADO
 class CreateProjectModal {
     constructor() {
         console.log('🔄 CreateProjectModal constructor ejecutándose...');
@@ -29,12 +29,14 @@ class CreateProjectModal {
                 members: [],
                 rolesNeeded: [],
                 collaborationMode: 'remote',
-                timeCommitment: 'part-time'
+                timeCommitment: 'part-time',
+                lookingCollaborators: false // 🔥 NUEVO: Para controlar si busca colaboradores
             },
             technology: {
                 currentStack: [],
                 desiredTech: [],
-                expertiseLevel: 'intermediate'
+                expertiseLevel: 'intermediate',
+                usingTechnologies: true // 🔥 NUEVO: Para controlar si usa tecnologías
             },
             configuration: {
                 activeButtons: ['join-team', 'contact-team'],
@@ -46,7 +48,8 @@ class CreateProjectModal {
                 visibility: 'public',
                 license: 'open-source',
                 needsFunding: false
-            }
+            },
+            gallery: [] // 🔥 NUEVO: Para almacenar archivos de la galería
         };
         
         setTimeout(() => {
@@ -211,22 +214,40 @@ class CreateProjectModal {
             });
         });
 
-        // Roles necesarios
+        // 🔥 NUEVO: Opción para buscar colaboradores
+        const collaboratorRadios = document.querySelectorAll('input[name="looking-collaborators"]');
+        collaboratorRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                this.projectData.team.lookingCollaborators = (e.target.value === 'yes');
+                this.toggleCollaborationSection(this.projectData.team.lookingCollaborators);
+            });
+        });
+
+        // Roles necesarios (solo si se busca colaboradores)
         const roleSelect = document.getElementById('roleSelect');
         if (roleSelect) {
             roleSelect.addEventListener('change', (e) => {
-                if (e.target.value) {
+                if (e.target.value && this.projectData.team.lookingCollaborators) {
                     this.addRole(e.target.value);
                     e.target.value = '';
                 }
             });
         }
 
-        // Tecnologías actuales
+        // 🔥 NUEVO: Opción para usar tecnologías
+        const techRadios = document.querySelectorAll('input[name="using-technologies"]');
+        techRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                this.projectData.technology.usingTechnologies = (e.target.value === 'yes');
+                this.toggleCurrentTechSection(this.projectData.technology.usingTechnologies);
+            });
+        });
+
+        // Tecnologías actuales (solo si se usan tecnologías)
         const techSearchInput = document.getElementById('techSearchInput');
         if (techSearchInput) {
             techSearchInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && e.target.value.trim()) {
+                if (e.key === 'Enter' && e.target.value.trim() && this.projectData.technology.usingTechnologies) {
                     e.preventDefault();
                     this.addCurrentTech(e.target.value.trim());
                     e.target.value = '';
@@ -243,6 +264,19 @@ class CreateProjectModal {
                     this.addDesiredTech(e.target.value.trim());
                     e.target.value = '';
                 }
+            });
+        }
+
+        // 🔥 NUEVO: Galería de imágenes/videos
+        const galleryUploadBtn = document.querySelector('.btn-upload-gallery');
+        const galleryUploadInput = document.getElementById('galleryUpload');
+        if (galleryUploadBtn && galleryUploadInput) {
+            galleryUploadBtn.addEventListener('click', () => {
+                galleryUploadInput.click();
+            });
+            
+            galleryUploadInput.addEventListener('change', (e) => {
+                this.handleGalleryFiles(e.target.files);
             });
         }
 
@@ -336,6 +370,109 @@ class CreateProjectModal {
         this.initUserSearch();
 
         console.log('✅ Funcionalidades del formulario inicializadas');
+    }
+
+    // 🔥 NUEVAS FUNCIONES PARA LAS SECCIONES CONDICIONALES
+    toggleCollaborationSection(show) {
+        const collaborationSection = document.getElementById('collaborationSection');
+        if (collaborationSection) {
+            collaborationSection.style.display = show ? 'block' : 'none';
+        }
+    }
+
+    toggleCurrentTechSection(show) {
+        const currentTechSection = document.getElementById('currentTechSection');
+        if (currentTechSection) {
+            currentTechSection.style.display = show ? 'block' : 'none';
+        }
+    }
+
+    // 🔥 NUEVA FUNCIÓN PARA MANEJAR LA GALERÍA
+    handleGalleryFiles(files) {
+        if (!files || files.length === 0) return;
+
+        const maxFiles = 10;
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'video/webm'];
+
+        if (this.projectData.gallery.length + files.length > maxFiles) {
+            this.showNotification(`Máximo ${maxFiles} archivos permitidos en la galería`, 'warning');
+            return;
+        }
+
+        Array.from(files).forEach(file => {
+            if (!allowedTypes.includes(file.type)) {
+                this.showNotification(`Tipo de archivo no permitido: ${file.name}`, 'error');
+                return;
+            }
+
+            if (file.size > maxSize) {
+                this.showNotification(`Archivo demasiado grande: ${file.name} (máximo 10MB)`, 'error');
+                return;
+            }
+
+            // Agregar a la galería
+            this.projectData.gallery.push({
+                file: file,
+                type: file.type.startsWith('image/') ? 'image' : 'video',
+                name: file.name,
+                size: file.size
+            });
+
+            this.updateGalleryPreview();
+        });
+
+        this.showNotification(`${files.length} archivo(s) agregado(s) a la galería`, 'success');
+    }
+
+    updateGalleryPreview() {
+        const galleryPreview = document.getElementById('galleryPreview');
+        if (!galleryPreview) return;
+
+        if (this.projectData.gallery.length === 0) {
+            galleryPreview.innerHTML = `
+                <div class="gallery-placeholder">
+                    <i class="fas fa-images"></i>
+                    <p>Agrega imágenes o videos de tu proyecto</p>
+                    <small>Arrastra archivos o haz clic para subir</small>
+                </div>
+            `;
+            return;
+        }
+
+        const previewHTML = this.projectData.gallery.map((item, index) => `
+            <div class="gallery-item">
+                ${item.type === 'image' ? 
+                    `<img src="${URL.createObjectURL(item.file)}" alt="${item.name}">` :
+                    `<video controls>
+                        <source src="${URL.createObjectURL(item.file)}" type="${item.file.type}">
+                        Tu navegador no soporta el elemento video.
+                    </video>`
+                }
+                <button type="button" class="remove-gallery-item" data-index="${index}">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `).join('');
+
+        galleryPreview.innerHTML = previewHTML;
+
+        // Agregar eventos para eliminar items
+        const removeButtons = galleryPreview.querySelectorAll('.remove-gallery-item');
+        removeButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const index = parseInt(e.target.closest('.remove-gallery-item').dataset.index);
+                this.removeGalleryItem(index);
+            });
+        });
+    }
+
+    removeGalleryItem(index) {
+        if (index >= 0 && index < this.projectData.gallery.length) {
+            const removedItem = this.projectData.gallery.splice(index, 1)[0];
+            this.updateGalleryPreview();
+            this.showNotification(`Archivo "${removedItem.name}" eliminado`, 'info');
+        }
     }
 
     // 🔥 FUNCIONES PARA EL BUSCADOR DE USUARIOS
@@ -635,7 +772,17 @@ class CreateProjectModal {
             'devops': 'DevOps Engineer',
             'data-scientist': 'Data Scientist',
             'product-manager': 'Product Manager',
-            'qa': 'QA Tester'
+            'qa': 'QA Tester',
+            'mobile': 'Mobile Developer',
+            'ai-engineer': 'AI Engineer',
+            'blockchain-dev': 'Blockchain Developer',
+            'security': 'Security Specialist',
+            'data-engineer': 'Data Engineer',
+            'cloud-architect': 'Cloud Architect',
+            'technical-writer': 'Technical Writer',
+            'marketing': 'Marketing Specialist',
+            'business-dev': 'Business Development',
+            'other-role': 'Otro'
         };
         return roleNames[roleKey] || roleKey;
     }
@@ -1255,7 +1402,18 @@ class CreateProjectModal {
                 }
             }
             
-            // 🔥 3. Preparar datos para la tabla 'projects'
+            // 🔥 3. Subir archivos de la galería si existen
+            let galleryUrls = [];
+            if (this.projectData.gallery.length > 0) {
+                try {
+                    galleryUrls = await this.uploadGalleryFiles();
+                } catch (error) {
+                    console.error('Error subiendo archivos de la galería:', error);
+                    this.showNotification('Error al subir algunos archivos de la galería. Continuando...', 'warning');
+                }
+            }
+            
+            // 🔥 4. Preparar datos para la tabla 'projects'
             const projectData = {
                 // Portada
                 title: this.projectData.cover.title,
@@ -1275,10 +1433,14 @@ class CreateProjectModal {
                 // Equipo
                 collaboration_mode: this.projectData.team.collaborationMode,
                 time_commitment: this.projectData.team.timeCommitment,
+                looking_collaborators: this.projectData.team.lookingCollaborators, // 🔥 NUEVO
                 
                 // Tecnologías
-                technologies: this.projectData.technology.currentStack,
+                technologies: this.projectData.technology.usingTechnologies ? this.projectData.technology.currentStack : [], // 🔥 MODIFICADO
                 expertise_level: this.projectData.technology.expertiseLevel,
+                
+                // Galería
+                gallery_files: galleryUrls, // 🔥 NUEVO
                 
                 // Configuración
                 active_buttons: this.projectData.configuration.activeButtons,
@@ -1293,7 +1455,7 @@ class CreateProjectModal {
             
             console.log('📦 Datos listos para Supabase:', projectData);
             
-            // 🔥 4. GUARDAR PROYECTO PRINCIPAL
+            // 🔥 5. GUARDAR PROYECTO PRINCIPAL
             const { data: project, error: projectError } = await window.supabase
                 .from('projects')
                 .insert([projectData])
@@ -1314,8 +1476,8 @@ class CreateProjectModal {
 
             console.log('✅ Proyecto guardado en Supabase:', project);
             
-            // 🔥 5. Guardar roles necesarios (si existen)
-            if (this.projectData.team.rolesNeeded.length > 0) {
+            // 🔥 6. Guardar roles necesarios (si existen y se buscan colaboradores)
+            if (this.projectData.team.lookingCollaborators && this.projectData.team.rolesNeeded.length > 0) {
                 try {
                     await this.saveProjectRoles(project.id);
                 } catch (error) {
@@ -1324,7 +1486,7 @@ class CreateProjectModal {
                 }
             }
             
-            // 🔥 6. Guardar tecnologías deseadas (si existen)
+            // 🔥 7. Guardar tecnologías deseadas (si existen)
             if (this.projectData.technology.desiredTech.length > 0) {
                 try {
                     await this.saveDesiredTechnologies(project.id);
@@ -1350,6 +1512,50 @@ class CreateProjectModal {
             console.error('Error creando proyecto:', error);
             this.showNotification(error.message, 'error');
         }
+    }
+
+    // 🔥 NUEVA FUNCIÓN: Subir archivos de la galería
+    async uploadGalleryFiles() {
+        if (this.projectData.gallery.length === 0) {
+            return [];
+        }
+
+        const uploadedUrls = [];
+        
+        for (const galleryItem of this.projectData.gallery) {
+            try {
+                const fileExt = galleryItem.file.name.split('.').pop();
+                const fileName = `gallery_${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+                const filePath = `project-gallery/${fileName}`;
+
+                const { data, error } = await window.supabase.storage
+                    .from('project-gallery')
+                    .upload(filePath, galleryItem.file, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+
+                if (error) {
+                    console.error(`Error subiendo archivo ${galleryItem.name}:`, error);
+                    continue; // Continuar con el siguiente archivo
+                }
+
+                const { data: { publicUrl } } = window.supabase.storage
+                    .from('project-gallery')
+                    .getPublicUrl(filePath);
+
+                uploadedUrls.push({
+                    url: publicUrl,
+                    type: galleryItem.type,
+                    name: galleryItem.name
+                });
+
+            } catch (error) {
+                console.error(`Error procesando archivo ${galleryItem.name}:`, error);
+            }
+        }
+
+        return uploadedUrls;
     }
 
     // 🔥 FUNCIÓN PARA GUARDAR ROLES NECESARIOS
@@ -1481,15 +1687,27 @@ class CreateProjectModal {
         this.projectData = {
             cover: { image: null, imageFile: null, title: '', subtitle: '', status: 'planning' },
             identity: { name: '', slug: '', category: '', tags: [], description: '', solution: '', usp: [] },
-            team: { members: [], rolesNeeded: [], collaborationMode: 'remote', timeCommitment: 'part-time' },
-            technology: { currentStack: [], desiredTech: [], expertiseLevel: 'intermediate' },
+            team: { 
+                members: [], 
+                rolesNeeded: [], 
+                collaborationMode: 'remote', 
+                timeCommitment: 'part-time',
+                lookingCollaborators: false // 🔥 NUEVO
+            },
+            technology: { 
+                currentStack: [], 
+                desiredTech: [], 
+                expertiseLevel: 'intermediate',
+                usingTechnologies: true // 🔥 NUEVO
+            },
             configuration: { 
                 activeButtons: ['join-team', 'contact-team'],
                 socialLinks: { github: '', linkedin: '', website: '' },
                 visibility: 'public',
                 license: 'open-source',
                 needsFunding: false
-            }
+            },
+            gallery: [] // 🔥 NUEVO
         };
         
         // 🔥 RESETEAR LA BANDERA DE EDICIÓN MANUAL DEL SLUG
@@ -1522,11 +1740,16 @@ class CreateProjectModal {
             imagePlaceholder.style.display = 'flex';
         }
         
+        // 🔥 RESETEAR SECCIONES CONDICIONALES
+        this.toggleCollaborationSection(false);
+        this.toggleCurrentTechSection(true);
+        
         // Limpiar otros inputs y displays
         this.updateTagsDisplay();
         this.updateRolesDisplay();
         this.updateCurrentTechDisplay();
         this.updateDesiredTechDisplay();
+        this.updateGalleryPreview();
         
         // 🔥 LIMPIAR BUSCADOR DE USUARIOS
         this.clearSearchInput();
@@ -1545,16 +1768,16 @@ class CreateProjectModal {
             }
         });
         
+        // Restablecer radios por defecto
+        const defaultRadios = document.querySelectorAll('input[value="remote"], input[value="part-time"], input[value="intermediate"], input[value="yes"][name="using-technologies"], input[value="no"][name="looking-collaborators"]');
+        defaultRadios.forEach(radio => {
+            radio.checked = true;
+        });
+        
         // Restablecer checkboxes por defecto
         const defaultCheckboxes = document.querySelectorAll('input[name="join-team"], input[name="contact-team"]');
         defaultCheckboxes.forEach(checkbox => {
             checkbox.checked = true;
-        });
-        
-        // Restablecer radios por defecto
-        const defaultRadios = document.querySelectorAll('input[value="remote"], input[value="part-time"], input[value="intermediate"]');
-        defaultRadios.forEach(radio => {
-            radio.checked = true;
         });
     }
 
@@ -1648,6 +1871,40 @@ const errorStyles = `
 
 .slug-invalid {
     color: #ef4444;
+}
+
+.gallery-item {
+    position: relative;
+    display: inline-block;
+    margin: 5px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.gallery-item img, .gallery-item video {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+.remove-gallery-item {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(239, 68, 68, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.collaboration-section, #currentTechSection {
+    transition: all 0.3s ease;
 }
 `;
 

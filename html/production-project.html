@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Producción | Proyecto 301</title>
+
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/production-project.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="icon" type="image/svg+xml" href="assets/logos/icon.svg">
+
+  <!-- CDN de Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="production-page">
+  <!-- Navbar placeholder -->
+  <div id="navbar-placeholder"></div>
+  <div class="ball"></div>
+
+  <!-- Contenido Principal -->
+  <main class="production-dashboard">
+    
+    <!-- Contenedor Principal dividido en 3 partes -->
+    <div class="dashboard-container">
+      
+      <!-- Div 1: Header de Navegación -->
+      <div class="dashboard-header-section">
+        <header class="project-navigation-header">
+          <div class="nav-container">
+            <!-- Barra de Navegación Horizontal -->
+            <nav class="project-nav">
+              <a class="nav-item">
+                <span>MI PROYECTO</span>
+              </a>
+              <a class="nav-item active">
+                <span>TAREAS</span>
+              </a>
+              <a class="nav-item">
+                <span>NUBE</span>
+              </a>
+              <a class="nav-item">
+                <span>SOLICITUDES</span>
+              </a>
+              <a class="nav-item">
+                <span>NOTIFICACIONES</span>
+              </a>
+            </nav>
+          </div>
+        </header>
+      </div>
+
+      <!-- Div 2: Contenido Principal (Columnas 1 y 2) -->
+      <div class="dashboard-content-section">
+        
+        <!-- Grid de Columnas (Tareas + Actividad/Calendario) -->
+        <div class="dashboard-columns-grid">
+          
+          <!-- Columna 1 - Tareas -->
+          <section class="dashboard-column tasks-column">
+            <div class="column-header">
+              <h2><i class="fas fa-tasks"></i> Tareas Próximas</h2>
+              <button class="btn-add-task" title="Agregar nueva tarea" id="btn-add-task">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+            
+            <div class="tasks-scroll-container">
+              <div class="tasks-container" id="tasks-container">
+                <!-- Las tareas se cargarán dinámicamente aquí -->
+                <div class="loading-tasks">
+                  <i class="fas fa-spinner fa-spin"></i>
+                  <span>Cargando tareas...</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Columna 2 - Actividad Reciente -->
+          <section class="dashboard-column activity-column">
+            <div class="column-header">
+              <h2><i class="fas fa-history"></i> Actividad Reciente</h2>
+            </div>
+            <div class="activity-container" id="activity-container">
+              <!-- La actividad se cargará dinámicamente aquí -->
+              <div class="loading-activity">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span>Cargando actividad...</span>
+              </div>
+            </div>
+          </section>
+         
+        </div> <!-- Fin del dashboard-columns-grid -->
+      </div> <!-- Fin del dashboard-content-section -->
+    </div> <!-- Fin del dashboard-container -->
+
+    <!-- Modal para crear nueva tarea -->
+    <div id="task-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Crear Nueva Tarea</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <form id="task-form" class="modal-body">
+          <div class="form-group">
+            <label for="task-title">Título</label>
+            <input type="text" id="task-title" name="title" required>
+          </div>
+          <div class="form-group">
+            <label for="task-description">Descripción</label>
+            <textarea id="task-description" name="description" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="task-assignee">Asignar a</label>
+            <select id="task-assignee" name="assigned_to">
+              <option value="">Seleccionar miembro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="task-priority">Prioridad</label>
+            <select id="task-priority" name="priority" required>
+              <option value="low">Baja</option>
+              <option value="medium" selected>Media</option>
+              <option value="high">Alta</option>
+              <option value="urgent">Urgente</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="task-due-date">Fecha límite</label>
+            <input type="datetime-local" id="task-due-date" name="due_date">
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-cancel">Cancelar</button>
+            <button type="submit" class="btn-primary">Crear Tarea</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Div 3: Chat General Fijo -->
+    <section class="chat-column">
+      <div class="chat-section">
+        <div class="chat-header">
+          <div class="chat-info">
+            <h2><i class="fas fa-comments"></i> Chat General</h2>
+            <div class="active-users">
+              <span class="users-count" id="active-users-count">Cargando miembros...</span>
+              <div class="users-avatars" id="users-avatars">
+                <!-- Los avatares se cargarán dinámicamente -->
+              </div>
+            </div>
+          </div>
+          <button class="btn-chat-settings" title="Configuración del chat">
+            <i class="fas fa-cog"></i>
+          </button>
+        </div>
+        
+        <div class="messages-container" id="messages-container">
+          <!-- Los mensajes se cargarán dinámicamente aquí -->
+          <div class="loading-messages">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>Cargando mensajes...</span>
+          </div>
+        </div>
+        
+        <div class="message-input-container">
+          <button class="btn-attach" title="Adjuntar archivo" id="btn-attach-file">
+            <i class="fas fa-paperclip"></i>
+          </button>
+          <div class="input-wrapper">
+            <input type="text" placeholder="Escribe un mensaje..." class="message-input" id="message-input">
+            <button class="btn-emoji" title="Insertar emoji" id="btn-emoji">
+              <i class="fas fa-smile"></i>
+            </button>
+          </div>
+          <button class="btn-send" title="Enviar mensaje" id="btn-send-message">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Scripts -->
+  <script src="/js/supabase-client.js" defer></script>
+  <script src="/js/i18n.js" defer></script>
+  <script src="/js/main.js" defer></script>
+  <script src="/js/load-navbar.js" defer></script>
+  <script src="/js/production-tasks.js" defer></script>
+  <script src="/js/production-dashboard.js" defer></script>
+</body>
+</html>

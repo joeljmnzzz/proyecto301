@@ -1,4 +1,4 @@
-// project-details.js - CON SISTEMA DE VISTAS INTEGRADO
+// project-details.js - CON SISTEMA DE VISTAS INTEGRADO Y REDIRECCIÓN A PRODUCCIÓN
 class ProjectDetailsLoader {
     constructor() {
         this.projectSlug = this.getSlugFromURL();
@@ -65,7 +65,15 @@ class ProjectDetailsLoader {
             console.log('✅ Proyecto cargado:', project);
             console.log('👥 Miembros del proyecto:', project.project_members);
 
-            // ✅ NUEVO: REGISTRAR VISTA DEL PROYECTO
+            // ✅ NUEVO: VERIFICAR SI EL USUARIO ES MIEMBRO DEL PROYECTO
+            const isMember = await this.checkIfUserIsMember(project.id);
+            if (isMember) {
+                console.log('🎯 Usuario es miembro, redirigiendo a dashboard de producción...');
+                this.redirectToProductionDashboard(project.id, project.slug);
+                return; // Detener ejecución aquí - no cargar la vista pública
+            }
+
+            // ✅ NUEVO: REGISTRAR VISTA DEL PROYECTO (solo si no es miembro)
             await this.registerProjectView(project.id);
 
             // ✅ Cargar información de usuarios por separado si hay miembros
@@ -73,7 +81,7 @@ class ProjectDetailsLoader {
                 await this.loadUsersInfo(project.project_members);
             }
 
-            // Actualizar la interfaz
+            // Actualizar la interfaz (solo para no miembros)
             this.updateUI();
             this.showContent();
 
@@ -86,6 +94,54 @@ class ProjectDetailsLoader {
                 window.universalSpinner.hide();
             }
         }
+    }
+
+    // ✅ NUEVO MÉTODO: Verificar si el usuario actual es miembro del proyecto
+    async checkIfUserIsMember(projectId) {
+        try {
+            // Obtener usuario actual
+            const { data: { user }, error: authError } = await window.supabase.auth.getUser();
+            
+            if (authError || !user) {
+                console.log('🔐 Usuario no autenticado - no es miembro');
+                return false;
+            }
+
+            console.log('👤 Usuario autenticado:', user.id);
+
+            // Verificar si el usuario es miembro del proyecto
+            const { data: membership, error } = await window.supabase
+                .from('project_members')
+                .select('id, role, is_active')
+                .eq('project_id', projectId)
+                .eq('user_id', user.id)
+                .eq('is_active', true)
+                .single();
+
+            if (error) {
+                console.log('ℹ️ Usuario no es miembro del proyecto:', error.message);
+                return false;
+            }
+
+            console.log('✅ Usuario es miembro del proyecto:', membership);
+            return true;
+
+        } catch (error) {
+            console.warn('⚠️ Error verificando membresía:', error);
+            return false;
+        }
+    }
+
+    // ✅ NUEVO MÉTODO: Redirigir al dashboard de producción
+    redirectToProductionDashboard(projectId, projectSlug) {
+        // Guardar el projectId en sessionStorage para usarlo en la página de producción
+        sessionStorage.setItem('currentProjectId', projectId);
+        sessionStorage.setItem('currentProjectSlug', projectSlug);
+        
+        // Redirigir a la página de producción
+        const productionUrl = `/produccion/proyecto.html?project_id=${projectId}&slug=${projectSlug}`;
+        console.log('🚀 Redirigiendo a:', productionUrl);
+        window.location.href = productionUrl;
     }
 
     // ✅ NUEVO MÉTODO: Registrar vista del proyecto
@@ -192,6 +248,43 @@ class ProjectDetailsLoader {
         // Actualizar título de la página
         if (project.title) {
             document.title = `${project.title} | Proyecto 301`;
+        }
+
+        // ✅ NUEVO: Mostrar botón de acceso para miembros
+        this.showMemberAccessButton();
+    }
+
+    // ✅ NUEVO: Mostrar botón de acceso para miembros
+    showMemberAccessButton() {
+        const memberAccessSection = document.getElementById('member-access-section');
+        if (!memberAccessSection) return;
+
+        memberAccessSection.style.display = 'block';
+        
+        const accessButton = document.getElementById('member-access-button');
+        if (accessButton) {
+            accessButton.addEventListener('click', async () => {
+                try {
+                    // Verificar autenticación
+                    const { data: { user }, error: authError } = await window.supabase.auth.getUser();
+                    
+                    if (authError || !user) {
+                        alert('⚠️ Debes iniciar sesión para acceder al dashboard del proyecto');
+                        return;
+                    }
+
+                    // Verificar membresía
+                    const isMember = await this.checkIfUserIsMember(this.currentProject.id);
+                    if (isMember) {
+                        this.redirectToProductionDashboard(this.currentProject.id, this.currentProject.slug);
+                    } else {
+                        alert('❌ No eres miembro de este proyecto. Solicita unirte al equipo.');
+                    }
+                } catch (error) {
+                    console.error('Error verificando acceso:', error);
+                    alert('Error al verificar acceso al proyecto');
+                }
+            });
         }
     }
 
