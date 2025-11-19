@@ -302,12 +302,12 @@
 
 .assignee-name {
     font-size: 0.85rem;
-    color: #333;
+    color: var(--texto-primario);
 }
 
 .no-assignee {
     font-size: 0.85rem;
-    color: #999;
+    color: var(--texto-secundario);
     font-style: italic;
 }
 
@@ -322,11 +322,11 @@
     align-items: center;
     gap: 0.25rem;
     font-size: 0.85rem;
-    color: #666;
+    color: var(--texto-secundario);
 }
 
 .task-due-date.overdue {
-    color: #dc3545;
+    color: var(--color-peligro);
     font-weight: 500;
 }
 
@@ -352,48 +352,53 @@
 }
 
 .task-status-badge.pending {
-    background: #fff3cd;
-    color: #856404;
+    background: rgba(255, 193, 7, 0.2);
+    color: var(--color-advertencia);
+    border: 1px solid rgba(255, 193, 7, 0.3);
 }
 
 .task-status-badge.in_progress {
-    background: #cce7ff;
-    color: #004085;
+    background: rgba(0, 123, 255, 0.2);
+    color: var(--color-info);
+    border: 1px solid rgba(0, 123, 255, 0.3);
 }
 
 .task-status-badge.completed {
-    background: #d4edda;
-    color: #155724;
+    background: rgba(40, 167, 69, 0.2);
+    color: var(--color-exito);
+    border: 1px solid rgba(40, 167, 69, 0.3);
 }
 
 .task-status-badge.blocked {
-    background: #f8d7da;
-    color: #721c24;
+    background: rgba(220, 53, 69, 0.2);
+    color: var(--color-peligro);
+    border: 1px solid rgba(220, 53, 69, 0.3);
 }
 
 .task-attachments-indicator {
     display: flex;
     align-items: center;
     gap: 0.25rem;
-    color: #666;
+    color: var(--texto-secundario);
     font-size: 0.85rem;
 }
 
 .btn-task-options {
     background: none;
     border: none;
-    color: #666;
+    color: var(--texto-secundario);
     cursor: pointer;
     padding: 0.25rem;
     border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.3s ease;
 }
 
 .btn-task-options:hover {
-    background: #f8f9fa;
-    color: #333;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--texto-primario);
 }
 
 /* Badges de prioridad */
@@ -406,23 +411,27 @@
 }
 
 .task-priority-badge.low {
-    background: #d4edda;
-    color: #155724;
+    background: rgba(40, 167, 69, 0.2);
+    color: var(--color-exito);
+    border: 1px solid rgba(40, 167, 69, 0.3);
 }
 
 .task-priority-badge.medium {
-    background: #fff3cd;
-    color: #856404;
+    background: rgba(255, 193, 7, 0.2);
+    color: var(--color-advertencia);
+    border: 1px solid rgba(255, 193, 7, 0.3);
 }
 
 .task-priority-badge.high {
-    background: #ffe5d0;
+    background: rgba(253, 126, 20, 0.2);
     color: #fd7e14;
+    border: 1px solid rgba(253, 126, 20, 0.3);
 }
 
 .task-priority-badge.urgent {
-    background: #f8d7da;
-    color: #721c24;
+    background: rgba(220, 53, 69, 0.2);
+    color: var(--color-peligro);
+    border: 1px solid rgba(220, 53, 69, 0.3);
 }
 
 /* Acciones de tarea */
@@ -490,7 +499,7 @@
 .loading-activity {
     text-align: center;
     padding: 2rem;
-    color: #666;
+    color: var(--texto-secundario);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -500,7 +509,7 @@
 .empty-state {
     text-align: center;
     padding: 3rem 1rem;
-    color: #666;
+    color: var(--texto-secundario);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -510,13 +519,14 @@
 .empty-state i {
     font-size: 3rem;
     margin-bottom: 1rem;
-    color: #ccc;
+    color: var(--texto-secundario);
+    opacity: 0.5;
 }
 
 .error-message {
     text-align: center;
     padding: 2rem;
-    color: #dc3545;
+    color: var(--color-peligro);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -524,20 +534,22 @@
 }
 
 .btn-retry {
-    background: #007bff;
+    background: var(--color-acento);
     color: white;
     border: none;
     padding: 0.5rem 1rem;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
     font-family: inherit;
+    transition: all 0.3s ease;
 }
 
 .btn-retry:hover {
-    background: #0056b3;
+    background: var(--texto-destacado);
+    transform: translateY(-1px);
 }
 
-/* === MODAL === */
+/* === MODAL MEJORADO - COMBINA CON EL ESTILO DE LA PÁGINA === */
 .modal {
     display: none;
     position: fixed;
@@ -545,25 +557,40 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
     z-index: 1000;
     align-items: center;
     justify-content: center;
+    padding: 1rem;
 }
 
 .modal-content {
-    background: white;
-    border-radius: 8px;
+    background: var(--fondo-tarjeta);
+    border: 1px solid var(--borde-tarjeta);
+    border-radius: 20px;
     width: 90%;
     max-width: 500px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .modal-header {
-    padding: 1.5rem;
-    border-bottom: 1px solid #eee;
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--borde-tarjeta);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -571,8 +598,13 @@
 
 .modal-header h3 {
     margin: 0;
-    color: #333;
+    color: var(--texto-primario);
     font-family: inherit;
+    font-size: 1.3rem;
+    font-weight: 700;
+    background: var(--color-acento);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .close-modal {
@@ -580,12 +612,19 @@
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #666;
+    color: var(--texto-secundario);
     font-family: inherit;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .close-modal:hover {
-    color: #333;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--texto-primario);
 }
 
 .modal-body {
@@ -593,72 +632,105 @@
 }
 
 .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    color: #333;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    color: var(--texto-primario);
     font-family: inherit;
+    font-size: 0.95rem;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
     width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 0.9rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--borde-tarjeta);
+    border-radius: 12px;
+    font-size: 0.95rem;
     box-sizing: border-box;
     font-family: inherit;
+    background: var(--fondo-tarjeta-hover);
+    color: var(--texto-primario);
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-acento);
+    box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
+    background: var(--fondo-tarjeta);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: var(--texto-secundario);
+    opacity: 0.7;
 }
 
 .form-group textarea {
     resize: vertical;
-    min-height: 80px;
+    min-height: 100px;
+    line-height: 1.5;
 }
 
 .form-actions {
     display: flex;
     gap: 1rem;
     justify-content: flex-end;
-    margin-top: 1.5rem;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--borde-tarjeta);
 }
 
 .btn-cancel {
-    background: #6c757d;
-    color: white;
-    border: none;
+    background: transparent;
+    color: var(--texto-secundario);
+    border: 1px solid var(--borde-tarjeta);
     padding: 0.75rem 1.5rem;
-    border-radius: 4px;
+    border-radius: 12px;
     cursor: pointer;
     font-family: inherit;
+    font-weight: 500;
+    transition: all 0.3s ease;
 }
 
 .btn-cancel:hover {
-    background: #545b62;
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--texto-secundario);
+    color: var(--texto-primario);
 }
 
 .btn-primary {
-    background: #007bff;
+    background: var(--color-acento);
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
-    border-radius: 4px;
+    border-radius: 12px;
     cursor: pointer;
     font-family: inherit;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(106, 17, 203, 0.3);
 }
 
 .btn-primary:hover {
-    background: #0056b3;
+    background: linear-gradient(135deg, var(--color-acento) 0%, var(--texto-destacado) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(106, 17, 203, 0.4);
 }
 
 .btn-primary:disabled {
-    background: #6c757d;
+    background: var(--texto-secundario);
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 /* === CHAT === */
