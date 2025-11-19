@@ -1,5 +1,4 @@
-
-// Manejo de tareas para Proyecto301 - VERSIÓN MEJORADA
+// production-project.js - VERSIÓN CORREGIDA CON CONSULTAS SEPARADAS
 
 // Variables globales
 let currentProjectId = null;
@@ -51,7 +50,7 @@ async function initializeDashboard() {
     }
 }
 
-// ✅ NUEVO: Verificar acceso al proyecto
+// Verificar acceso al proyecto
 async function verifyProjectAccess(projectId) {
     try {
         const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -84,7 +83,7 @@ async function verifyProjectAccess(projectId) {
     }
 }
 
-// ✅ NUEVO: Cargar datos del proyecto
+// Cargar datos del proyecto
 async function loadProjectData() {
     try {
         const { data: project, error } = await supabase
@@ -104,7 +103,7 @@ async function loadProjectData() {
     }
 }
 
-// ✅ NUEVO: Actualizar UI con datos del proyecto
+// Actualizar UI con datos del proyecto
 function updateProjectUI() {
     if (!currentProjectData) return;
 
@@ -115,7 +114,7 @@ function updateProjectUI() {
     updateActiveNavigation();
 }
 
-// ✅ NUEVO: Actualizar navegación activa
+// Actualizar navegación activa
 function updateActiveNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
     const currentPath = window.location.pathname;
@@ -174,11 +173,11 @@ function setupEventListeners() {
         });
     }
 
-    // ✅ NUEVO: Navegación entre pestañas
+    // Navegación entre pestañas
     setupNavigationListeners();
 }
 
-// ✅ NUEVO: Configurar listeners de navegación
+// Configurar listeners de navegación
 function setupNavigationListeners() {
     const navItems = document.querySelectorAll('.nav-item');
     
@@ -201,7 +200,7 @@ function setupNavigationListeners() {
     });
 }
 
-// ✅ NUEVO: Manejar navegación entre pestañas
+// Manejar navegación entre pestañas
 function handleNavigation(navType) {
     console.log('Navegando a:', navType);
     
@@ -231,7 +230,7 @@ function handleNavigation(navType) {
     }
 }
 
-// ✅ NUEVAS FUNCIONES DE NAVEGACIÓN
+// FUNCIONES DE NAVEGACIÓN
 function showProjectOverview() {
     // Ocultar todas las secciones
     hideAllSections();
@@ -329,22 +328,60 @@ function getCurrentProjectId() {
     return projectId;
 }
 
-// Cargar miembros del proyecto
+// CARGAR MIEMBROS DEL PROYECTO - VERSIÓN CORREGIDA
 async function loadProjectMembers() {
     try {
-        const { data, error } = await supabase
+        // PRIMERO: Obtener los user_ids de los miembros
+        const { data: members, error: membersError } = await supabase
             .from('project_members')
-            .select(`
-                user_id,
-                role,
-                profiles!inner(full_name, avatar_url, username)
-            `)
+            .select('user_id, role')
             .eq('project_id', currentProjectId)
             .eq('is_active', true);
 
-        if (error) throw error;
+        if (membersError) {
+            console.error('Error cargando miembros:', membersError);
+            throw membersError;
+        }
 
-        projectMembers = data || [];
+        console.log('👥 Miembros encontrados:', members);
+
+        if (!members || members.length === 0) {
+            projectMembers = [];
+            updateMembersDropdown();
+            updateActiveUsers();
+            console.log('ℹ️ No hay miembros en este proyecto');
+            return;
+        }
+
+        // SEGUNDO: Obtener información de perfiles por separado
+        const userIds = members.map(member => member.user_id);
+        const { data: profiles, error: profilesError } = await supabase
+            .from('profiles')
+            .select('id, username, full_name, avatar_url')
+            .in('id', userIds);
+
+        if (profilesError) {
+            console.error('Error cargando perfiles:', profilesError);
+            throw profilesError;
+        }
+
+        console.log('👤 Perfiles cargados:', profiles);
+
+        // COMBINAR: Unir la información de miembros con perfiles
+        projectMembers = members.map(member => {
+            const profile = profiles?.find(p => p.id === member.user_id);
+            return {
+                user_id: member.user_id,
+                role: member.role,
+                profiles: profile || { 
+                    username: 'Usuario', 
+                    full_name: 'Usuario', 
+                    avatar_url: null 
+                }
+            };
+        });
+
+        console.log('✅ Miembros combinados:', projectMembers);
         updateMembersDropdown();
         updateActiveUsers();
         
@@ -396,26 +433,79 @@ function updateActiveUsers() {
     });
 }
 
-// Cargar tareas
+// CARGAR TAREAS - VERSIÓN CORREGIDA
 async function loadTasks() {
     const tasksContainer = document.getElementById('tasks-container');
     if (!tasksContainer) return;
     
     try {
-        const { data: tasks, error } = await supabase
+        // PRIMERO: Obtener las tareas básicas
+        const { data: tasks, error: tasksError } = await supabase
             .from('tasks')
-            .select(`
-                *,
-                assigned_to:profiles!tasks_assigned_to_fkey(full_name, avatar_url, username),
-                created_by:profiles!tasks_created_by_fkey(full_name, avatar_url, username),
-                attachments:task_attachments(count)
-            `)
+            .select('*')
             .eq('project_id', currentProjectId)
             .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        if (tasksError) {
+            console.error('Error cargando tareas:', tasksError);
+            throw tasksError;
+        }
 
-        renderTasks(tasks || []);
+        console.log('📋 Tareas encontradas:', tasks);
+
+        if (!tasks || tasks.length === 0) {
+            renderTasks([]);
+            return;
+        }
+
+        // SEGUNDO: Obtener información de usuarios asignados
+        const assignedUserIds = tasks.map(task => task.assigned_to).filter(id => id);
+        const createdUserIds = tasks.map(task => task.created_by).filter(id => id);
+        const allUserIds = [...new Set([...assignedUserIds, ...createdUserIds])];
+
+        let userProfiles = {};
+        if (allUserIds.length > 0) {
+            const { data: profiles, error: profilesError } = await supabase
+                .from('profiles')
+                .select('id, username, full_name, avatar_url')
+                .in('id', allUserIds);
+
+            if (!profilesError && profiles) {
+                profiles.forEach(profile => {
+                    userProfiles[profile.id] = profile;
+                });
+                console.log('👤 Perfiles de tareas cargados:', userProfiles);
+            }
+        }
+
+        // TERCERO: Obtener contador de archivos adjuntos
+        const taskIds = tasks.map(task => task.id);
+        let attachmentsCount = {};
+        
+        if (taskIds.length > 0) {
+            const { data: attachments, error: attachmentsError } = await supabase
+                .from('task_attachments')
+                .select('task_id')
+                .in('task_id', taskIds);
+
+            if (!attachmentsError && attachments) {
+                attachments.forEach(attachment => {
+                    attachmentsCount[attachment.task_id] = (attachmentsCount[attachment.task_id] || 0) + 1;
+                });
+                console.log('📎 Archivos adjuntos contados:', attachmentsCount);
+            }
+        }
+
+        // COMBINAR: Crear el objeto final de tareas
+        const tasksWithDetails = tasks.map(task => ({
+            ...task,
+            assigned_to: task.assigned_to ? userProfiles[task.assigned_to] : null,
+            created_by: task.created_by ? userProfiles[task.created_by] : null,
+            attachments: attachmentsCount[task.id] ? [{ count: attachmentsCount[task.id] }] : []
+        }));
+
+        console.log('✅ Tareas combinadas:', tasksWithDetails);
+        renderTasks(tasksWithDetails);
         
     } catch (error) {
         console.error('Error loading tasks:', error);
@@ -460,7 +550,7 @@ function renderTasks(tasks) {
                         <div class="assignee-info">
                             <div class="assignee-avatar">
                                 ${task.assigned_to.avatar_url ? 
-                                    `<img src="${task.assigned_to.avatar_url}" alt="${task.assigned_to.full_name}">` : 
+                                    `<img src="${task.assigned_to.avatar_url}" alt="${task.assigned_to.full_name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : 
                                     `<i class="fas fa-user"></i>`
                                 }
                             </div>
@@ -485,7 +575,7 @@ function renderTasks(tasks) {
                 ${task.attachments && task.attachments.length > 0 ? `
                     <div class="task-attachments-indicator">
                         <i class="fas fa-paperclip"></i>
-                        <span>${task.attachments.length}</span>
+                        <span>${task.attachments[0].count}</span>
                     </div>
                 ` : ''}
                 
@@ -652,7 +742,7 @@ function showTaskOptions(taskId) {
     console.log('Mostrar opciones para tarea:', taskId);
 }
 
-// ✅ NUEVAS FUNCIONES PARA OTRAS SECCIONES
+// FUNCIONES PARA OTRAS SECCIONES
 async function loadProjectOverview() {
     console.log('Cargando overview del proyecto...');
     // Implementar carga de datos generales del proyecto
@@ -739,3 +829,18 @@ window.openTaskModal = openTaskModal;
 window.closeTaskModal = closeTaskModal;
 window.loadTasks = loadTasks;
 window.showTaskOptions = showTaskOptions;
+
+// ANIMACIÓN DEL NAV BAR (bola)
+function initBallScroll() {
+    const ball = document.querySelector('.ball');
+    if (!ball) return;
+
+    window.addEventListener('scroll', () => {
+        const scrollY = window.scrollY;
+        const moveDown = Math.min(scrollY * 0.3, 200);
+        ball.style.transform = `translateY(${moveDown}px)`;
+    });
+}
+
+// Inicializar animación cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', initBallScroll);
